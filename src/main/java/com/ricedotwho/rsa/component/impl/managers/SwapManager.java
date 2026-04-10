@@ -5,7 +5,9 @@ import com.ricedotwho.rsa.IMixin.IMultiPlayerGameMode;
 import com.ricedotwho.rsm.data.Rotation;
 import com.ricedotwho.rsm.utils.ItemUtils;
 import com.ricedotwho.rsm.utils.RotationUtils;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Queue;
 import java.util.function.Predicate;
 import net.minecraft.util.Hand;
 import net.minecraft.item.Item;
@@ -31,10 +33,17 @@ public class SwapManager {
    private static int lastSentServerSlot;
    private static boolean swappedThisTick = false;
    private static int requireSwap = -1;
+   private static final Queue<Packet<?>> pendingC08Packets = new ArrayDeque<>();
+   private static int currentTick = 0;
+   private static int lastC08Tick = Integer.MIN_VALUE;
+   private static int lastSwapTick = Integer.MIN_VALUE;
+   private static boolean flushingQueuedC08 = false;
 
    public static void onPreTickStart() {
+      currentTick++;
       swappedThisTick = false;
       requireSwap = -1;
+      flushQueuedC08();
    }
 
    public static boolean onPostSendPacket(Packet<?> packet) {
@@ -43,10 +52,22 @@ public class SwapManager {
             swappedThisTick = true;
             serverSlot = slotPacket.getSelectedSlot();
             lastSentServerSlot = slotPacket.getSelectedSlot();
+            lastSwapTick = currentTick;
             return true;
          } else {
             RSA.chat("Prevented packet 0 tick swap! This shouldn't happen, tell hyper!");
             return false;
+         }
+      } else if (isC08Packet(packet)) {
+         if (flushingQueuedC08) {
+            lastC08Tick = currentTick;
+            return true;
+         } else if (!pendingC08Packets.isEmpty() || lastC08Tick == currentTick || lastSwapTick == currentTick) {
+            pendingC08Packets.add(packet);
+            return false;
+         } else {
+            lastC08Tick = currentTick;
+            return true;
          }
       } else {
          return true;
@@ -56,6 +77,34 @@ public class SwapManager {
    public static void onHandleLogin() {
       serverSlot = 0;
       lastSentServerSlot = 0;
+      pendingC08Packets.clear();
+      lastC08Tick = Integer.MIN_VALUE;
+      lastSwapTick = Integer.MIN_VALUE;
+      flushingQueuedC08 = false;
+   }
+
+   private static boolean isC08Packet(Packet<?> packet) {
+      return packet instanceof PlayerInteractItemC2SPacket || packet instanceof PlayerInteractBlockC2SPacket;
+   }
+
+   private static void flushQueuedC08() {
+      MinecraftClient client = MinecraftClient.getInstance();
+      if (pendingC08Packets.isEmpty() || lastC08Tick == currentTick || lastSwapTick == currentTick || client.getNetworkHandler() == null) {
+         return;
+      }
+
+      Packet<?> packet = pendingC08Packets.poll();
+      if (packet == null) {
+         return;
+      }
+
+      flushingQueuedC08 = true;
+
+      try {
+         client.getNetworkHandler().sendPacket(packet);
+      } finally {
+         flushingQueuedC08 = false;
+      }
    }
 
    public static boolean onEnsureHasSentCarriedItem(int managerServerSlot) {

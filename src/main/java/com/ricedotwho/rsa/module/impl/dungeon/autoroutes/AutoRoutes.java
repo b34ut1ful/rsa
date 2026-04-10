@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.ricedotwho.rsa.RSA;
 import com.ricedotwho.rsa.component.impl.pathfinding.Goal;
 import com.ricedotwho.rsa.component.impl.pathfinding.GoalDungeonXYZ;
+import com.ricedotwho.rsa.screen.DungeonRouteMapScreen;
 import com.ricedotwho.rsa.module.impl.dungeon.DynamicRoutes;
 import com.ricedotwho.rsa.module.impl.dungeon.autoroutes.awaits.AwaitClick;
 import com.ricedotwho.rsa.module.impl.dungeon.autoroutes.awaits.AwaitSecrets;
@@ -78,6 +79,7 @@ public class AutoRoutes extends Module implements Accessor {
    private final KeybindSetting triggerBind = new KeybindSetting("Trigger Bind", new Keybind(0, true, this::onTrigger));
    private final KeybindSetting addBlockBind = new KeybindSetting("Add Block Bind", new Keybind(59, false, this::addBlockToInNode));
    private final KeybindSetting routeStartBind = new KeybindSetting("Route to start Bind", new Keybind(257, false, this::routeToStart));
+   private final KeybindSetting fullScreenMapBind = new KeybindSetting("Fullscreen Map Bind", new Keybind(-1, false, this::openFullscreenMap));
    private final DefaultGroupSetting render = new DefaultGroupSetting("Render", this);
    private static final BooleanSetting startDepth = new BooleanSetting("Start Depth", false);
    private static final BooleanSetting nodeDepth = new BooleanSetting("Node Depth", true);
@@ -129,7 +131,16 @@ public class AutoRoutes extends Module implements Accessor {
    public AutoRoutes() {
       this.registerProperty(
          new Setting[]{
-            this.editMode, centerOnly, zeroTickBreak, use1_8Height, this.triggerBind, this.addBlockBind, this.routeStartBind, this.data, this.render
+            this.editMode,
+            centerOnly,
+            zeroTickBreak,
+            use1_8Height,
+            this.triggerBind,
+            this.addBlockBind,
+            this.routeStartBind,
+            this.fullScreenMapBind,
+            this.data,
+            this.render
          }
       );
       this.render.add(new Setting[]{startDepth, nodeDepth, startColour, etherwarpColour, breakColour, boomColour, batColour, aotvColour});
@@ -496,33 +507,108 @@ public class AutoRoutes extends Module implements Accessor {
    }
 
    private void routeToStart() {
-      if (mc.player != null && !this.hasGuiOpen()) {
-         if (Location.getArea().is(Island.Dungeon) && !Dungeon.isInBoss() && !this.activeNodes.isEmpty()) {
-            Room currentRoom = Map.getCurrentRoom();
-            if (currentRoom != null && this.activeNodes.containsKey(currentRoom.getData())) {
-               BlockPos startPos = mc.player.getBlockPos().down();
-               Node closestStart = this.activeNodes
-                  .get(currentRoom.getData())
-                  .stream()
-                  .filter(Node::isStart)
-                  .min(Comparator.comparingDouble(n -> n.getRealPos().squaredDistanceTo(startPos.toCenterPos())))
-                  .orElse(null);
-               if (closestStart == null) {
-                  RSA.chat("Couldn't find a start node.");
-               } else {
-                  Pos goalPos = closestStart.getRealPos();
-                  Goal goal = GoalDungeonXYZ.create(goalPos.asBlockPos().down(goalPos.y % 1.0 == 0.0 ? 1 : 0));
-                  DynamicRoutes dynamicRoutes = (DynamicRoutes)RSM.getModule(DynamicRoutes.class);
-                  if (!dynamicRoutes.isEnabled()) {
-                     RSA.chat("Couldn't use dynamic routes (disabled).");
-                  } else {
-                     dynamicRoutes.cancelPathing();
-                     dynamicRoutes.executePath(startPos, goal);
-                  }
-               }
-            }
-         }
+      if (mc.player == null || this.hasGuiOpen()) {
+         return;
       }
+
+      Room currentRoom = Map.getCurrentRoom();
+      if (currentRoom != null) {
+         this.routeToRoomStart(currentRoom.getUniqueRoom());
+      }
+   }
+
+   private void openFullscreenMap() {
+      if (mc.player == null || this.hasGuiOpen()) {
+         return;
+      }
+
+      if (!Location.getArea().is(Island.Dungeon) || Dungeon.isInBoss()) {
+         RSA.chat("You must be in a dungeon room to open the route map.");
+         return;
+      }
+
+      mc.setScreen(new DungeonRouteMapScreen(this));
+   }
+
+   public boolean routeToRoomStart(UniqueRoom uniqueRoom) {
+      if (mc.player == null) {
+         return false;
+      }
+
+      if (!Location.getArea().is(Island.Dungeon) || Dungeon.isInBoss()) {
+         RSA.chat("You must be in a dungeon room to route.");
+         return false;
+      }
+
+      if (uniqueRoom == null || uniqueRoom.getMainRoom() == null) {
+         RSA.chat("That room is not loaded yet.");
+         return false;
+      }
+
+      Node closestStart = this.findClosestStartNode(uniqueRoom);
+      if (closestStart == null) {
+         RSA.chat("Couldn't find a start node for %s.", uniqueRoom.getName());
+         return false;
+      }
+
+      DynamicRoutes dynamicRoutes = (DynamicRoutes)RSM.getModule(DynamicRoutes.class);
+      if (!dynamicRoutes.isEnabled()) {
+         RSA.chat("Couldn't use dynamic routes (disabled).");
+         return false;
+      }
+
+      Pos goalPos = closestStart.getRealPos();
+      Goal goal = GoalDungeonXYZ.create(goalPos.asBlockPos().down(goalPos.y % 1.0 == 0.0 ? 1 : 0));
+      if (goal == null) {
+         return false;
+      }
+
+      BlockPos startPos = mc.player.getBlockPos().down();
+      dynamicRoutes.cancelPathing();
+      dynamicRoutes.executePath(startPos, goal);
+      RSA.chat("Routing to %s start.", uniqueRoom.getName());
+      return true;
+   }
+
+   public boolean hasStartNode(UniqueRoom uniqueRoom) {
+      return this.findRoomNodes(uniqueRoom).stream().anyMatch(Node::isStart);
+   }
+
+   private Node findClosestStartNode(UniqueRoom uniqueRoom) {
+      if (mc.player == null) {
+         return null;
+      }
+
+      BlockPos startPos = mc.player.getBlockPos().down();
+      return this.findRoomNodes(uniqueRoom)
+         .stream()
+         .filter(Node::isStart)
+         .min(Comparator.comparingDouble(n -> n.getRealPos().squaredDistanceTo(startPos.toCenterPos())))
+         .orElse(null);
+   }
+
+   private List<Node> findRoomNodes(UniqueRoom uniqueRoom) {
+      if (uniqueRoom == null || uniqueRoom.getMainRoom() == null) {
+         return List.of();
+      }
+
+      RoomData roomData = uniqueRoom.getMainRoom().getData();
+      if (roomData == null) {
+         return List.of();
+      }
+
+      List<Node> nodes = this.activeNodes.get(roomData);
+      if (nodes == null || nodes.isEmpty()) {
+         nodes = this.getSavedNodes().get(roomData.name());
+         if (nodes == null || nodes.isEmpty()) {
+            return List.of();
+         }
+
+         this.activeNodes.put(roomData, nodes);
+      }
+
+      nodes.forEach(n -> n.calculate(uniqueRoom));
+      return nodes;
    }
 
    public void save() {
@@ -601,6 +687,10 @@ public class AutoRoutes extends Module implements Accessor {
 
    public KeybindSetting getRouteStartBind() {
       return this.routeStartBind;
+   }
+
+   public KeybindSetting getFullScreenMapBind() {
+      return this.fullScreenMapBind;
    }
 
    public DefaultGroupSetting getRender() {

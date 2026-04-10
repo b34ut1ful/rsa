@@ -31,8 +31,11 @@ import com.ricedotwho.rsm.utils.FileUtils;
 import com.ricedotwho.rsm.utils.ItemUtils;
 import com.ricedotwho.rsm.utils.Utils;
 import com.ricedotwho.rsm.utils.render.render3d.type.FilledBox;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.util.Formatting;
@@ -60,6 +63,7 @@ public class BreakerAura extends Module {
       "Aura Blocks", "dungeon/breaker", "breaker_aura.json", HashSet::new, (new TypeToken<Set<Pos>>() {}).getType(), FileUtils.getPgson(), true, null, null
    );
    private int charges = 20;
+   private final Map<Pos, Long> nextMineAttempt = new HashMap<>();
 
    public BreakerAura() {
       this.registerProperty(new Setting[]{this.edit, this.addBlockBind, this.swap, this.renderBlocks, this.colour, this.zeroTick, this.timeout, this.data});
@@ -80,6 +84,7 @@ public class BreakerAura extends Module {
          && mc.world != null
          && mc.player != null
          && this.charges > 0) {
+         long now = System.currentTimeMillis();
          if ((Boolean)this.zeroTick.getValue()) {
             List<Pos> f = ((Set<Pos>)this.data.getValue())
                .stream()
@@ -90,6 +95,7 @@ public class BreakerAura extends Module {
                      VoxelShape shape = state.getOutlineShape(mc.world, bp);
                      return !shape.isEmpty()
                         && DungeonBreaker.canInstantMine(state)
+                        && this.canRetryMine(p, now)
                         && InteractUtils.faceDistance(
                               p.asVec3(), mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0)
                            )
@@ -104,7 +110,8 @@ public class BreakerAura extends Module {
             }
 
             for (Pos pos : f) {
-               InteractUtils.breakBlock(pos, true, SwapManager.isDesynced());
+               this.markMineAttempt(pos, now);
+               InteractUtils.breakBlock(pos, false, SwapManager.isDesynced());
                if (--this.charges <= 0) {
                   return;
                }
@@ -115,7 +122,8 @@ public class BreakerAura extends Module {
                posx -> {
                   if ((Boolean)this.swap.getValue() && SwapManager.reserveSwap("DUNGEONBREAKER")
                      || "DUNGEONBREAKER".equals(ItemUtils.getID(mc.player.getInventory().getSelectedStack()))) {
-                     InteractUtils.breakBlock(posx, true, SwapManager.isDesynced());
+                     this.markMineAttempt(posx, now);
+                     InteractUtils.breakBlock(posx, false, SwapManager.isDesynced());
                      this.charges--;
                   }
                }
@@ -148,6 +156,7 @@ public class BreakerAura extends Module {
    @SubscribeEvent
    public void onReset(Load event) {
       this.charges = 20;
+      this.nextMineAttempt.clear();
    }
 
    @SubscribeEvent
@@ -162,6 +171,7 @@ public class BreakerAura extends Module {
    private Optional<Pos> getClosest(Set<Pos> positions) {
       Pos closest = null;
       double dist = 2.147483647E9;
+      long now = System.currentTimeMillis();
 
       assert mc.world != null;
 
@@ -174,6 +184,7 @@ public class BreakerAura extends Module {
          Vec3d vec3 = pos.asVec3();
          if (!shape.isEmpty()
             && DungeonBreaker.canInstantMine(state)
+            && this.canRetryMine(pos, now)
             && !(
                InteractUtils.faceDistance(vec3, mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0))
                   > 25.0
@@ -189,12 +200,21 @@ public class BreakerAura extends Module {
       return Optional.ofNullable(closest);
    }
 
+   private boolean canRetryMine(Pos pos, long now) {
+      return this.nextMineAttempt.getOrDefault(pos, 0L) <= now;
+   }
+
+   private void markMineAttempt(Pos pos, long now) {
+      this.nextMineAttempt.put(pos, now + ((BigDecimal)this.timeout.getValue()).longValue());
+   }
+
    public void addOrRemoveBlock() {
       if (Location.getArea().is(Island.Dungeon) && Dungeon.isInBoss() && mc.player != null) {
          if (MinecraftClient.getInstance().crosshairTarget instanceof BlockHitResult blockHitResult && blockHitResult.getType() != Type.MISS) {
             Pos pos = new Pos(blockHitResult.getBlockPos());
             if (((Set)this.data.getValue()).contains(pos)) {
                ((Set)this.data.getValue()).remove(pos);
+               this.nextMineAttempt.remove(pos);
                RSA.chat(Formatting.RED + "Removed " + pos.toChatString());
             } else {
                ((Set)this.data.getValue()).add(pos);
