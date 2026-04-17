@@ -8,12 +8,12 @@ import com.ricedotwho.rsm.RSM;
 import com.ricedotwho.rsm.command.Command;
 import com.ricedotwho.rsm.command.api.CommandInfo;
 import com.ricedotwho.rsm.utils.api.PriceData;
-import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.class_637;
 
 @CommandInfo(name = "autocroesus", aliases = "ac", description = "Configuring and starting AutoCroesus")
 public class AutoCroesusCommand extends Command {
-   public LiteralArgumentBuilder<ClientCommandSource> build() {
-      return (LiteralArgumentBuilder<ClientCommandSource>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(this.name())
+   public LiteralArgumentBuilder<class_637> build() {
+      return (LiteralArgumentBuilder<class_637>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(this.name())
                   .then(literal("go").executes(ctx -> {
                      ((AutoCroesus)RSM.getModule(AutoCroesus.class)).start();
                      return 1;

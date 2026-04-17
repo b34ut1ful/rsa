@@ -12,21 +12,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.StringHelper;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_1297;
+import net.minecraft.class_1531;
+import net.minecraft.class_1657;
+import net.minecraft.class_2338;
+import net.minecraft.class_238;
+import net.minecraft.class_310;
+import net.minecraft.class_3544;
+import net.minecraft.class_638;
+import net.minecraft.class_746;
 
 public class InvWalkCheck {
    public static boolean startChecking;
    private static final Pattern playerName = Pattern.compile("^(\\w+)\\s+activated a terminal");
    public static String username;
-   private static final Map<BlockPos, Entity> inactiveTerminals = new HashMap<>();
+   private static final Map<class_2338, class_1297> inactiveTerminals = new HashMap<>();
    private static final List<String> termCompleter = new ArrayList<>();
    private static final List<Double> TermPos = new ArrayList<>();
    private static final List<Double> PlayerPos = new ArrayList<>();
@@ -40,25 +40,25 @@ public class InvWalkCheck {
 
    @SubscribeEvent
    public static void Check1() {
-      MinecraftClient mc = MinecraftClient.getInstance();
-      ClientWorld level = mc.world;
-      ClientPlayerEntity player = mc.player;
+      class_310 mc = class_310.method_1551();
+      class_638 level = mc.field_1687;
+      class_746 player = mc.field_1724;
       if (player != null && level != null) {
-         Box searchBox = player.getBoundingBox().expand(192.0);
-         List<Entity> entities = level.getOtherEntities(null, searchBox);
-         Set<BlockPos> currentInactive = new HashSet<>();
+         class_238 searchBox = player.method_5829().method_1014(192.0);
+         List<class_1297> entities = level.method_8335(null, searchBox);
+         Set<class_2338> currentInactive = new HashSet<>();
 
-         for (Entity entity : entities) {
-            String name = entity.getName().getString();
-            BlockPos pos = entity.getBlockPos();
-            if (entity instanceof ArmorStandEntity) {
+         for (class_1297 entity : entities) {
+            String name = entity.method_5477().getString();
+            class_2338 pos = entity.method_24515();
+            if (entity instanceof class_1531) {
                if (name.contains("Inactive Terminal")) {
                   currentInactive.add(pos);
                   inactiveTerminals.putIfAbsent(pos, entity);
                } else if (name.contains("Terminal Active") && inactiveTerminals.containsKey(pos)) {
-                  double TermX = entity.getX();
-                  double TermY = entity.getY();
-                  double TermZ = entity.getZ();
+                  double TermX = entity.method_23317();
+                  double TermY = entity.method_23318();
+                  double TermZ = entity.method_23321();
                   TermPos.add(TermX);
                   TermPos.add(TermY);
                   TermPos.add(TermZ);
@@ -66,10 +66,10 @@ public class InvWalkCheck {
                }
             }
 
-            if (entity instanceof PlayerEntity && !termCompleter.isEmpty() && name.contains(termCompleter.getFirst())) {
-               double playerx = entity.getX();
-               double playery = entity.getY();
-               double playerz = entity.getZ();
+            if (entity instanceof class_1657 && !termCompleter.isEmpty() && name.contains(termCompleter.getFirst())) {
+               double playerx = entity.method_23317();
+               double playery = entity.method_23318();
+               double playerz = entity.method_23321();
                PlayerPos.add(playerx);
                PlayerPos.add(playery);
                PlayerPos.add(playerz);
@@ -115,9 +115,9 @@ public class InvWalkCheck {
 
    @SubscribeEvent
    public static void terminalCompletedMsg(Chat event) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null) {
-         String unformatted = StringHelper.stripTextFormat(event.getMessage().getString());
+         String unformatted = class_3544.method_15440(event.getMessage().getString());
          Matcher matcher = playerName.matcher(unformatted);
          if (matcher.find()) {
             termCompleter.add(matcher.group(1));

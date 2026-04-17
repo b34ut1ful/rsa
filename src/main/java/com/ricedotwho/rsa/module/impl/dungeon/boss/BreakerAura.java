@@ -38,17 +38,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.class_124;
+import net.minecraft.class_2338;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
+import net.minecraft.class_265;
+import net.minecraft.class_2653;
+import net.minecraft.class_2680;
+import net.minecraft.class_310;
+import net.minecraft.class_3965;
+import net.minecraft.class_642;
+import net.minecraft.class_239.class_240;
 
 @ModuleInfo(aliases = "Breaker Aura", id = "BreakerAura", category = Category.DUNGEONS, hasKeybind = true)
 public class BreakerAura extends Module {
@@ -70,8 +70,8 @@ public class BreakerAura extends Module {
    }
 
    public boolean inP3Sim(boolean isP3Sim) {
-      ServerInfo server = MinecraftClient.getInstance().getCurrentServerEntry();
-      return server != null && server.address.equals("hypixelp3sim.zapto.org") ? true : isP3Sim;
+      class_642 server = class_310.method_1551().method_1558();
+      return server != null && server.field_3761.equals("hypixelp3sim.zapto.org") ? true : isP3Sim;
    }
 
    @SubscribeEvent
@@ -79,25 +79,25 @@ public class BreakerAura extends Module {
       if (Location.getArea().is(Island.Dungeon)
          && Dungeon.isInBoss()
          && Utils.equalsOneOf(Location.getFloor(), new Object[]{Floor.M7, Floor.F7})
-         && !((Set<Pos>)this.data.getValue()).isEmpty()
+         && !((Set)this.data.getValue()).isEmpty()
          && !(Boolean)this.edit.getValue()
-         && mc.world != null
-         && mc.player != null
+         && mc.field_1687 != null
+         && mc.field_1724 != null
          && this.charges > 0) {
          long now = System.currentTimeMillis();
          if ((Boolean)this.zeroTick.getValue()) {
-            List<Pos> f = ((Set<Pos>)this.data.getValue())
+            List<Pos> f = ((Set)this.data.getValue())
                .stream()
                .filter(
                   p -> {
-                     BlockPos bp = p.asBlockPos();
-                     BlockState state = mc.world.getBlockState(bp);
-                     VoxelShape shape = state.getOutlineShape(mc.world, bp);
-                     return !shape.isEmpty()
+                     class_2338 bp = p.asBlockPos();
+                     class_2680 state = mc.field_1687.method_8320(bp);
+                     class_265 shape = state.method_26218(mc.field_1687, bp);
+                     return !shape.method_1110()
                         && DungeonBreaker.canInstantMine(state)
                         && this.canRetryMine(p, now)
                         && InteractUtils.faceDistance(
-                              p.asVec3(), mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0)
+                              p.asVec3(), mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0)
                            )
                            <= 25.0;
                   }
@@ -105,7 +105,7 @@ public class BreakerAura extends Module {
                .toList();
             if (f.isEmpty()
                || (Boolean)this.swap.getValue() && !SwapManager.reserveSwap("DUNGEONBREAKER")
-               || !"DUNGEONBREAKER".equals(ItemUtils.getID(mc.player.getInventory().getSelectedStack()))) {
+               || !"DUNGEONBREAKER".equals(ItemUtils.getID(mc.field_1724.method_31548().method_7391()))) {
                return;
             }
 
@@ -121,7 +121,7 @@ public class BreakerAura extends Module {
             closest.ifPresent(
                posx -> {
                   if ((Boolean)this.swap.getValue() && SwapManager.reserveSwap("DUNGEONBREAKER")
-                     || "DUNGEONBREAKER".equals(ItemUtils.getID(mc.player.getInventory().getSelectedStack()))) {
+                     || "DUNGEONBREAKER".equals(ItemUtils.getID(mc.field_1724.method_31548().method_7391()))) {
                      this.markMineAttempt(posx, now);
                      InteractUtils.breakBlock(posx, false, SwapManager.isDesynced());
                      this.charges--;
@@ -139,14 +139,14 @@ public class BreakerAura extends Module {
          && Dungeon.isInBoss()
          && Utils.equalsOneOf(Location.getFloor(), new Object[]{Floor.M7, Floor.F7})
          && !((Set)this.data.getValue()).isEmpty()
-         && mc.world != null
-         && mc.player != null) {
-         for (Pos pos : (Set<Pos>)this.data.getValue()) {
-            BlockPos bp = pos.asBlockPos();
-            BlockState state = mc.world.getBlockState(bp);
-            VoxelShape shape = state.getOutlineShape(mc.world, bp);
-            if (!shape.isEmpty()) {
-               Box aabb = shape.getBoundingBox().offset(bp);
+         && mc.field_1687 != null
+         && mc.field_1724 != null) {
+         for (Pos pos : (Set)this.data.getValue()) {
+            class_2338 bp = pos.asBlockPos();
+            class_2680 state = mc.field_1687.method_8320(bp);
+            class_265 shape = state.method_26218(mc.field_1687, bp);
+            if (!shape.method_1110()) {
+               class_238 aabb = shape.method_1107().method_996(bp);
                Renderer3D.addTask(new FilledBox(aabb, this.colour.getValue(), true));
             }
          }
@@ -161,10 +161,10 @@ public class BreakerAura extends Module {
 
    @SubscribeEvent
    public void onItemUpdate(PostReceive event) {
-      if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet
+      if (event.getPacket() instanceof class_2653 packet
          && Location.getArea().is(Island.Dungeon)
-         && "DUNGEONBREAKER".equals(ItemUtils.getID(packet.getStack()))) {
-         this.charges = (Integer)ItemUtils.getDbCharges(packet.getStack()).getFirst();
+         && "DUNGEONBREAKER".equals(ItemUtils.getID(packet.method_11449()))) {
+         this.charges = (Integer)ItemUtils.getDbCharges(packet.method_11449()).getFirst();
       }
    }
 
@@ -173,23 +173,23 @@ public class BreakerAura extends Module {
       double dist = 2.147483647E9;
       long now = System.currentTimeMillis();
 
-      assert mc.world != null;
+      assert mc.field_1687 != null;
 
-      assert mc.player != null;
+      assert mc.field_1724 != null;
 
       for (Pos pos : positions) {
-         BlockPos bp = pos.asBlockPos();
-         BlockState state = mc.world.getBlockState(bp);
-         VoxelShape shape = state.getOutlineShape(mc.world, bp);
-         Vec3d vec3 = pos.asVec3();
-         if (!shape.isEmpty()
+         class_2338 bp = pos.asBlockPos();
+         class_2680 state = mc.field_1687.method_8320(bp);
+         class_265 shape = state.method_26218(mc.field_1687, bp);
+         class_243 vec3 = pos.asVec3();
+         if (!shape.method_1110()
             && DungeonBreaker.canInstantMine(state)
             && this.canRetryMine(pos, now)
             && !(
-               InteractUtils.faceDistance(vec3, mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0))
+               InteractUtils.faceDistance(vec3, mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0))
                   > 25.0
             )) {
-            double d = vec3.distanceTo(mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0));
+            double d = vec3.method_1022(mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0));
             if (d < dist) {
                closest = pos;
                dist = d;
@@ -209,21 +209,21 @@ public class BreakerAura extends Module {
    }
 
    public void addOrRemoveBlock() {
-      if (Location.getArea().is(Island.Dungeon) && Dungeon.isInBoss() && mc.player != null) {
-         if (MinecraftClient.getInstance().crosshairTarget instanceof BlockHitResult blockHitResult && blockHitResult.getType() != Type.MISS) {
-            Pos pos = new Pos(blockHitResult.getBlockPos());
+      if (Location.getArea().is(Island.Dungeon) && Dungeon.isInBoss() && mc.field_1724 != null) {
+         if (class_310.method_1551().field_1765 instanceof class_3965 blockHitResult && blockHitResult.method_17783() != class_240.field_1333) {
+            Pos pos = new Pos(blockHitResult.method_17777());
             if (((Set)this.data.getValue()).contains(pos)) {
                ((Set)this.data.getValue()).remove(pos);
                this.nextMineAttempt.remove(pos);
-               RSA.chat(Formatting.RED + "Removed " + pos.toChatString());
+               RSA.chat(class_124.field_1061 + "Removed " + pos.toChatString());
             } else {
                ((Set)this.data.getValue()).add(pos);
-               RSA.chat(Formatting.GREEN + "Added " + pos.toChatString());
+               RSA.chat(class_124.field_1060 + "Added " + pos.toChatString());
             }
 
             this.data.save();
          } else {
-            RSA.chat(Formatting.RED + "Not looking at a block");
+            RSA.chat(class_124.field_1061 + "Not looking at a block");
          }
       }
    }

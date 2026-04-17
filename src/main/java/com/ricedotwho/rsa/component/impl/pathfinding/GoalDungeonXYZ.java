@@ -6,17 +6,17 @@ import com.ricedotwho.rsm.component.impl.map.utils.ScanUtils;
 import com.ricedotwho.rsm.utils.EtherUtils;
 import java.util.HashMap;
 import java.util.List;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_2338;
+import net.minecraft.class_310;
+import net.minecraft.class_746;
 
 public class GoalDungeonXYZ implements Goal {
    public static final float ROOM_COST = 100000.0F;
    private static final float MAX = 1.0E8F;
-   private final BlockPos endPos;
+   private final class_2338 endPos;
    private final HashMap<String, RoomCandidate> rooms;
 
-   public GoalDungeonXYZ(BlockPos endPos, List<RoomCandidate> rooms) {
+   public GoalDungeonXYZ(class_2338 endPos, List<RoomCandidate> rooms) {
       this.endPos = endPos;
       this.rooms = new HashMap<>(rooms.size());
 
@@ -26,13 +26,13 @@ public class GoalDungeonXYZ implements Goal {
       }
    }
 
-   public static GoalDungeonXYZ create(BlockPos endPos) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static GoalDungeonXYZ create(class_2338 endPos) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player == null) {
          return null;
       } else {
-         Room startRoom = ScanUtils.getRoomFromPos(player.getBlockX(), player.getBlockZ());
-         Room endRoom = ScanUtils.getRoomFromPos(endPos.getX(), endPos.getZ());
+         Room startRoom = ScanUtils.getRoomFromPos(player.method_31477(), player.method_31479());
+         Room endRoom = ScanUtils.getRoomFromPos(endPos.method_10263(), endPos.method_10260());
          if (startRoom != null && endRoom != null) {
             List<RoomCandidate> candidates = DungeonMapPathfinder.solve(startRoom, endRoom);
             if (candidates.isEmpty()) {
@@ -50,7 +50,7 @@ public class GoalDungeonXYZ implements Goal {
 
    @Override
    public boolean test(int x, int y, int z) {
-      return x == this.endPos.getX() && y == this.endPos.getY() && z == this.endPos.getZ();
+      return x == this.endPos.method_10263() && y == this.endPos.method_10264() && z == this.endPos.method_10260();
    }
 
    @Override
@@ -70,9 +70,9 @@ public class GoalDungeonXYZ implements Goal {
                endY = y;
                endZ = candidate.getDoorRoom().getZ() + candidate.getNextDoorRoom().getZ() >> 1;
             } else {
-               endX = this.endPos.getX();
-               endY = this.endPos.getY();
-               endZ = this.endPos.getZ();
+               endX = this.endPos.method_10263();
+               endY = this.endPos.method_10264();
+               endZ = this.endPos.method_10260();
             }
 
             int xDif = x - endX;

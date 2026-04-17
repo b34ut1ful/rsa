@@ -9,31 +9,31 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Queue;
 import java.util.function.Predicate;
-import net.minecraft.util.Hand;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.GameMode;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action;
+import net.minecraft.class_1268;
+import net.minecraft.class_1792;
+import net.minecraft.class_1799;
+import net.minecraft.class_1934;
+import net.minecraft.class_2338;
+import net.minecraft.class_2350;
+import net.minecraft.class_239;
+import net.minecraft.class_243;
+import net.minecraft.class_2596;
+import net.minecraft.class_2846;
+import net.minecraft.class_2868;
+import net.minecraft.class_2885;
+import net.minecraft.class_2886;
+import net.minecraft.class_310;
+import net.minecraft.class_3965;
+import net.minecraft.class_746;
+import net.minecraft.class_239.class_240;
+import net.minecraft.class_2846.class_2847;
 
 public class SwapManager {
    private static int serverSlot;
    private static int lastSentServerSlot;
    private static boolean swappedThisTick = false;
    private static int requireSwap = -1;
-   private static final Queue<Packet<?>> pendingC08Packets = new ArrayDeque<>();
+   private static final Queue<class_2596<?>> pendingC08Packets = new ArrayDeque<>();
    private static int currentTick = 0;
    private static int lastC08Tick = Integer.MIN_VALUE;
    private static int lastSwapTick = Integer.MIN_VALUE;
@@ -46,12 +46,12 @@ public class SwapManager {
       flushQueuedC08();
    }
 
-   public static boolean onPostSendPacket(Packet<?> packet) {
-      if (packet instanceof UpdateSelectedSlotC2SPacket slotPacket) {
-         if (!swappedThisTick && slotPacket.getSelectedSlot() != lastSentServerSlot) {
+   public static boolean onPostSendPacket(class_2596<?> packet) {
+      if (packet instanceof class_2868 slotPacket) {
+         if (!swappedThisTick && slotPacket.method_12442() != lastSentServerSlot) {
             swappedThisTick = true;
-            serverSlot = slotPacket.getSelectedSlot();
-            lastSentServerSlot = slotPacket.getSelectedSlot();
+            serverSlot = slotPacket.method_12442();
+            lastSentServerSlot = slotPacket.method_12442();
             lastSwapTick = currentTick;
             return true;
          } else {
@@ -62,12 +62,12 @@ public class SwapManager {
          if (flushingQueuedC08) {
             lastC08Tick = currentTick;
             return true;
-         } else if (!pendingC08Packets.isEmpty() || lastC08Tick == currentTick || lastSwapTick == currentTick) {
-            pendingC08Packets.add(packet);
-            return false;
-         } else {
+         } else if (pendingC08Packets.isEmpty() && lastC08Tick != currentTick && lastSwapTick != currentTick) {
             lastC08Tick = currentTick;
             return true;
+         } else {
+            pendingC08Packets.add(packet);
+            return false;
          }
       } else {
          return true;
@@ -83,32 +83,28 @@ public class SwapManager {
       flushingQueuedC08 = false;
    }
 
-   private static boolean isC08Packet(Packet<?> packet) {
-      return packet instanceof PlayerInteractItemC2SPacket || packet instanceof PlayerInteractBlockC2SPacket;
+   private static boolean isC08Packet(class_2596<?> packet) {
+      return packet instanceof class_2886 || packet instanceof class_2885;
    }
 
    private static void flushQueuedC08() {
-      MinecraftClient client = MinecraftClient.getInstance();
-      if (pendingC08Packets.isEmpty() || lastC08Tick == currentTick || lastSwapTick == currentTick || client.getNetworkHandler() == null) {
-         return;
-      }
+      class_310 client = class_310.method_1551();
+      if (!pendingC08Packets.isEmpty() && lastC08Tick != currentTick && lastSwapTick != currentTick && client.method_1562() != null) {
+         class_2596<?> packet = pendingC08Packets.poll();
+         if (packet != null) {
+            flushingQueuedC08 = true;
 
-      Packet<?> packet = pendingC08Packets.poll();
-      if (packet == null) {
-         return;
-      }
-
-      flushingQueuedC08 = true;
-
-      try {
-         client.getNetworkHandler().sendPacket(packet);
-      } finally {
-         flushingQueuedC08 = false;
+            try {
+               client.method_1562().method_52787(packet);
+            } finally {
+               flushingQueuedC08 = false;
+            }
+         }
       }
    }
 
    public static boolean onEnsureHasSentCarriedItem(int managerServerSlot) {
-      if (MinecraftClient.getInstance().player == null) {
+      if (class_310.method_1551().field_1724 == null) {
          return false;
       } else {
          if (serverSlot != managerServerSlot) {
@@ -117,13 +113,13 @@ public class SwapManager {
             RSA.chat("GameMode : " + managerServerSlot);
          }
 
-         int i = MinecraftClient.getInstance().player.getInventory().getSelectedSlot();
+         int i = class_310.method_1551().field_1724.method_31548().method_67532();
          if (!swappedThisTick && requireSwap > -1 && i != requireSwap) {
             if (requireSwap == managerServerSlot) {
                return false;
             }
 
-            MinecraftClient.getInstance().player.getInventory().setSelectedSlot(requireSwap);
+            class_310.method_1551().field_1724.method_31548().method_61496(requireSwap);
             i = requireSwap;
          }
 
@@ -162,7 +158,7 @@ public class SwapManager {
       } else if (requireSwap > -1) {
          return requireSwap;
       } else {
-         return MinecraftClient.getInstance().player == null ? 0 : MinecraftClient.getInstance().player.getInventory().getSelectedSlot();
+         return class_310.method_1551().field_1724 == null ? 0 : class_310.method_1551().field_1724.method_31548().method_67532();
       }
    }
 
@@ -171,11 +167,11 @@ public class SwapManager {
    }
 
    public static boolean sendAirC08(float yaw, float pitch, boolean syncSlots, boolean swing) {
-      if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().player.getGameMode() == GameMode.SPECTATOR) {
+      if (class_310.method_1551().field_1724 == null || class_310.method_1551().field_1724.method_68876() == class_1934.field_9219) {
          return false;
-      } else if (MinecraftClient.getInstance().interactionManager != null && MinecraftClient.getInstance().world != null) {
-         IMultiPlayerGameMode manager = (IMultiPlayerGameMode)MinecraftClient.getInstance().interactionManager;
-         int i = MinecraftClient.getInstance().player.getInventory().getSelectedSlot();
+      } else if (class_310.method_1551().field_1761 != null && class_310.method_1551().field_1687 != null) {
+         IMultiPlayerGameMode manager = (IMultiPlayerGameMode)class_310.method_1551().field_1761;
+         int i = class_310.method_1551().field_1724.method_31548().method_67532();
          if (syncSlots) {
             manager.syncSlot();
          }
@@ -184,9 +180,9 @@ public class SwapManager {
             RSA.chat("Failed to swap to slot : " + i);
             return false;
          } else {
-            manager.sendPacketSequenced(MinecraftClient.getInstance().world, sequence -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, sequence, yaw, pitch));
+            manager.sendPacketSequenced(class_310.method_1551().field_1687, sequence -> new class_2886(class_1268.field_5808, sequence, yaw, pitch));
             if (swing) {
-               MinecraftClient.getInstance().player.swingHand(Hand.MAIN_HAND);
+               class_310.method_1551().field_1724.method_6104(class_1268.field_5808);
             }
 
             return true;
@@ -212,13 +208,13 @@ public class SwapManager {
       return sendAirC08(rot.getYaw(), rot.getPitch(), syncSlots, swing);
    }
 
-   public static boolean sendBlockC08(BlockHitResult result, boolean swing, boolean syncSlot) {
-      if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().player.getGameMode() == GameMode.SPECTATOR) {
+   public static boolean sendBlockC08(class_3965 result, boolean swing, boolean syncSlot) {
+      if (class_310.method_1551().field_1724 == null || class_310.method_1551().field_1724.method_68876() == class_1934.field_9219) {
          return false;
-      } else if (MinecraftClient.getInstance().interactionManager != null && MinecraftClient.getInstance().world != null) {
+      } else if (class_310.method_1551().field_1761 != null && class_310.method_1551().field_1687 != null) {
          if (syncSlot) {
-            IMultiPlayerGameMode manager = (IMultiPlayerGameMode)MinecraftClient.getInstance().interactionManager;
-            int i = MinecraftClient.getInstance().player.getInventory().getSelectedSlot();
+            IMultiPlayerGameMode manager = (IMultiPlayerGameMode)class_310.method_1551().field_1761;
+            int i = class_310.method_1551().field_1724.method_31548().method_67532();
             manager.syncSlot();
             if (!checkServerSlot(i)) {
                RSA.chat("Failed to swap to slot : " + i);
@@ -226,10 +222,10 @@ public class SwapManager {
             }
          }
 
-         ((IMultiPlayerGameMode)MinecraftClient.getInstance().interactionManager)
-            .sendPacketSequenced(MinecraftClient.getInstance().world, sequence -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, sequence));
+         ((IMultiPlayerGameMode)class_310.method_1551().field_1761)
+            .sendPacketSequenced(class_310.method_1551().field_1687, sequence -> new class_2885(class_1268.field_5808, result, sequence));
          if (swing) {
-            MinecraftClient.getInstance().player.swingHand(Hand.MAIN_HAND);
+            class_310.method_1551().field_1724.method_6104(class_1268.field_5808);
          }
 
          return true;
@@ -239,27 +235,27 @@ public class SwapManager {
    }
 
    public static boolean sendBlockC08(float yaw, float pitch, boolean swing, boolean syncSlot) {
-      HitResult result = RotationUtils.getBlockHitResult(
-         MinecraftClient.getInstance().player.getContainerInteractionRange(), yaw, pitch, MinecraftClient.getInstance().player.getEntityPos().add(0.0, 1.54F, 0.0)
+      class_239 result = RotationUtils.getBlockHitResult(
+         class_310.method_1551().field_1724.method_72381(), yaw, pitch, class_310.method_1551().field_1724.method_73189().method_1031(0.0, 1.54F, 0.0)
       );
-      if (result.getType() != Type.BLOCK) {
+      if (result.method_17783() != class_240.field_1332) {
          RSA.chat("Failed to send block C08!");
       }
 
-      return sendBlockC08((BlockHitResult)result, swing, syncSlot);
+      return sendBlockC08((class_3965)result, swing, syncSlot);
    }
 
-   public static boolean sendBlockC08(Vec3d pos, Direction direction, boolean swing, boolean syncSlot) {
-      return sendBlockC08(new BlockHitResult(pos, direction, BlockPos.ofFloored(pos), false), swing, syncSlot);
+   public static boolean sendBlockC08(class_243 pos, class_2350 direction, boolean swing, boolean syncSlot) {
+      return sendBlockC08(new class_3965(pos, direction, class_2338.method_49638(pos), false), swing, syncSlot);
    }
 
-   public static boolean sendC07(BlockPos result, Action action, Direction face, boolean swing, boolean syncSlot) {
-      if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().player.getGameMode() == GameMode.SPECTATOR) {
+   public static boolean sendC07(class_2338 result, class_2847 action, class_2350 face, boolean swing, boolean syncSlot) {
+      if (class_310.method_1551().field_1724 == null || class_310.method_1551().field_1724.method_68876() == class_1934.field_9219) {
          return false;
-      } else if (MinecraftClient.getInstance().interactionManager != null && MinecraftClient.getInstance().world != null) {
+      } else if (class_310.method_1551().field_1761 != null && class_310.method_1551().field_1687 != null) {
          if (syncSlot) {
-            IMultiPlayerGameMode manager = (IMultiPlayerGameMode)MinecraftClient.getInstance().interactionManager;
-            int i = MinecraftClient.getInstance().player.getInventory().getSelectedSlot();
+            IMultiPlayerGameMode manager = (IMultiPlayerGameMode)class_310.method_1551().field_1761;
+            int i = class_310.method_1551().field_1724.method_31548().method_67532();
             manager.syncSlot();
             if (!checkServerSlot(i)) {
                RSA.chat("Failed to swap to slot : " + i);
@@ -267,10 +263,10 @@ public class SwapManager {
             }
          }
 
-         ((IMultiPlayerGameMode)MinecraftClient.getInstance().interactionManager)
-            .sendPacketSequenced(MinecraftClient.getInstance().world, sequence -> new PlayerActionC2SPacket(action, result, face, sequence));
+         ((IMultiPlayerGameMode)class_310.method_1551().field_1761)
+            .sendPacketSequenced(class_310.method_1551().field_1687, sequence -> new class_2846(action, result, face, sequence));
          if (swing) {
-            MinecraftClient.getInstance().player.swingHand(Hand.MAIN_HAND);
+            class_310.method_1551().field_1724.method_6104(class_1268.field_5808);
          }
 
          return true;
@@ -279,15 +275,15 @@ public class SwapManager {
       }
    }
 
-   public static boolean reserveSwap(Item item) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static boolean reserveSwap(class_1792 item) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && item != null) {
          if (!canSwap()) {
-            return item == player.getInventory().getStack(getNextUpdateIndex()).getItem();
+            return item == player.method_31548().method_5438(getNextUpdateIndex()).method_7909();
          } else {
             for (int i = 0; i < 9; i++) {
-               ItemStack stack = player.getInventory().getStack(i);
-               if (stack.getItem() == item) {
+               class_1799 stack = player.method_31548().method_5438(i);
+               if (stack.method_7909() == item) {
                   boolean bl = swapSlot(i);
                   if (bl) {
                      reserveSwap0(i);
@@ -304,15 +300,15 @@ public class SwapManager {
       }
    }
 
-   public static boolean reserveSwap(Predicate<ItemStack> predicate) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static boolean reserveSwap(Predicate<class_1799> predicate) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player == null) {
          return false;
       } else if (!canSwap()) {
-         return predicate.test(player.getInventory().getStack(getNextUpdateIndex()));
+         return predicate.test(player.method_31548().method_5438(getNextUpdateIndex()));
       } else {
          for (int i = 0; i < 9; i++) {
-            if (predicate.test(player.getInventory().getStack(i))) {
+            if (predicate.test(player.method_31548().method_5438(i))) {
                boolean bl = swapSlot(i);
                if (bl) {
                   reserveSwap0(i);
@@ -327,14 +323,14 @@ public class SwapManager {
    }
 
    public static boolean reserveSwap(String... sbId) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && sbId != null && sbId.length != 0) {
          if (!canSwap()) {
-            String next = ItemUtils.getID(player.getInventory().getStack(getNextUpdateIndex()));
+            String next = ItemUtils.getID(player.method_31548().method_5438(getNextUpdateIndex()));
             return Arrays.stream(sbId).anyMatch(idx -> !idx.isBlank() && next.equals(idx));
          } else {
             for (int i = 0; i < 9; i++) {
-               String id = ItemUtils.getID(player.getInventory().getStack(i));
+               String id = ItemUtils.getID(player.method_31548().method_5438(i));
                if (!Arrays.stream(sbId).noneMatch(id1 -> !id1.isBlank() && id.equals(id1))) {
                   boolean bl = swapSlot(i);
                   if (bl) {
@@ -352,17 +348,17 @@ public class SwapManager {
       }
    }
 
-   public static boolean swapItem(Item item) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static boolean swapItem(class_1792 item) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && item != null) {
-         if (item == player.getInventory().getStack(getNextUpdateIndex()).getItem()) {
+         if (item == player.method_31548().method_5438(getNextUpdateIndex()).method_7909()) {
             return true;
          } else if (!canSwap()) {
             return false;
          } else {
             for (int i = 0; i < 9; i++) {
-               ItemStack stack = player.getInventory().getStack(i);
-               if (stack.getItem() == item) {
+               class_1799 stack = player.method_31548().method_5438(i);
+               if (stack.method_7909() == item) {
                   return swapSlot(i);
                }
             }
@@ -375,16 +371,16 @@ public class SwapManager {
    }
 
    public static boolean swapItem(String... sbId) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && sbId != null && sbId.length != 0) {
-         String heldId = ItemUtils.getID(player.getInventory().getStack(getNextUpdateIndex()));
+         String heldId = ItemUtils.getID(player.method_31548().method_5438(getNextUpdateIndex()));
          if (Arrays.stream(sbId).anyMatch(idx -> !idx.isBlank() && heldId.equals(idx))) {
             return true;
          } else if (!canSwap()) {
             return false;
          } else {
             for (int i = 0; i < 9; i++) {
-               String id = ItemUtils.getID(player.getInventory().getStack(i));
+               String id = ItemUtils.getID(player.method_31548().method_5438(i));
                if (!Arrays.stream(sbId).noneMatch(id1 -> !id1.isBlank() && id.equals(id1))) {
                   return swapSlot(i);
                }
@@ -397,17 +393,17 @@ public class SwapManager {
       }
    }
 
-   public static boolean swapItem(Predicate<ItemStack> predicate) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static boolean swapItem(Predicate<class_1799> predicate) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player == null) {
          return false;
-      } else if (predicate.test(player.getInventory().getStack(getNextUpdateIndex()))) {
+      } else if (predicate.test(player.method_31548().method_5438(getNextUpdateIndex()))) {
          return true;
       } else if (!canSwap()) {
          return false;
       } else {
          for (int i = 0; i < 9; i++) {
-            if (predicate.test(player.getInventory().getStack(i))) {
+            if (predicate.test(player.method_31548().method_5438(i))) {
                return swapSlot(i);
             }
          }
@@ -417,13 +413,13 @@ public class SwapManager {
    }
 
    public static boolean swapSlot(int slot) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (slot == getNextUpdateIndex()) {
          return true;
       } else if (player == null || swappedThisTick) {
          return false;
       } else if (slot >= 0 && slot <= 8) {
-         player.getInventory().setSelectedSlot(slot);
+         player.method_31548().method_61496(slot);
          return true;
       } else {
          RSA.getLogger().error("Invalid swap slot! : {}", slot);
@@ -435,52 +431,52 @@ public class SwapManager {
       return serverSlot == slot;
    }
 
-   public static boolean checkServerItem(Item item) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static boolean checkServerItem(class_1792 item) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && serverSlot >= 0 && serverSlot <= 8) {
-         ItemStack stack = player.getInventory().getStack(serverSlot);
-         return stack.getItem() == item;
+         class_1799 stack = player.method_31548().method_5438(serverSlot);
+         return stack.method_7909() == item;
       } else {
          return false;
       }
    }
 
    public static boolean checkServerItem(String... sbId) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && serverSlot >= 0 && serverSlot <= 8 && sbId.length != 0) {
-         String heldId = ItemUtils.getID(player.getInventory().getStack(serverSlot));
+         String heldId = ItemUtils.getID(player.method_31548().method_5438(serverSlot));
          return Arrays.stream(sbId).anyMatch(id -> !id.isBlank() && heldId.equals(id));
       } else {
          return false;
       }
    }
 
-   public static boolean checkClientItem(Item item) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static boolean checkClientItem(class_1792 item) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player == null) {
          return false;
       } else {
-         ItemStack stack = player.getInventory().getStack(player.getInventory().getSelectedSlot());
-         return stack.getItem() == item;
+         class_1799 stack = player.method_31548().method_5438(player.method_31548().method_67532());
+         return stack.method_7909() == item;
       }
    }
 
    public static boolean checkClientItem(String... sbId) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && sbId.length != 0) {
-         String heldId = ItemUtils.getID(player.getInventory().getStack(player.getInventory().getSelectedSlot()));
+         String heldId = ItemUtils.getID(player.method_31548().method_5438(player.method_31548().method_67532()));
          return Arrays.stream(sbId).anyMatch(id -> !id.isBlank() && heldId.equals(id));
       } else {
          return false;
       }
    }
 
-   public static int getItemSlot(Item item) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   public static int getItemSlot(class_1792 item) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && item != null) {
          for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
-            if (stack.getItem() == item) {
+            class_1799 stack = player.method_31548().method_5438(i);
+            if (stack.method_7909() == item) {
                return i;
             }
          }
@@ -492,10 +488,10 @@ public class SwapManager {
    }
 
    public static int getItemSlot(String... id) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null && id != null && id.length != 0) {
          for (int i = 0; i < 9; i++) {
-            ItemStack stack = player.getInventory().getStack(i);
+            class_1799 stack = player.method_31548().method_5438(i);
             if (Arrays.stream(id).anyMatch(s -> s.equals(ItemUtils.getID(stack)))) {
                return i;
             }

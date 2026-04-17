@@ -13,10 +13,10 @@ import com.ricedotwho.rsm.data.Colour;
 import com.ricedotwho.rsm.data.MutableInput;
 import com.ricedotwho.rsm.data.Pos;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.class_10185;
+import net.minecraft.class_243;
+import net.minecraft.class_2743;
+import net.minecraft.class_310;
 
 public class BonzoRing extends Ring {
    private final float yaw;
@@ -24,10 +24,10 @@ public class BonzoRing extends Ring {
    protected byte state;
    protected static final byte END_STATE = 5;
 
-   public BonzoRing(Vec3d pos) {
+   public BonzoRing(class_243 pos) {
       super(pos, 0.5, (double)RingType.BONZO.getRenderSizeOffset());
-      this.yaw = MinecraftClient.getInstance().gameRenderer.getCamera().getCameraYaw();
-      this.pitch = MinecraftClient.getInstance().gameRenderer.getCamera().getPitch();
+      this.yaw = class_310.method_1551().field_1773.method_19418().method_71155();
+      this.pitch = class_310.method_1551().field_1773.method_19418().method_19329();
       this.state = 0;
    }
 
@@ -35,8 +35,8 @@ public class BonzoRing extends Ring {
       this(
          min,
          max,
-         (Float)extra.getOrDefault("yaw", MinecraftClient.getInstance().gameRenderer.getCamera().getCameraYaw()),
-         (Float)extra.getOrDefault("pitch", MinecraftClient.getInstance().gameRenderer.getCamera().getPitch()),
+         (Float)extra.getOrDefault("yaw", class_310.method_1551().field_1773.method_19418().method_71155()),
+         (Float)extra.getOrDefault("pitch", class_310.method_1551().field_1773.method_19418().method_19329()),
          manager,
          actions
       );
@@ -61,8 +61,8 @@ public class BonzoRing extends Ring {
 
    protected void registerWaitCondition() {
       PacketOrderManager.registerReceiveListener(p -> {
-         if (MinecraftClient.getInstance().player != null && this.state == 1) {
-            if (p instanceof EntityVelocityUpdateS2CPacket motionPacket && motionPacket.getEntityId() == MinecraftClient.getInstance().player.getId()) {
+         if (class_310.method_1551().field_1724 != null && this.state == 1) {
+            if (p instanceof class_2743 motionPacket && motionPacket.method_11818() == class_310.method_1551().field_1724.method_5628()) {
                this.state = 5;
                return true;
             } else {
@@ -76,7 +76,7 @@ public class BonzoRing extends Ring {
 
    @Override
    public boolean run() {
-      if (MinecraftClient.getInstance().player == null) {
+      if (class_310.method_1551().field_1724 == null) {
          return false;
       } else {
          switch (this.state) {
@@ -123,7 +123,7 @@ public class BonzoRing extends Ring {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
       return true;
    }
 

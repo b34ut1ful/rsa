@@ -2,22 +2,22 @@ package com.ricedotwho.rsa.component.impl.pathfinding;
 
 import com.mojang.datafixers.util.Function5;
 import java.util.function.Consumer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.class_2338;
 
 public class Path {
-   private final BlockPos start;
+   private final class_2338 start;
    private final PathNode startNode;
    private final PathNode endNode;
    private final Goal goal;
 
-   public Path(BlockPos start, PathNode startNode, PathNode endNode, Goal goal) {
+   public Path(class_2338 start, PathNode startNode, PathNode endNode, Goal goal) {
       this.start = start;
       this.startNode = startNode;
       this.endNode = endNode;
       this.goal = goal;
    }
 
-   public BlockPos getStart() {
+   public class_2338 getStart() {
       return this.start;
    }
 
@@ -39,7 +39,7 @@ public class Path {
       return count;
    }
 
-   public <T> int consumeNodes(Consumer<T> consumer, Function5<BlockPos, Float, Float, Boolean, Integer, T> provider, int sequenceStart) {
+   public <T> int consumeNodes(Consumer<T> consumer, Function5<class_2338, Float, Float, Boolean, Integer, T> provider, int sequenceStart) {
       PathNode node = this.getEndNode();
       PathNode last = null;
 

@@ -11,12 +11,12 @@ import com.ricedotwho.rsm.RSM;
 import com.ricedotwho.rsm.command.Command;
 import com.ricedotwho.rsm.command.api.CommandInfo;
 import com.ricedotwho.rsm.component.impl.task.TaskComponent;
-import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.class_637;
 
 @CommandInfo(name = "rdev", description = "Developer")
 public class RSADevCommand extends Command {
-   public LiteralArgumentBuilder<ClientCommandSource> build() {
-      return (LiteralArgumentBuilder<ClientCommandSource>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(this.name())
+   public LiteralArgumentBuilder<class_637> build() {
+      return (LiteralArgumentBuilder<class_637>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(this.name())
                .then(((LiteralArgumentBuilder)literal("tickrate").then(argument("tick rate", FloatArgumentType.floatArg(0.0F, 20.0F)).executes(ctx -> {
                   Util.setTickRate(FloatArgumentType.getFloat(ctx, "tick rate"));
                   TaskComponent.onMilli(2500L, () -> Util.setTickRate(20.0F, false));

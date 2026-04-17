@@ -1,14 +1,14 @@
 package com.ricedotwho.rsa.mixins;
 
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.handler.PacketSizeLogger;
+import net.minecraft.class_2535;
+import net.minecraft.class_8762;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ClientConnection.class)
+@Mixin(class_2535.class)
 public interface ConnectionAccessor {
-   @Accessor("packetSizeLogger")
+   @Accessor("field_45955")
    @Nullable
-   PacketSizeLogger getBandwidthDebugMonitor();
+   class_8762 getBandwidthDebugMonitor();
 }

@@ -20,13 +20,13 @@ import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import com.ricedotwho.rsm.utils.DungeonUtils;
 import com.ricedotwho.rsm.utils.MathUtils;
 import java.math.BigDecimal;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.class_1297;
+import net.minecraft.class_1531;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
+import net.minecraft.class_2561;
+import net.minecraft.class_310;
+import net.minecraft.class_465;
 
 @ModuleInfo(aliases = "Term Aura", id = "TermAura", category = Category.DUNGEONS)
 public class TermAura extends Module {
@@ -43,44 +43,44 @@ public class TermAura extends Module {
 
    @SubscribeEvent
    public void onTick(Start event) {
-      if (mc.currentScreen == null) {
+      if (mc.field_1755 == null) {
          PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, this::rapeArmorstands);
       }
    }
 
    private void rapeArmorstands() {
-      if (MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().world != null && MinecraftClient.getInstance().getNetworkHandler() != null) {
-         if (System.currentTimeMillis() - this.lastClick >= ((BigDecimal)this.delay.getValue()).longValue()) {
-            if (this.locationCheck()) {
-               if (!AutoTerms.isInTerminal() && !(MinecraftClient.getInstance().currentScreen instanceof HandledScreen)) {
-                  Vec3d eyePos = MinecraftClient.getInstance().player.getEntityPos().add(0.0, MinecraftClient.getInstance().player.getStandingEyeHeight(), 0.0);
-                  double bestDistance = 16.0;
-                  ArmorStandEntity bestCandidate = null;
-                  Vec3d retardedPos = MinecraftClient.getInstance().player.getEntityPos().add(0.0, -2.0, 0.0);
-                  Box box = new Box(retardedPos, retardedPos).expand(4.0, 4.0, 4.0);
+      if (class_310.method_1551().field_1724 != null
+         && class_310.method_1551().field_1687 != null
+         && class_310.method_1551().method_1562() != null
+         && System.currentTimeMillis() - this.lastClick >= ((BigDecimal)this.delay.getValue()).longValue()
+         && this.locationCheck()
+         && !AutoTerms.isInTerminal()
+         && !(class_310.method_1551().field_1755 instanceof class_465)) {
+         class_243 eyePos = class_310.method_1551().field_1724.method_73189().method_1031(0.0, class_310.method_1551().field_1724.method_5751(), 0.0);
+         double bestDistance = 16.0;
+         class_1531 bestCandidate = null;
+         class_243 retardedPos = class_310.method_1551().field_1724.method_73189().method_1031(0.0, -2.0, 0.0);
+         class_238 box = new class_238(retardedPos, retardedPos).method_1009(4.0, 4.0, 4.0);
 
-                  for (ArmorStandEntity stand : MinecraftClient.getInstance().world.getEntitiesByClass(ArmorStandEntity.class, box, TermAura::filterEntities)) {
-                     double distance = stand.getEntityPos().squaredDistanceTo(retardedPos);
-                     if (distance <= bestDistance) {
-                        bestCandidate = stand;
-                        bestDistance = distance;
-                     }
-                  }
-
-                  if (bestCandidate != null) {
-                     Vec3d vec3 = MathUtils.clamp(bestCandidate.getBoundingBox(), eyePos)
-                        .subtract(bestCandidate.getX(), bestCandidate.getY(), bestCandidate.getZ());
-                     InteractUtils.interactOnEntity(bestCandidate, vec3);
-                     this.lastClick = System.currentTimeMillis();
-                  }
-               }
+         for (class_1531 stand : class_310.method_1551().field_1687.method_8390(class_1531.class, box, TermAura::filterEntities)) {
+            double distance = stand.method_73189().method_1025(retardedPos);
+            if (distance <= bestDistance) {
+               bestCandidate = stand;
+               bestDistance = distance;
             }
+         }
+
+         if (bestCandidate != null) {
+            class_243 vec3 = MathUtils.clamp(bestCandidate.method_5829(), eyePos)
+               .method_1023(bestCandidate.method_23317(), bestCandidate.method_23318(), bestCandidate.method_23321());
+            InteractUtils.interactOnEntity(bestCandidate, vec3);
+            this.lastClick = System.currentTimeMillis();
          }
       }
    }
 
-   public static boolean getEntityVisibility(Entity entity) {
-      if (!entity.isInvisible()) {
+   public static boolean getEntityVisibility(class_1297 entity) {
+      if (!entity.method_5767()) {
          return true;
       } else {
          TermAura termAura = (TermAura)RSM.getModule(TermAura.class);
@@ -96,11 +96,11 @@ public class TermAura extends Module {
             && Dungeon.isInBoss();
    }
 
-   private static boolean filterEntities(ArmorStandEntity armorStand) {
-      if (armorStand.isDead()) {
+   private static boolean filterEntities(class_1531 armorStand) {
+      if (armorStand.method_29504()) {
          return false;
       } else {
-         Text name = armorStand.getCustomName();
+         class_2561 name = armorStand.method_5797();
          return name == null ? false : name.getString().equals("Inactive Terminal");
       }
    }

@@ -7,77 +7,75 @@ import com.ricedotwho.rsm.module.api.ModuleInfo;
 import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.ButtonSetting;
 import com.ricedotwho.rsm.utils.ItemUtils;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.client.Keyboard;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.class_1799;
+import net.minecraft.class_2338;
+import net.minecraft.class_239;
+import net.minecraft.class_309;
+import net.minecraft.class_310;
+import net.minecraft.class_3965;
+import net.minecraft.class_3966;
+import net.minecraft.class_746;
+import net.minecraft.class_239.class_240;
 
 @ModuleInfo(aliases = "Dev Utils", id = "DevUtils", category = Category.OTHER)
 public class DevUtils extends Module {
    private final ButtonSetting pos = new ButtonSetting("Your XYZ", "List Pos", () -> {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
-      MinecraftClient mc = MinecraftClient.getInstance();
-      Keyboard keyboard = mc.keyboard;
+      class_746 player = class_310.method_1551().field_1724;
+      class_310 mc = class_310.method_1551();
+      class_309 keyboard = mc.field_1774;
       if (player != null) {
-         double x = player.getX();
-         double y = player.getY();
-         double z = player.getZ();
+         double x = player.method_23317();
+         double y = player.method_23318();
+         double z = player.method_23321();
          String xyz = x + ", " + y + ", " + z;
          RSA.chat(xyz);
-         keyboard.setClipboard(xyz);
+         keyboard.method_1455(xyz);
          RSA.chat("Copied to clipboard!");
       }
    });
    private final ButtonSetting yawPitch = new ButtonSetting("Yaw and Pitch", "Yaw/Pitch", () -> {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
-      MinecraftClient mc = MinecraftClient.getInstance();
-      Keyboard keyboard = mc.keyboard;
+      class_746 player = class_310.method_1551().field_1724;
+      class_310 mc = class_310.method_1551();
+      class_309 keyboard = mc.field_1774;
       if (player != null) {
-         float yaw = player.getYaw();
-         float pitch = player.getPitch();
+         float yaw = player.method_36454();
+         float pitch = player.method_36455();
          String yp = yaw + ", " + pitch;
          RSA.chat(yp);
-         keyboard.setClipboard(yp);
+         keyboard.method_1455(yp);
       }
    });
    private final ButtonSetting blockinfo = new ButtonSetting("Block info that you're lookin at", "Block Info", () -> {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
-      MinecraftClient mc = MinecraftClient.getInstance();
-      Keyboard keyboard = mc.keyboard;
-      HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
-      if (player != null) {
-         if (hitResult.getType() == Type.BLOCK) {
-            MinecraftClient client = MinecraftClient.getInstance();
-            BlockHitResult blockHit = (BlockHitResult)client.crosshairTarget;
-            BlockPos pos = blockHit.getBlockPos();
-            double x = pos.getX() + 0.5;
-            int y = pos.getY();
-            double z = pos.getZ() + 0.5;
-            String BlockInfo = x + ", " + y + ", " + z;
-            RSA.chat("XYZ: " + BlockInfo);
-         }
+      class_746 player = class_310.method_1551().field_1724;
+      class_310 mc = class_310.method_1551();
+      class_309 keyboard = mc.field_1774;
+      class_239 hitResult = class_310.method_1551().field_1765;
+      if (player != null && hitResult.method_17783() == class_240.field_1332) {
+         class_310 client = class_310.method_1551();
+         class_3965 blockHit = (class_3965)client.field_1765;
+         class_2338 pos = blockHit.method_17777();
+         double x = pos.method_10263() + 0.5;
+         int y = pos.method_10264();
+         double z = pos.method_10260() + 0.5;
+         String BlockInfo = x + ", " + y + ", " + z;
+         RSA.chat("XYZ: " + BlockInfo);
       }
    });
    private final ButtonSetting entityinfo = new ButtonSetting(
       "Entity info that you're lookin at",
       "Entity Info",
       () -> {
-         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-         HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
+         class_746 player = class_310.method_1551().field_1724;
+         class_239 hitResult = class_310.method_1551().field_1765;
          if (player != null) {
-            EntityHitResult entityHR = (EntityHitResult)hitResult;
-            String entityInfo = entityHR.getEntity().getName().getString();
-            String entityId = String.valueOf(entityHR.getEntity().getId());
-            String simplePos = entityHR.getEntity().getBlockPos().getX()
+            class_3966 entityHR = (class_3966)hitResult;
+            String entityInfo = entityHR.method_17782().method_5477().getString();
+            String entityId = String.valueOf(entityHR.method_17782().method_5628());
+            String simplePos = entityHR.method_17782().method_24515().method_10263()
                + ", "
-               + entityHR.getEntity().getBlockPos().getY()
+               + entityHR.method_17782().method_24515().method_10264()
                + ", "
-               + entityHR.getEntity().getBlockPos().getZ();
+               + entityHR.method_17782().method_24515().method_10260();
             RSA.chat("Name: " + entityInfo);
             RSA.chat("ID: " + entityId);
             RSA.chat("Pos: " + simplePos);
@@ -85,10 +83,10 @@ public class DevUtils extends Module {
       }
    );
    private final ButtonSetting getSbID = new ButtonSetting("Gets the SBID of the item you're holding", "Get SBID", () -> {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
-      MinecraftClient mc = MinecraftClient.getInstance();
+      class_746 player = class_310.method_1551().field_1724;
+      class_310 mc = class_310.method_1551();
       if (player != null) {
-         ItemStack stack = player.getMainHandStack();
+         class_1799 stack = player.method_6047();
          String sbid = ItemUtils.getID(stack);
          RSA.chat("SBID: " + sbid);
       }

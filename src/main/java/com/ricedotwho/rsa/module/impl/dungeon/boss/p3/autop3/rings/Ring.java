@@ -15,15 +15,15 @@ import com.ricedotwho.rsm.utils.Accessor;
 import com.ricedotwho.rsm.utils.FileUtils;
 import com.ricedotwho.rsm.utils.render.render3d.type.FilledBox;
 import com.ricedotwho.rsm.utils.render.render3d.type.OutlineBox;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.class_10185;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
 
 public abstract class Ring implements Accessor {
-   private final Box box;
-   private final Box renderBox;
-   private final Box fillBox;
-   private final Box inlineBox;
+   private final class_238 box;
+   private final class_238 renderBox;
+   private final class_238 fillBox;
+   private final class_238 inlineBox;
    private boolean triggered;
    private boolean active = false;
    private final SubActionManager subManager;
@@ -33,47 +33,47 @@ public abstract class Ring implements Accessor {
       this(pos.subtract(radius, 0.0, radius), pos.add(radius, radius * 2.0, radius), renderOffset, null, null);
    }
 
-   protected Ring(Vec3d pos, double radius, double renderOffset) {
-      this(pos.subtract(radius, 0.0, radius), pos.add(radius, radius * 2.0, radius), renderOffset);
+   protected Ring(class_243 pos, double radius, double renderOffset) {
+      this(pos.method_1023(radius, 0.0, radius), pos.method_1031(radius, radius * 2.0, radius), renderOffset);
    }
 
-   protected Ring(Vec3d min, Vec3d max, double renderOffset) {
-      this.box = new Box(min, max);
-      this.renderBox = this.box.shrink(renderOffset, renderOffset, renderOffset);
+   protected Ring(class_243 min, class_243 max, double renderOffset) {
+      this.box = new class_238(min, max);
+      this.renderBox = this.box.method_1002(renderOffset, renderOffset, renderOffset);
       this.triggered = false;
       this.subManager = null;
       this.argManager = null;
-      this.fillBox = new Box(
-         min.getX(), min.getY(), min.getZ(), max.getX(), min.getY() + 0.05, max.getZ()
+      this.fillBox = new class_238(
+         min.method_10216(), min.method_10214(), min.method_10215(), max.method_10216(), min.method_10214() + 0.05, max.method_10215()
       );
-      Vec3d diff = max.subtract(min).multiply(0.15, 0.0, 0.15);
-      this.inlineBox = new Box(
-         min.getX() + diff.getX(),
-         min.getY(),
-         min.getZ() + diff.getZ(),
-         max.getX() - diff.getX(),
-         min.getY() + 0.05,
-         max.getZ() - diff.getZ()
+      class_243 diff = max.method_1020(min).method_18805(0.15, 0.0, 0.15);
+      this.inlineBox = new class_238(
+         min.method_10216() + diff.method_10216(),
+         min.method_10214(),
+         min.method_10215() + diff.method_10215(),
+         max.method_10216() - diff.method_10216(),
+         min.method_10214() + 0.05,
+         max.method_10215() - diff.method_10215()
       );
    }
 
    protected Ring(Pos min, Pos max, double renderOffset, ArgumentManager manager, SubActionManager subManager) {
-      this.box = new Box(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
-      this.renderBox = this.box.shrink(renderOffset, renderOffset, renderOffset);
+      this.box = new class_238(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
+      this.renderBox = this.box.method_1002(renderOffset, renderOffset, renderOffset);
       this.triggered = false;
       this.subManager = subManager;
       this.argManager = manager;
-      this.fillBox = new Box(min.x(), min.y(), min.z(), max.x(), min.y() + 0.05, max.z());
+      this.fillBox = new class_238(min.x(), min.y(), min.z(), max.x(), min.y() + 0.05, max.z());
       Pos diff = max.subtract(min).multiply(0.15, 0.0, 0.15);
-      this.inlineBox = new Box(min.x() + diff.x(), min.y(), min.z() + diff.z(), max.x() - diff.x(), min.y() + 0.05, max.z() - diff.z());
+      this.inlineBox = new class_238(min.x() + diff.x(), min.y(), min.z() + diff.z(), max.x() - diff.x(), min.y() + 0.05, max.z() - diff.z());
    }
 
-   public boolean isInNode(Vec3d curr, Vec3d prev) {
-      Box feet = new Box(
-         curr.x - 0.2, curr.y, curr.z - 0.2, curr.x + 0.3, curr.y + 0.5, curr.z
+   public boolean isInNode(class_243 curr, class_243 prev) {
+      class_238 feet = new class_238(
+         curr.field_1352 - 0.2, curr.field_1351, curr.field_1350 - 0.2, curr.field_1352 + 0.3, curr.field_1351 + 0.5, curr.field_1350
       );
-      boolean intercept = this.box.intersects(curr, prev);
-      boolean intersects = this.box.intersects(feet);
+      boolean intercept = this.box.method_993(curr, prev);
+      boolean intersects = this.box.method_994(feet);
       return intercept || intersects;
    }
 
@@ -89,7 +89,7 @@ public abstract class Ring implements Accessor {
       this.active = false;
    }
 
-   public boolean updateState(Vec3d playerPos, Vec3d oldPos) {
+   public boolean updateState(class_243 playerPos, class_243 oldPos) {
       boolean inNode = this.isInNode(playerPos, oldPos);
       if (inNode && !this.triggered) {
          return true;
@@ -102,10 +102,10 @@ public abstract class Ring implements Accessor {
       }
    }
 
-   public float getDistanceSq(Vec3d vec3) {
-      float dx = (float)((this.box.maxX + this.box.minX) / 2.0 - vec3.x);
-      float dy = (float)((this.box.maxY + this.box.minY) / 2.0 - vec3.y);
-      float dz = (float)((this.box.maxZ + this.box.minZ) / 2.0 - vec3.z);
+   public float getDistanceSq(class_243 vec3) {
+      float dx = (float)((this.box.field_1320 + this.box.field_1323) / 2.0 - vec3.field_1352);
+      float dy = (float)((this.box.field_1325 + this.box.field_1322) / 2.0 - vec3.field_1351);
+      float dz = (float)((this.box.field_1324 + this.box.field_1321) / 2.0 - vec3.field_1350);
       return dx * dx + dy * dy + dz * dz;
    }
 
@@ -141,7 +141,7 @@ public abstract class Ring implements Accessor {
 
    public abstract int getPriority();
 
-   public abstract boolean tick(MutableInput input, PlayerInput playerInput, AutoP3 module);
+   public abstract boolean tick(MutableInput var1, class_10185 var2, AutoP3 var3);
 
    public abstract void feedback();
 
@@ -162,8 +162,8 @@ public abstract class Ring implements Accessor {
    public JsonObject serialize() {
       JsonObject obj = new JsonObject();
       obj.addProperty("type", this.getType().name());
-      obj.add("min", FileUtils.getGson().toJsonTree(new Pos(this.box.minX, this.box.minY, this.box.minZ)));
-      obj.add("max", FileUtils.getGson().toJsonTree(new Pos(this.box.maxX, this.box.maxY, this.box.maxZ)));
+      obj.add("min", FileUtils.getGson().toJsonTree(new Pos(this.box.field_1323, this.box.field_1322, this.box.field_1321)));
+      obj.add("max", FileUtils.getGson().toJsonTree(new Pos(this.box.field_1320, this.box.field_1325, this.box.field_1324)));
       if (this.argManager != null && !this.argManager.getArgs().isEmpty()) {
          obj.add("args", this.argManager.serialize());
       }
@@ -175,11 +175,11 @@ public abstract class Ring implements Accessor {
       return obj;
    }
 
-   public Box getBox() {
+   public class_238 getBox() {
       return this.box;
    }
 
-   public Box getRenderBox() {
+   public class_238 getRenderBox() {
       return this.renderBox;
    }
 

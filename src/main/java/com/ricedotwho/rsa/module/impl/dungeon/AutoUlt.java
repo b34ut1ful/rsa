@@ -15,7 +15,7 @@ import com.ricedotwho.rsm.ui.clickgui.settings.impl.BooleanSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
-import net.minecraft.util.Formatting;
+import net.minecraft.class_124;
 
 @ModuleInfo(aliases = "Abilities", id = "Abilities", category = Category.DUNGEONS, isOverwrite = true)
 public class AutoUlt extends Abilities {
@@ -32,7 +32,7 @@ public class AutoUlt extends Abilities {
    @SubscribeEvent
    public void onChat(Chat event) {
       if (Location.getArea().is(Island.Dungeon) && Dungeon.isStarted()) {
-         String value = Formatting.strip(event.getMessage().getString());
+         String value = class_124.method_539(event.getMessage().getString());
          if ((Boolean)this.wishCommand.getValue() && wishPattern.matcher(value).find()) {
             this.drop(false);
          } else {

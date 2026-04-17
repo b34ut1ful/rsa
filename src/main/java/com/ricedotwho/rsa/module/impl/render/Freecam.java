@@ -17,16 +17,16 @@ import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import com.ricedotwho.rsm.utils.RotationUtils;
 import java.math.BigDecimal;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.class_124;
+import net.minecraft.class_241;
+import net.minecraft.class_243;
+import net.minecraft.class_310;
+import net.minecraft.class_315;
 
 @ModuleInfo(aliases = "Freecam", id = "Freecam", category = Category.RENDER, hasKeybind = true)
 public class Freecam extends Module implements ClientRotationProvider, CameraPositionProvider {
-   private static final String ENABLE_MSG = "Freecam " + Formatting.GREEN + "enabled!";
-   private static final String DISABLE_MSG = "Freecam " + Formatting.RED + "disabled!";
+   private static final String ENABLE_MSG = "Freecam " + class_124.field_1060 + "enabled!";
+   private static final String DISABLE_MSG = "Freecam " + class_124.field_1061 + "disabled!";
    private final NumberSetting horizontalSpeed = new NumberSetting("Horizontal Speed", 0.0, 1.0, 0.35, 0.05);
    private final NumberSetting verticalSpeed = new NumberSetting("Vertical Speed", 0.0, 0.5, 0.25, 0.025);
    private static Freecam INSTANCE;
@@ -42,7 +42,7 @@ public class Freecam extends Module implements ClientRotationProvider, CameraPos
          INSTANCE = (Freecam)RSM.getModule(Freecam.class);
       }
 
-      this.freecamPos = new Pos(MinecraftClient.getInstance().gameRenderer.getCamera().getPos());
+      this.freecamPos = new Pos(class_310.method_1551().field_1773.method_19418().method_19326());
       CameraHandler.registerProvider(this);
       ClientRotationHandler.registerProvider(this);
    }
@@ -58,24 +58,24 @@ public class Freecam extends Module implements ClientRotationProvider, CameraPos
 
    @SubscribeEvent
    public void onRenderWorld(Start event) {
-      if (MinecraftClient.getInstance().getCameraEntity() != null) {
-         GameOptions options = MinecraftClient.getInstance().options;
-         boolean up = options.forwardKey.isPressed();
-         boolean down = options.backKey.isPressed();
-         boolean left = options.leftKey.isPressed();
-         boolean right = options.rightKey.isPressed();
+      if (class_310.method_1551().method_1560() != null) {
+         class_315 options = class_310.method_1551().field_1690;
+         boolean up = options.field_1894.method_1434();
+         boolean down = options.field_1881.method_1434();
+         boolean left = options.field_1913.method_1434();
+         boolean right = options.field_1849.method_1434();
          float x = RotationUtils.calculateImpulse(up, down);
          float y = RotationUtils.calculateImpulse(left, right);
-         Vec2f hori = Vec2f.ZERO;
+         class_241 hori = class_241.field_1340;
          if (x != 0.0F || y != 0.0F) {
             hori = RotationUtils.rotateVector(y, x, -ClientRotationHandler.getClientYaw())
-               .normalize()
-               .multiply(((BigDecimal)this.horizontalSpeed.getValue()).floatValue());
+               .method_35581()
+               .method_35582(((BigDecimal)this.horizontalSpeed.getValue()).floatValue());
          }
 
-         float vertical = RotationUtils.calculateImpulse(options.jumpKey.isPressed(), options.sneakKey.isPressed())
+         float vertical = RotationUtils.calculateImpulse(options.field_1903.method_1434(), options.field_1832.method_1434())
             * ((BigDecimal)this.verticalSpeed.getValue()).floatValue();
-         this.freecamPos.selfAdd(hori.x, vertical, hori.y);
+         this.freecamPos.selfAdd(hori.field_1343, vertical, hori.field_1342);
       }
    }
 
@@ -99,15 +99,15 @@ public class Freecam extends Module implements ClientRotationProvider, CameraPos
       return true;
    }
 
-   public Vec3d getCameraPosition() {
+   public class_243 getCameraPosition() {
       return this.freecamPos.asVec3();
    }
 
-   public Vec3d getPosForHit() {
+   public class_243 getPosForHit() {
       return null;
    }
 
-   public Vec3d getRotForHit() {
+   public class_243 getRotForHit() {
       return null;
    }
 

@@ -13,16 +13,16 @@ import com.ricedotwho.rsm.data.Pos;
 import com.ricedotwho.rsm.utils.FileUtils;
 import com.ricedotwho.rsm.utils.RotationUtils;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.class_10185;
+import net.minecraft.class_2246;
+import net.minecraft.class_2338;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
+import net.minecraft.class_265;
+import net.minecraft.class_2680;
+import net.minecraft.class_310;
+import net.minecraft.class_3965;
+import net.minecraft.class_239.class_240;
 
 public class BoomRing extends Ring {
    private final Pos target;
@@ -34,11 +34,11 @@ public class BoomRing extends Ring {
 
    public BoomRing(Pos min, Pos max, ArgumentManager manager, SubActionManager actions, Map<String, Object> ignored) {
       super(min, max, RingType.BOOM.getRenderSizeOffset(), manager, actions);
-      if (MinecraftClient.getInstance().crosshairTarget instanceof BlockHitResult blockHitResult && blockHitResult.getType() != Type.MISS) {
-         Vec3d eyePos = mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0);
-         Vec3d dir = blockHitResult.getPos().subtract(eyePos).normalize().multiply(0.001F);
-         this.target = new Pos(blockHitResult.getPos());
-         this.target.selfAdd(dir.x, dir.y, dir.z);
+      if (class_310.method_1551().field_1765 instanceof class_3965 blockHitResult && blockHitResult.method_17783() != class_240.field_1333) {
+         class_243 eyePos = mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0);
+         class_243 dir = blockHitResult.method_17784().method_1020(eyePos).method_1029().method_1021(0.001F);
+         this.target = new Pos(blockHitResult.method_17784());
+         this.target.selfAdd(dir.field_1352, dir.field_1351, dir.field_1350);
       } else {
          this.target = null;
       }
@@ -54,24 +54,24 @@ public class BoomRing extends Ring {
       if (!SwapManager.reserveSwap("INFINITE_SUPERBOOM_TNT", "SUPERBOOM_TNT")) {
          return false;
       } else {
-         Vec3d eyePos = mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0);
-         Vec3d targetVec = this.target.asVec3();
+         class_243 eyePos = mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0);
+         class_243 targetVec = this.target.asVec3();
          boolean swap = SwapManager.isDesynced();
          PacketOrderManager.register(
             PacketOrderManager.STATE.ITEM_USE,
             () -> {
-               BlockPos blockPos = BlockPos.ofFloored(targetVec);
-               BlockState blockState = MinecraftClient.getInstance().world.getBlockState(blockPos);
-               if (blockState.getBlock() != Blocks.AIR) {
-                  VoxelShape voxelShape = blockState.getOutlineShape(MinecraftClient.getInstance().world, blockPos);
-                  if (!voxelShape.isEmpty()) {
-                     Box blockAABB = voxelShape.getBoundingBox();
-                     Vec3d center = new Vec3d(
-                        (blockAABB.minX + blockAABB.maxX) * 0.5 + blockPos.getX(),
-                        (blockAABB.minY + blockAABB.maxY) * 0.5 + blockPos.getY(),
-                        (blockAABB.minZ + blockAABB.maxZ) * 0.5 + blockPos.getZ()
+               class_2338 blockPos = class_2338.method_49638(targetVec);
+               class_2680 blockState = class_310.method_1551().field_1687.method_8320(blockPos);
+               if (blockState.method_26204() != class_2246.field_10124) {
+                  class_265 voxelShape = blockState.method_26218(class_310.method_1551().field_1687, blockPos);
+                  if (!voxelShape.method_1110()) {
+                     class_238 blockAABB = voxelShape.method_1107();
+                     class_243 center = new class_243(
+                        (blockAABB.field_1323 + blockAABB.field_1320) * 0.5 + blockPos.method_10263(),
+                        (blockAABB.field_1322 + blockAABB.field_1325) * 0.5 + blockPos.method_10264(),
+                        (blockAABB.field_1321 + blockAABB.field_1324) * 0.5 + blockPos.method_10260()
                      );
-                     BlockHitResult result = RotationUtils.collisionRayTrace(blockPos, blockAABB, eyePos, center);
+                     class_3965 result = RotationUtils.collisionRayTrace(blockPos, blockAABB, eyePos, center);
                      if (result == null) {
                         AutoP3.modMessage("Failed to find block hit result!");
                      } else {
@@ -96,7 +96,7 @@ public class BoomRing extends Ring {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
       return true;
    }
 

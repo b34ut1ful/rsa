@@ -6,7 +6,7 @@ import com.ricedotwho.rsa.module.impl.dungeon.boss.p3.autop3.args.Argument;
 import com.ricedotwho.rsa.module.impl.dungeon.boss.p3.autop3.args.RingArgType;
 import com.ricedotwho.rsm.component.impl.map.handler.Dungeon;
 import com.ricedotwho.rsm.utils.NumberUtils;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.class_3532;
 
 public class LeapArg extends Argument<Boolean> {
    private final int players;
@@ -14,7 +14,7 @@ public class LeapArg extends Argument<Boolean> {
 
    public LeapArg(int players) {
       super(RingArgType.LEAP);
-      this.players = MathHelper.clamp(players, 0, 5);
+      this.players = class_3532.method_15340(players, 0, 5);
    }
 
    @Override

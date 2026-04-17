@@ -1,8 +1,8 @@
 package com.ricedotwho.rsa.module.impl.dungeon.boss.p3.terminals.auto.terminals;
 
 import java.util.function.BiFunction;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import net.minecraft.class_1703;
+import net.minecraft.class_3944;
 
 public enum TerminalType {
    NUMBERS(0, "Click in order!", 35, Numbers::supply),
@@ -15,9 +15,9 @@ public enum TerminalType {
    private final int id;
    private final int slotCount;
    private final String title;
-   private final BiFunction<OpenScreenS2CPacket, ScreenHandler, Terminal> supplier;
+   private final BiFunction<class_3944, class_1703, Terminal> supplier;
 
-   private TerminalType(int id, String title, int slotCount, BiFunction<OpenScreenS2CPacket, ScreenHandler, Terminal> supplier) {
+   private TerminalType(int id, String title, int slotCount, BiFunction<class_3944, class_1703, Terminal> supplier) {
       this.id = id;
       this.title = title;
       this.slotCount = slotCount;
@@ -34,7 +34,7 @@ public enum TerminalType {
       return null;
    }
 
-   public Terminal supply(OpenScreenS2CPacket packet, ScreenHandler menu) {
+   public Terminal supply(class_3944 packet, class_1703 menu) {
       return this.getSupplier() == null ? null : this.getSupplier().apply(packet, menu);
    }
 
@@ -50,7 +50,7 @@ public enum TerminalType {
       return this.title;
    }
 
-   public BiFunction<OpenScreenS2CPacket, ScreenHandler, Terminal> getSupplier() {
+   public BiFunction<class_3944, class_1703, Terminal> getSupplier() {
       return this.supplier;
    }
 }

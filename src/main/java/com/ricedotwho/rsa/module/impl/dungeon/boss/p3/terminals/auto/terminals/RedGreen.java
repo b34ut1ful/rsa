@@ -3,15 +3,15 @@ package com.ricedotwho.rsa.module.impl.dungeon.boss.p3.terminals.auto.terminals;
 import com.ricedotwho.rsa.module.impl.dungeon.boss.p3.terminals.auto.AutoTerms;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import net.minecraft.class_1703;
+import net.minecraft.class_1713;
+import net.minecraft.class_1735;
+import net.minecraft.class_1799;
+import net.minecraft.class_1802;
+import net.minecraft.class_3944;
 
 public class RedGreen extends Terminal {
-   protected RedGreen(OpenScreenS2CPacket packet, ScreenHandler menu) {
+   protected RedGreen(class_3944 packet, class_1703 menu) {
       super(TerminalType.REDGREEN, packet, menu);
    }
 
@@ -24,10 +24,10 @@ public class RedGreen extends Terminal {
          int changedIndex = this.solution.getNext().index();
 
          for (int i = 0; i < this.getType().getSlotCount(); i++) {
-            Slot slot = this.terminalContainer.getSlot(i);
-            Terminal.HashInfo hashInfo = new Terminal.HashInfo(slot.getStack());
-            if (slot.id == changedIndex) {
-               hashInfo.setItem(Items.LIME_STAINED_GLASS_PANE);
+            class_1735 slot = this.terminalContainer.method_7611(i);
+            Terminal.HashInfo hashInfo = new Terminal.HashInfo(slot.method_7677());
+            if (slot.field_7874 == changedIndex) {
+               hashInfo.setItem(class_1802.field_8581);
             }
 
             infos.add(hashInfo);
@@ -42,8 +42,8 @@ public class RedGreen extends Terminal {
       List<Terminal.HashInfo> infos = new ArrayList<>(this.getType().getSlotCount());
 
       for (int i = 0; i < this.getType().getSlotCount(); i++) {
-         Slot slot = this.terminalContainer.getSlot(i);
-         infos.add(new Terminal.HashInfo(slot.getStack()));
+         class_1735 slot = this.terminalContainer.method_7611(i);
+         infos.add(new Terminal.HashInfo(slot.method_7677()));
       }
 
       return Terminal.getTerminalState(TerminalType.REDGREEN, infos);
@@ -54,10 +54,10 @@ public class RedGreen extends Terminal {
       super.solve();
       List<SolutionClick> solutionClicks = new ArrayList<>();
 
-      for (Slot slot : this.terminalContainer.slots) {
-         ItemStack stack = slot.getStack();
-         if (!stack.isEmpty() && stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
-            solutionClicks.add(new SolutionClick(SlotActionType.CLONE, slot.id, 0));
+      for (class_1735 slot : this.terminalContainer.field_7761) {
+         class_1799 stack = slot.method_7677();
+         if (!stack.method_7960() && stack.method_7909() == class_1802.field_8879) {
+            solutionClicks.add(new SolutionClick(class_1713.field_7796, slot.field_7874, 0));
          }
       }
 
@@ -70,7 +70,7 @@ public class RedGreen extends Terminal {
       return AutoTerms.getTerminals().get("Red Green");
    }
 
-   protected static RedGreen supply(OpenScreenS2CPacket packet, ScreenHandler menu) {
+   protected static RedGreen supply(class_3944 packet, class_1703 menu) {
       return new RedGreen(packet, menu);
    }
 }

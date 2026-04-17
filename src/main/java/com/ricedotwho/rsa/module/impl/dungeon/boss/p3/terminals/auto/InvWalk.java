@@ -23,8 +23,8 @@ import com.ricedotwho.rsm.utils.render.render2d.NVGUtils;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.class_10185;
+import net.minecraft.class_310;
 import org.joml.Vector2d;
 
 @SubModuleInfo(name = "InvWalk", alwaysDisabled = false)
@@ -80,7 +80,7 @@ public class InvWalk extends SubModule<AutoTerms> {
    public void onRenderGui(Render2DEvent event) {
       try {
          if (((AutoTerms)this.module).isInTerm()) {
-            int slots = Utils.getGuiSlotCount(((AutoTerms)this.module).getTerminalContainer().getType());
+            int slots = Utils.getGuiSlotCount(((AutoTerms)this.module).getTerminalContainer().method_17358());
             if ((Boolean)this.renderClicksLeft.getValue() && Terminals.getCurrent() != null) {
                String remainingText = "Clicks remaining: ";
                String clicks = Terminals.getCurrent() instanceof Melody mel
@@ -88,8 +88,8 @@ public class InvWalk extends SubModule<AutoTerms> {
                   : String.valueOf(Terminals.getCurrent().getSolution().size());
                if ((Boolean)this.clicksMCFont.getValue()) {
                   this.clicksText.renderScaledGFX(event.getGfx(), () -> {
-                     event.getGfx().drawTextWithShadow(mc.textRenderer, remainingText, 0, 0, this.remainingColour.getValue().getRGB());
-                     event.getGfx().drawTextWithShadow(mc.textRenderer, clicks, mc.textRenderer.getWidth(remainingText), 0, this.clicksColour.getValue().getRGB());
+                     event.getGfx().method_25303(mc.field_1772, remainingText, 0, 0, this.remainingColour.getValue().getRGB());
+                     event.getGfx().method_25303(mc.field_1772, clicks, mc.field_1772.method_1727(remainingText), 0, this.clicksColour.getValue().getRGB());
                   }, 150.0F, 15.0F);
                } else {
                   this.clicksText
@@ -130,7 +130,7 @@ public class InvWalk extends SubModule<AutoTerms> {
                   this.termTitle
                      .renderScaledGFX(
                         event.getGfx(),
-                        () -> event.getGfx().drawTextWithShadow(mc.textRenderer, finalTermText, 0, 0, this.titleColour.getValue().getRGB()),
+                        () -> event.getGfx().method_25303(mc.field_1772, finalTermText, 0, 0, this.titleColour.getValue().getRGB()),
                         150.0F,
                         15.0F
                      );
@@ -159,19 +159,19 @@ public class InvWalk extends SubModule<AutoTerms> {
                this.gui.renderScaled(event.getGfx(), () -> this.terminalRenderer.renderSolver(gap), 9.0F * gap, slots / 9.0F * gap);
             }
          }
-      } catch (Exception exception) {
-         throw new RuntimeException(exception);
+      } catch (Exception var7) {
+         throw new RuntimeException(var7);
       }
    }
 
    @SubscribeEvent
    public void onPollInput(InputPollEvent event) {
       if (this.melodyMoveCounter >= 1) {
-         if (MinecraftClient.getInstance().currentScreen == null && !((AutoTerms)this.module).isInTerm()) {
+         if (class_310.method_1551().field_1755 == null && !((AutoTerms)this.module).isInTerm()) {
             this.melodyMoveCounter = 0;
          } else {
-            PlayerInput oldInputs = event.getClientInput();
-            PlayerInput newInputs = new PlayerInput(false, false, false, false, false, oldInputs.sneak(), false);
+            class_10185 oldInputs = event.getClientInput();
+            class_10185 newInputs = new class_10185(false, false, false, false, false, oldInputs.comp_3164(), false);
             event.getInput().apply(newInputs);
             this.melodyMoveCounter--;
          }

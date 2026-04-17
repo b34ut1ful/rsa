@@ -19,9 +19,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.item.Items;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.class_1802;
+import net.minecraft.class_2246;
+import net.minecraft.class_243;
 
 @ModuleInfo(aliases = "Auto4", id = "Auto4", category = Category.DUNGEONS)
 public class Auto4 extends Module {
@@ -46,18 +46,18 @@ public class Auto4 extends Module {
 
    @SubscribeEvent
    public void onBlockChange(BlockChangeEvent event) {
-      if (Location.getArea().is(Island.Dungeon) && mc.player != null && this.on4thDev() && this.isHoldingBow()) {
+      if (Location.getArea().is(Island.Dungeon) && mc.field_1724 != null && this.on4thDev() && this.isHoldingBow()) {
          Pos pos = event.getPos();
          int index = blocks.indexOf(pos);
          if (index != -1) {
-            if (event.getNewState().isOf(Blocks.BLUE_TERRACOTTA)) {
+            if (event.getNewState().method_27852(class_2246.field_10409)) {
                this.done.add(index);
             }
 
-            if (event.getNewState().isOf(Blocks.EMERALD_BLOCK)) {
+            if (event.getNewState().method_27852(class_2246.field_10234)) {
                long now = System.currentTimeMillis();
                long delay = ((BigDecimal)this.delay.getValue()).longValue() - (now - this.lastShot);
-               Rotation rotation = this.calculateAim(event.getPos(), index, "TERMINATOR".equals(ItemUtils.getID(mc.player.getInventory().getSelectedStack())));
+               Rotation rotation = this.calculateAim(event.getPos(), index, "TERMINATOR".equals(ItemUtils.getID(mc.field_1724.method_31548().method_7391())));
                TaskComponent.onMilli(delay, () -> {
                   if (this.isHoldingBow()) {
                      PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> {
@@ -72,12 +72,12 @@ public class Auto4 extends Module {
    }
 
    private boolean isHoldingBow() {
-      return mc.player.getInventory().getSelectedStack().getItem().equals(Items.BOW);
+      return mc.field_1724.method_31548().method_7391().method_7909().equals(class_1802.field_8102);
    }
 
    private boolean on4thDev() {
-      Vec3d pos = mc.player.getEntityPos();
-      return pos.getX() > 63.0 && pos.getX() < 64.0 && pos.getY() == 127.0 && pos.getZ() > 35.0 && pos.getZ() < 36.0;
+      class_243 pos = mc.field_1724.method_73189();
+      return pos.method_10216() > 63.0 && pos.method_10216() < 64.0 && pos.method_10214() == 127.0 && pos.method_10215() > 35.0 && pos.method_10215() < 36.0;
    }
 
    private Rotation calculateAim(Pos pos, int index, boolean term) {

@@ -4,18 +4,18 @@ import com.ricedotwho.rsm.utils.Accessor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.world.tick.TickManager;
+import net.minecraft.class_8921;
 
 public final class Util implements Accessor {
    private static final Pattern timestampPattern = Pattern.compile("(\\d+)\\s*([dhms])");
 
    public static void setTickRate(float tickRate, boolean frozen) {
       if (!(tickRate > 20.0F) && !(tickRate < 0.0F)) {
-         TickManager tickRateManager = mc.world.getTickManager();
-         tickRateManager.setTickRate(tickRate);
-         tickRateManager.setFrozen(frozen);
+         class_8921 tickRateManager = mc.field_1687.method_54719();
+         tickRateManager.method_54671(tickRate);
+         tickRateManager.method_54675(frozen);
          if (frozen) {
-            tickRateManager.setStepTicks(0);
+            tickRateManager.method_54747(0);
          }
       } else {
          throw new IllegalArgumentException("tickRate must be between 0 and 20!");
@@ -31,12 +31,12 @@ public final class Util implements Accessor {
          try {
             Class<?> clazz = Class.forName("com.ricedotwho.zero.ZeroClient");
             return (Boolean)clazz.getMethod("isZero").invoke(null);
-         } catch (Throwable e) {
+         } catch (Throwable var1) {
             return false;
          }
+      } else {
+         return false;
       }
-
-      return false;
    }
 
    public static long getMillisFromDHMS(String input) {

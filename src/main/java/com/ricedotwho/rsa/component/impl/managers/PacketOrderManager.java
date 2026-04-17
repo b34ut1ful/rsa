@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.class_2596;
 
 public class PacketOrderManager {
    private static final ConcurrentHashMap<PacketOrderManager.STATE, List<Runnable>> packets = new ConcurrentHashMap<>();
-   private static final List<Predicate<Packet<?>>> receiveListeners = new ArrayList<>(4);
+   private static final List<Predicate<class_2596<?>>> receiveListeners = new ArrayList<>(4);
 
    private PacketOrderManager() {
    }
@@ -30,13 +30,13 @@ public class PacketOrderManager {
       }
    }
 
-   public static void registerReceiveListener(Predicate<Packet<?>> listener) {
+   public static void registerReceiveListener(Predicate<class_2596<?>> listener) {
       synchronized (receiveListeners) {
          receiveListeners.add(listener);
       }
    }
 
-   public static void onPreReceivePacket(Packet<?> packet) {
+   public static void onPreReceivePacket(class_2596<?> packet) {
       synchronized (receiveListeners) {
          if (!receiveListeners.isEmpty()) {
             receiveListeners.removeIf(predicate -> predicate.test(packet));

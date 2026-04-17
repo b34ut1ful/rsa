@@ -5,12 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.ricedotwho.rsa.RSA;
 import com.ricedotwho.rsa.component.impl.pathfinding.Goal;
 import com.ricedotwho.rsa.component.impl.pathfinding.GoalDungeonXYZ;
-import com.ricedotwho.rsa.screen.DungeonRouteMapScreen;
 import com.ricedotwho.rsa.module.impl.dungeon.DynamicRoutes;
 import com.ricedotwho.rsa.module.impl.dungeon.autoroutes.awaits.AwaitClick;
 import com.ricedotwho.rsa.module.impl.dungeon.autoroutes.awaits.AwaitSecrets;
 import com.ricedotwho.rsa.module.impl.dungeon.autoroutes.nodes.BatNode;
 import com.ricedotwho.rsa.module.impl.dungeon.autoroutes.nodes.BreakNode;
+import com.ricedotwho.rsa.screen.DungeonRouteMapScreen;
 import com.ricedotwho.rsm.RSM;
 import com.ricedotwho.rsm.component.impl.location.Island;
 import com.ricedotwho.rsm.component.impl.location.Location;
@@ -52,20 +52,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.Formatting;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
-import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.class_10185;
+import net.minecraft.class_124;
+import net.minecraft.class_1297;
+import net.minecraft.class_1542;
+import net.minecraft.class_2246;
+import net.minecraft.class_2248;
+import net.minecraft.class_2338;
+import net.minecraft.class_243;
+import net.minecraft.class_2716;
+import net.minecraft.class_2775;
+import net.minecraft.class_2851;
+import net.minecraft.class_2885;
+import net.minecraft.class_310;
+import net.minecraft.class_465;
 import org.jetbrains.annotations.NotNull;
 
 @ModuleInfo(aliases = "Auto Routes", id = "Autoroutes", category = Category.DUNGEONS)
@@ -73,6 +73,7 @@ public class AutoRoutes extends Module implements Accessor {
    private final HashMap<RoomData, List<Node>> activeNodes = new HashMap<>();
    private final HashMap<String, List<Node>> redoMap = new HashMap<>();
    private static final BooleanSetting centerOnly = new BooleanSetting("Center Only", false);
+   private static final BooleanSetting centerOnlyOnNonStartNodes = new BooleanSetting("Center Only on Non Start Nodes", false);
    private static final BooleanSetting zeroTickBreak = new BooleanSetting("0t Break", false);
    private static final BooleanSetting use1_8Height = new BooleanSetting("Use 1.8 height for placing node", false);
    private final BooleanSetting editMode = new BooleanSetting("Edit Mode", false);
@@ -133,6 +134,7 @@ public class AutoRoutes extends Module implements Accessor {
          new Setting[]{
             this.editMode,
             centerOnly,
+            centerOnlyOnNonStartNodes,
             zeroTickBreak,
             use1_8Height,
             this.triggerBind,
@@ -182,26 +184,22 @@ public class AutoRoutes extends Module implements Accessor {
    public void onClientTickStart(Start event) {
       this.lastBlockC08--;
       this.isRouting = false;
-      if (!Location.getArea().is(Island.Dungeon)) {
-         return;
-      }
+      if (Location.getArea().is(Island.Dungeon)) {
+         this.tickTime++;
+         if (!this.hasGuiOpen() && !(Boolean)this.editMode.getValue() && Map.getCurrentRoom() != null && class_310.method_1551().field_1724 != null) {
+            Room currentRoom = Map.getCurrentRoom();
+            List<Node> nodes = this.activeNodes.get(currentRoom.getData());
+            if (nodes != null && !nodes.isEmpty()) {
+               Pos playerPos = new Pos(class_310.method_1551().field_1724.method_73189());
+               nodes.forEach(n -> n.updateNodeState(playerPos, this.tickTime));
+               this.lastType = null;
 
-      this.tickTime++;
-      if (this.hasGuiOpen() || (Boolean)this.editMode.getValue() || Map.getCurrentRoom() == null || MinecraftClient.getInstance().player == null) {
-         return;
-      }
-
-      Room currentRoom = Map.getCurrentRoom();
-      List<Node> nodes = this.activeNodes.get(currentRoom.getData());
-      if (nodes == null || nodes.isEmpty()) {
-         this.inNode = null;
-         return;
-      }
-
-      Pos playerPos = new Pos(MinecraftClient.getInstance().player.getEntityPos());
-      nodes.forEach(n -> n.updateNodeState(playerPos, this.tickTime));
-      this.lastType = null;
-      while (this.handleQueue(playerPos, nodes)) {
+               while (this.handleQueue(playerPos, nodes)) {
+               }
+            } else {
+               this.inNode = null;
+            }
+         }
       }
    }
 
@@ -212,15 +210,15 @@ public class AutoRoutes extends Module implements Accessor {
    @SubscribeEvent
    public void onPollInputs(InputPollEvent event) {
       if (this.isRouting() && Location.getArea().is(Island.Dungeon) && !this.hasGuiOpen()) {
-         PlayerInput oldInputs = event.getClientInput();
-         PlayerInput newInputs = new PlayerInput(
-            oldInputs.forward(),
-            oldInputs.backward(),
-            oldInputs.left(),
-            oldInputs.right(),
-            oldInputs.jump(),
+         class_10185 oldInputs = event.getClientInput();
+         class_10185 newInputs = new class_10185(
+            oldInputs.comp_3159(),
+            oldInputs.comp_3160(),
+            oldInputs.comp_3161(),
+            oldInputs.comp_3162(),
+            oldInputs.comp_3163(),
             !this.forceNextNotSneak,
-            oldInputs.sprint()
+            oldInputs.comp_3165()
          );
          this.forceNextNotSneak = false;
          event.getInput().apply(newInputs);
@@ -252,106 +250,105 @@ public class AutoRoutes extends Module implements Accessor {
    }
 
    private boolean hasGuiOpen() {
-      return MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().currentScreen instanceof HandledScreen;
+      return class_310.method_1551().field_1724 != null && class_310.method_1551().field_1755 instanceof class_465;
    }
 
-   @SuppressWarnings("unchecked")
    private HashMap<String, List<Node>> getSavedNodes() {
       return (HashMap<String, List<Node>>)this.data.getValue();
    }
 
    public boolean clearNodes(UniqueRoom uniqueRoom) {
-      if (MinecraftClient.getInstance().player == null || !this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
+      if (class_310.method_1551().field_1724 != null && this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
+         List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
+         if (nodes.isEmpty()) {
+            return false;
+         } else {
+            nodes.clear();
+            this.save();
+            return true;
+         }
+      } else {
          return false;
       }
-
-      List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
-      if (nodes.isEmpty()) {
-         return false;
-      }
-
-      nodes.clear();
-      this.save();
-      return true;
    }
 
    public boolean removeNearest(UniqueRoom uniqueRoom) {
-      if (MinecraftClient.getInstance().player == null || !this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
-         return false;
-      }
+      if (class_310.method_1551().field_1724 != null && this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
+         List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
+         if (nodes.isEmpty()) {
+            return false;
+         } else {
+            int bestIndex = -1;
+            double bestDistance = Double.MAX_VALUE;
+            class_243 playerPos = class_310.method_1551().field_1724.method_73189();
 
-      List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
-      if (nodes.isEmpty()) {
-         return false;
-      }
+            for (int i = 0; i < nodes.size(); i++) {
+               double distance = nodes.get(i).getRealPos().squaredDistanceTo(playerPos);
+               if (distance < bestDistance) {
+                  bestIndex = i;
+                  bestDistance = distance;
+               }
+            }
 
-      int bestIndex = -1;
-      double bestDistance = Double.MAX_VALUE;
-      Vec3d playerPos = MinecraftClient.getInstance().player.getEntityPos();
-
-      for (int i = 0; i < nodes.size(); i++) {
-         double distance = nodes.get(i).getRealPos().squaredDistanceTo(playerPos);
-         if (distance < bestDistance) {
-            bestIndex = i;
-            bestDistance = distance;
+            if (bestIndex < 0) {
+               return false;
+            } else {
+               nodes.remove(bestIndex);
+               this.save();
+               return true;
+            }
          }
-      }
-
-      if (bestIndex < 0) {
+      } else {
          return false;
       }
-
-      nodes.remove(bestIndex);
-      this.save();
-      return true;
    }
 
    public boolean undoNode(UniqueRoom uniqueRoom) {
-      if (MinecraftClient.getInstance().player == null || !this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
+      if (class_310.method_1551().field_1724 != null && this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
+         List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
+         if (nodes.isEmpty()) {
+            return false;
+         } else {
+            if (!this.redoMap.containsKey(uniqueRoom.getName())) {
+               this.redoMap.put(uniqueRoom.getName(), new ArrayList<>());
+            }
+
+            Node node = nodes.removeLast();
+            this.redoMap.get(uniqueRoom.getName()).add(node);
+            this.save();
+            RSA.chat("Undid %s at %s", node.getName(), node.getRealPos().toChatString());
+            return true;
+         }
+      } else {
          return false;
       }
-
-      List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
-      if (nodes.isEmpty()) {
-         return false;
-      }
-
-      if (!this.redoMap.containsKey(uniqueRoom.getName())) {
-         this.redoMap.put(uniqueRoom.getName(), new ArrayList<>());
-      }
-
-      Node node = nodes.removeLast();
-      this.redoMap.get(uniqueRoom.getName()).add(node);
-      this.save();
-      RSA.chat("Undid %s at %s", node.getName(), node.getRealPos().toChatString());
-      return true;
    }
 
    public boolean redoNode(UniqueRoom uniqueRoom) {
-      if (MinecraftClient.getInstance().player == null || !this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
+      if (class_310.method_1551().field_1724 != null && this.activeNodes.containsKey(uniqueRoom.getMainRoom().getData())) {
+         List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
+         if (!this.redoMap.containsKey(uniqueRoom.getName())) {
+            return false;
+         } else {
+            List<Node> redo = this.redoMap.get(uniqueRoom.getName());
+            if (redo.isEmpty()) {
+               return false;
+            } else {
+               Node node = redo.removeLast();
+               nodes.add(node);
+               this.save();
+               RSA.chat("Redid %s at %s", node.getName(), node.getRealPos().toChatString());
+               return true;
+            }
+         }
+      } else {
          return false;
       }
-
-      List<Node> nodes = this.activeNodes.get(uniqueRoom.getMainRoom().getData());
-      if (!this.redoMap.containsKey(uniqueRoom.getName())) {
-         return false;
-      }
-
-      List<Node> redo = this.redoMap.get(uniqueRoom.getName());
-      if (redo.isEmpty()) {
-         return false;
-      }
-
-      Node node = redo.removeLast();
-      nodes.add(node);
-      this.save();
-      RSA.chat("Redid %s at %s", node.getName(), node.getRealPos().toChatString());
-      return true;
    }
 
    public void addNode(Node node, UniqueRoom uniqueRoom) {
       HashMap<String, List<Node>> savedNodes = this.getSavedNodes();
-      savedNodes.putIfAbsent(uniqueRoom.getName(), new ArrayList());
+      savedNodes.putIfAbsent(uniqueRoom.getName(), new ArrayList<>());
       List<Node> nodes = savedNodes.get(uniqueRoom.getName());
       node.calculate(uniqueRoom);
       nodes.add(node);
@@ -381,14 +378,14 @@ public class AutoRoutes extends Module implements Accessor {
 
    @SubscribeEvent
    public void onSendPacket(Send event) {
-      if (Location.getArea().is(Island.Dungeon) && MinecraftClient.getInstance().world != null) {
-         if (event.getPacket() instanceof PlayerInputC2SPacket packet) {
-            PlayerInput input = packet.input();
+      if (Location.getArea().is(Island.Dungeon) && class_310.method_1551().field_1687 != null) {
+         if (event.getPacket() instanceof class_2851 packet) {
+            class_10185 input = packet.comp_3139();
             this.crouchDataShiftRegister = (byte)(this.crouchDataShiftRegister << 1);
-            this.crouchDataShiftRegister = (byte)(this.crouchDataShiftRegister | (byte)(input.sneak() ? 1 : 0));
-         } else if (this.canConsumeSecretAwaits() && event.getPacket() instanceof PlayerInteractBlockC2SPacket useItemOnPacket) {
-            Block block = MinecraftClient.getInstance().world.getBlockState(useItemOnPacket.getBlockHitResult().getBlockPos()).getBlock();
-            if (block == Blocks.CHEST || block == Blocks.TRAPPED_CHEST || block == Blocks.PLAYER_HEAD || block == Blocks.LEVER) {
+            this.crouchDataShiftRegister = (byte)(this.crouchDataShiftRegister | (byte)(input.comp_3164() ? 1 : 0));
+         } else if (this.canConsumeSecretAwaits() && event.getPacket() instanceof class_2885 useItemOnPacket) {
+            class_2248 block = class_310.method_1551().field_1687.method_8320(useItemOnPacket.method_12543().method_17777()).method_26204();
+            if (block == class_2246.field_10034 || block == class_2246.field_10380 || block == class_2246.field_10432 || block == class_2246.field_10363) {
                this.inNode.getAwaitManager().consume(AwaitSecrets.class, 1);
                this.lastBlockC08 = 2;
             }
@@ -397,10 +394,7 @@ public class AutoRoutes extends Module implements Accessor {
    }
 
    private boolean canConsumeSecretAwaits() {
-      return this.inNode != null
-         && Map.getCurrentRoom() != null
-         && this.inNode.hasAwaits()
-         && this.inNode.getAwaitManager().hasAwait(AwaitType.SECRETS);
+      return this.inNode != null && Map.getCurrentRoom() != null && this.inNode.hasAwaits() && this.inNode.getAwaitManager().hasAwait(AwaitType.SECRETS);
    }
 
    @SubscribeEvent
@@ -408,31 +402,31 @@ public class AutoRoutes extends Module implements Accessor {
       if (Location.getArea().is(Island.Dungeon)
          && Map.getCurrentRoom() != null
          && this.inNode != null
-         && mc.world != null
+         && mc.field_1687 != null
          && this.canConsumeSecretAwaits()) {
-         if (event.getPacket() instanceof ItemPickupAnimationS2CPacket packet) {
-            if (MinecraftClient.getInstance().world == null) {
+         if (event.getPacket() instanceof class_2775 packet) {
+            if (class_310.method_1551().field_1687 == null) {
                return;
             }
 
-            if (!(MinecraftClient.getInstance().world.getEntityById(packet.getEntityId()) instanceof ItemEntity itemEntity)) {
+            if (!(class_310.method_1551().field_1687.method_8469(packet.method_11915()) instanceof class_1542 itemEntity)) {
                return;
             }
 
-            String name = Formatting.strip(itemEntity.getStack().getName().getString());
-            if (!SECRET_NAMES.contains(name)) {
+            String var8 = class_124.method_539(itemEntity.method_6983().method_7964().getString());
+            if (!SECRET_NAMES.contains(var8)) {
                return;
             }
 
             this.inNode.getAwaitManager().consume(AwaitSecrets.class, 1);
-         } else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            packet.getEntityIds()
+         } else if (event.getPacket() instanceof class_2716 packet) {
+            packet.method_36548()
                .forEach(
                   id -> {
-                     Entity entity = mc.world.getEntityById(id);
-                     if (entity instanceof ItemEntity itemEntityx
-                        && entity.squaredDistanceTo(mc.player) < 64.0
-                        && SECRET_NAMES.contains(Formatting.strip(itemEntityx.getStack().getName().getString()))) {
+                     class_1297 entity = mc.field_1687.method_8469(id);
+                     if (entity instanceof class_1542 itemEntityx
+                        && entity.method_5858(mc.field_1724) < 64.0
+                        && SECRET_NAMES.contains(class_124.method_539(itemEntityx.method_6983().method_7964().getString()))) {
                         this.inNode.getAwaitManager().consume(AwaitSecrets.class, 1);
                      }
                   }
@@ -466,20 +460,24 @@ public class AutoRoutes extends Module implements Accessor {
          this.inNode = null;
          return false;
       } else {
-         eligibleNodes.sort(Comparator.<Node>comparingInt(node -> node.getPriority()).reversed());
-         Node node = eligibleNodes.getFirst();
-         this.trySetInNode(node);
-         if (!node.shouldAwait() && this.lastBlockC08 <= 0 && (this.lastType == null || this.lastType == node.getClass())) {
-            node.preTrigger(this.tickTime);
-            boolean ran = node.run(playerPos);
-            if (ran) {
-               this.lastType = (Class<? extends Node>)node.getClass();
+         eligibleNodes.sort(Comparator.<Node>comparingInt(nodex -> nodex.getPriority()).reversed());
+         Node nodex = eligibleNodes.getFirst();
+         this.trySetInNode(nodex);
+         if (!nodex.shouldAwait() && this.lastBlockC08 <= 0 && (this.lastType == null || this.lastType == nodex.getClass())) {
+            if (!nodex.isReadyToRun(this.tickTime)) {
+               return false;
+            } else {
+               nodex.preTrigger(this.tickTime);
+               boolean ran = nodex.run(playerPos);
+               if (ran) {
+                  this.lastType = (Class<? extends Node>)nodex.getClass();
+               }
+
+               return ran;
             }
-
-            return ran;
+         } else {
+            return false;
          }
-
-         return false;
       }
    }
 
@@ -489,9 +487,9 @@ public class AutoRoutes extends Module implements Accessor {
          && !Dungeon.isInBoss()
          && currentRoom != null
          && !this.activeNodes.isEmpty()
-         && mc.player != null
+         && mc.field_1724 != null
          && this.activeNodes.containsKey(currentRoom.getData())) {
-         Pos playerPos = new Pos(mc.player.getEntityPos());
+         Pos playerPos = new Pos(mc.field_1724.method_73189());
          Optional<BreakNode> opt = this.activeNodes
             .get(currentRoom.getData())
             .stream()
@@ -507,67 +505,58 @@ public class AutoRoutes extends Module implements Accessor {
    }
 
    private void routeToStart() {
-      if (mc.player == null || this.hasGuiOpen()) {
-         return;
-      }
-
-      Room currentRoom = Map.getCurrentRoom();
-      if (currentRoom != null) {
-         this.routeToRoomStart(currentRoom.getUniqueRoom());
+      if (mc.field_1724 != null && !this.hasGuiOpen()) {
+         Room currentRoom = Map.getCurrentRoom();
+         if (currentRoom != null) {
+            this.routeToRoomStart(currentRoom.getUniqueRoom());
+         }
       }
    }
 
    private void openFullscreenMap() {
-      if (mc.player == null || this.hasGuiOpen()) {
-         return;
+      if (mc.field_1724 != null && !this.hasGuiOpen()) {
+         if (Location.getArea().is(Island.Dungeon) && !Dungeon.isInBoss()) {
+            mc.method_1507(new DungeonRouteMapScreen(this));
+         } else {
+            RSA.chat("You must be in a dungeon room to open the route map.");
+         }
       }
-
-      if (!Location.getArea().is(Island.Dungeon) || Dungeon.isInBoss()) {
-         RSA.chat("You must be in a dungeon room to open the route map.");
-         return;
-      }
-
-      mc.setScreen(new DungeonRouteMapScreen(this));
    }
 
    public boolean routeToRoomStart(UniqueRoom uniqueRoom) {
-      if (mc.player == null) {
+      if (mc.field_1724 == null) {
          return false;
-      }
-
-      if (!Location.getArea().is(Island.Dungeon) || Dungeon.isInBoss()) {
+      } else if (!Location.getArea().is(Island.Dungeon) || Dungeon.isInBoss()) {
          RSA.chat("You must be in a dungeon room to route.");
          return false;
-      }
-
-      if (uniqueRoom == null || uniqueRoom.getMainRoom() == null) {
+      } else if (uniqueRoom != null && uniqueRoom.getMainRoom() != null) {
+         Node closestStart = this.findClosestStartNode(uniqueRoom);
+         if (closestStart == null) {
+            RSA.chat("Couldn't find a start node for %s.", uniqueRoom.getName());
+            return false;
+         } else {
+            DynamicRoutes dynamicRoutes = (DynamicRoutes)RSM.getModule(DynamicRoutes.class);
+            if (!dynamicRoutes.isEnabled()) {
+               RSA.chat("Couldn't use dynamic routes (disabled).");
+               return false;
+            } else {
+               Pos goalPos = closestStart.getRealPos();
+               Goal goal = GoalDungeonXYZ.create(goalPos.asBlockPos().method_10087(goalPos.y % 1.0 == 0.0 ? 1 : 0));
+               if (goal == null) {
+                  return false;
+               } else {
+                  class_2338 startPos = mc.field_1724.method_24515().method_10074();
+                  dynamicRoutes.cancelPathing();
+                  dynamicRoutes.executePath(startPos, goal);
+                  RSA.chat("Routing to %s start.", uniqueRoom.getName());
+                  return true;
+               }
+            }
+         }
+      } else {
          RSA.chat("That room is not loaded yet.");
          return false;
       }
-
-      Node closestStart = this.findClosestStartNode(uniqueRoom);
-      if (closestStart == null) {
-         RSA.chat("Couldn't find a start node for %s.", uniqueRoom.getName());
-         return false;
-      }
-
-      DynamicRoutes dynamicRoutes = (DynamicRoutes)RSM.getModule(DynamicRoutes.class);
-      if (!dynamicRoutes.isEnabled()) {
-         RSA.chat("Couldn't use dynamic routes (disabled).");
-         return false;
-      }
-
-      Pos goalPos = closestStart.getRealPos();
-      Goal goal = GoalDungeonXYZ.create(goalPos.asBlockPos().down(goalPos.y % 1.0 == 0.0 ? 1 : 0));
-      if (goal == null) {
-         return false;
-      }
-
-      BlockPos startPos = mc.player.getBlockPos().down();
-      dynamicRoutes.cancelPathing();
-      dynamicRoutes.executePath(startPos, goal);
-      RSA.chat("Routing to %s start.", uniqueRoom.getName());
-      return true;
    }
 
    public boolean hasStartNode(UniqueRoom uniqueRoom) {
@@ -575,40 +564,40 @@ public class AutoRoutes extends Module implements Accessor {
    }
 
    private Node findClosestStartNode(UniqueRoom uniqueRoom) {
-      if (mc.player == null) {
+      if (mc.field_1724 == null) {
          return null;
+      } else {
+         class_2338 startPos = mc.field_1724.method_24515().method_10074();
+         return this.findRoomNodes(uniqueRoom)
+            .stream()
+            .filter(Node::isStart)
+            .min(Comparator.comparingDouble(n -> n.getRealPos().squaredDistanceTo(startPos.method_46558())))
+            .orElse(null);
       }
-
-      BlockPos startPos = mc.player.getBlockPos().down();
-      return this.findRoomNodes(uniqueRoom)
-         .stream()
-         .filter(Node::isStart)
-         .min(Comparator.comparingDouble(n -> n.getRealPos().squaredDistanceTo(startPos.toCenterPos())))
-         .orElse(null);
    }
 
    private List<Node> findRoomNodes(UniqueRoom uniqueRoom) {
-      if (uniqueRoom == null || uniqueRoom.getMainRoom() == null) {
-         return List.of();
-      }
-
-      RoomData roomData = uniqueRoom.getMainRoom().getData();
-      if (roomData == null) {
-         return List.of();
-      }
-
-      List<Node> nodes = this.activeNodes.get(roomData);
-      if (nodes == null || nodes.isEmpty()) {
-         nodes = this.getSavedNodes().get(roomData.name());
-         if (nodes == null || nodes.isEmpty()) {
+      if (uniqueRoom != null && uniqueRoom.getMainRoom() != null) {
+         RoomData roomData = uniqueRoom.getMainRoom().getData();
+         if (roomData == null) {
             return List.of();
+         } else {
+            List<Node> nodes = this.activeNodes.get(roomData);
+            if (nodes == null || nodes.isEmpty()) {
+               nodes = this.getSavedNodes().get(roomData.name());
+               if (nodes == null || nodes.isEmpty()) {
+                  return List.of();
+               }
+
+               this.activeNodes.put(roomData, nodes);
+            }
+
+            nodes.forEach(n -> n.calculate(uniqueRoom));
+            return nodes;
          }
-
-         this.activeNodes.put(roomData, nodes);
+      } else {
+         return List.of();
       }
-
-      nodes.forEach(n -> n.calculate(uniqueRoom));
-      return nodes;
    }
 
    public void save() {
@@ -623,8 +612,8 @@ public class AutoRoutes extends Module implements Accessor {
 
       try {
          Files.copy(this.data.getFile().toPath(), newBackup.toPath(), StandardCopyOption.REPLACE_EXISTING);
-      } catch (IOException exception) {
-         RSA.getLogger().error("Failed to create autoroute backup!", exception);
+      } catch (IOException var5) {
+         RSA.getLogger().error("Failed to create autoroute backup!", var5);
          return;
       }
 
@@ -642,7 +631,7 @@ public class AutoRoutes extends Module implements Accessor {
             if (!timeString.isEmpty()) {
                try {
                   timestamps.add(Long.parseLong(timeString));
-               } catch (NumberFormatException ignored) {
+               } catch (NumberFormatException var9) {
                }
             }
          }
@@ -727,6 +716,10 @@ public class AutoRoutes extends Module implements Accessor {
 
    public static BooleanSetting getCenterOnly() {
       return centerOnly;
+   }
+
+   public static BooleanSetting getCenterOnlyOnNonStartNodes() {
+      return centerOnlyOnNonStartNodes;
    }
 
    public static BooleanSetting getZeroTickBreak() {

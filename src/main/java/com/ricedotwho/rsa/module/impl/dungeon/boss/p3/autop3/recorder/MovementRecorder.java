@@ -19,13 +19,14 @@ import com.ricedotwho.rsm.ui.clickgui.settings.impl.SaveSetting;
 import com.ricedotwho.rsm.utils.ItemUtils;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.class_10185;
+import net.minecraft.class_1799;
+import net.minecraft.class_2886;
+import net.minecraft.class_3675;
 
 @SubModuleInfo(name = "Movement")
 public class MovementRecorder extends SubModule<AutoP3> {
-   private final KeybindSetting recordKey = new KeybindSetting("Record", new Keybind(InputUtil.UNKNOWN_KEY, this::toggleRecording));
+   private final KeybindSetting recordKey = new KeybindSetting("Record", new Keybind(class_3675.field_16237, this::toggleRecording));
    private final ButtonSetting prune = new ButtonSetting("Prune Inputs", "Prune", this::prune);
    private static final SaveSetting<List<MovementRecorder.PlayerInput>> data = new SaveSetting(
       "Route",
@@ -97,28 +98,28 @@ public class MovementRecorder extends SubModule<AutoP3> {
 
    @SubscribeEvent
    public void onPacket(Send event) {
-      if (state == MovementRecorder.State.RECORDING && mc.player != null && event.getPacket() instanceof PlayerInteractItemC2SPacket packet && !recorded.isEmpty()) {
-         ItemStack held = mc.player.getStackInHand(packet.getHand());
+      if (state == MovementRecorder.State.RECORDING && mc.field_1724 != null && event.getPacket() instanceof class_2886 packet && !recorded.isEmpty()) {
+         class_1799 held = mc.field_1724.method_5998(packet.method_12551());
          String itemId = ItemUtils.getID(held);
-         if (!itemId.isBlank() && (packet.getYaw() != 0.0 || packet.getPitch() != 0.0)) {
+         if (!itemId.isBlank() && (packet.method_60586() != 0.0 || packet.method_60587() != 0.0)) {
             MovementRecorder.PlayerInput last = recorded.getLast();
             last.using = true;
-            last.useItem = new MovementRecorder.UseItem(itemId, packet.getYaw(), packet.getPitch());
+            last.useItem = new MovementRecorder.UseItem(itemId, packet.method_60586(), packet.method_60587());
          }
       }
    }
 
    @SubscribeEvent
    public void record(InputPollEvent event) {
-      if (mc.player != null) {
-         net.minecraft.util.PlayerInput in = event.getClientInput();
+      if (mc.field_1724 != null) {
+         class_10185 in = event.getClientInput();
          if (state == MovementRecorder.State.RECORDING) {
             MovementRecorder.PlayerInput next = new MovementRecorder.PlayerInput(
-               mc.gameRenderer.getCamera().getCameraYaw(), mc.gameRenderer.getCamera().getPitch(), in
+               mc.field_1773.method_19418().method_71155(), mc.field_1773.method_19418().method_19329(), in
             );
             recorded.add(next);
          } else if (state == MovementRecorder.State.PLAYING) {
-            if (in.forward() || in.backward() || in.left() || in.right() || in.sneak()) {
+            if (in.comp_3159() || in.comp_3160() || in.comp_3161() || in.comp_3162() || in.comp_3164()) {
                AutoP3.modMessage("Cancelling movement");
                this.reset();
                return;
@@ -133,8 +134,8 @@ public class MovementRecorder extends SubModule<AutoP3> {
 
             MovementRecorder.PlayerInput next = inputs.get(playIndex);
             event.getInput().apply(next.input());
-            mc.player.setYaw(next.yaw);
-            mc.player.setPitch(next.pitch);
+            mc.field_1724.method_36456(next.yaw);
+            mc.field_1724.method_36457(next.pitch);
             if (next.using && next.useItem != null && SwapManager.swapItem(next.useItem.item)) {
                PacketOrderManager.register(
                   PacketOrderManager.STATE.ITEM_USE, () -> SwapManager.sendAirC08(next.useItem.yaw, next.useItem.pitch, SwapManager.isDesynced(), false)
@@ -153,8 +154,8 @@ public class MovementRecorder extends SubModule<AutoP3> {
 
       if (data.getValue() != null && playIndex < ((List)data.getValue()).size() && ((List)data.getValue()).get(playIndex) != null) {
          MovementRecorder.PlayerInput next = (MovementRecorder.PlayerInput)((List)data.getValue()).get(playIndex);
-         mc.player.setYaw(next.yaw);
-         mc.player.setPitch(next.pitch);
+         mc.field_1724.method_36456(next.yaw);
+         mc.field_1724.method_36457(next.pitch);
       }
    }
 
@@ -197,12 +198,12 @@ public class MovementRecorder extends SubModule<AutoP3> {
       public final boolean sneak;
       public final boolean sprint;
 
-      public PlayerInput(float yaw, float pitch, net.minecraft.util.PlayerInput in) {
-         this(yaw, pitch, in.forward(), in.backward(), in.left(), in.right(), in.jump(), in.sneak(), in.sprint());
+      public PlayerInput(float yaw, float pitch, class_10185 in) {
+         this(yaw, pitch, in.comp_3159(), in.comp_3160(), in.comp_3161(), in.comp_3162(), in.comp_3163(), in.comp_3164(), in.comp_3165());
       }
 
-      public net.minecraft.util.PlayerInput input() {
-         return new net.minecraft.util.PlayerInput(this.forward, this.back, this.left, this.right, this.jump, this.sneak, this.sprint);
+      public class_10185 input() {
+         return new class_10185(this.forward, this.back, this.left, this.right, this.jump, this.sneak, this.sprint);
       }
 
       public boolean equals(MovementRecorder.PlayerInput other) {

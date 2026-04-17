@@ -14,9 +14,9 @@ import com.ricedotwho.rsm.data.Pos;
 import com.ricedotwho.rsm.utils.Accessor;
 import com.ricedotwho.rsm.utils.ItemUtils;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.Hand;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.class_10185;
+import net.minecraft.class_1268;
+import net.minecraft.class_310;
 
 public class UseRing extends Ring implements Accessor {
    private final String item;
@@ -32,9 +32,9 @@ public class UseRing extends Ring implements Accessor {
       this(
          min,
          max,
-         ItemUtils.getID(mc.player.getStackInHand(Hand.MAIN_HAND)),
-         (Float)extra.getOrDefault("yaw", mc.gameRenderer.getCamera().getCameraYaw()),
-         (Float)extra.getOrDefault("yaw", mc.gameRenderer.getCamera().getPitch()),
+         ItemUtils.getID(mc.field_1724.method_5998(class_1268.field_5808)),
+         (Float)extra.getOrDefault("yaw", mc.field_1773.method_19418().method_71155()),
+         (Float)extra.getOrDefault("yaw", mc.field_1773.method_19418().method_19329()),
          manage,
          actions
       );
@@ -63,7 +63,7 @@ public class UseRing extends Ring implements Accessor {
                   }
                } else {
                   RSA.chat(
-                     "Big fuck up! : " + swap + ", " + MinecraftClient.getInstance().player.getInventory().getStack(SwapManager.getServerSlot()).getItem()
+                     "Big fuck up! : " + swap + ", " + class_310.method_1551().field_1724.method_31548().method_5438(SwapManager.getServerSlot()).method_7909()
                   );
                }
             }
@@ -83,7 +83,7 @@ public class UseRing extends Ring implements Accessor {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
       return true;
    }
 

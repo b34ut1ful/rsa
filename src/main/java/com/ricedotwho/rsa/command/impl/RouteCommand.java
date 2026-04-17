@@ -36,14 +36,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.class_2172;
+import net.minecraft.class_2561;
+import net.minecraft.class_637;
 
 @CommandInfo(name = "autoroute", aliases = {"r", "ar", "route"}, description = "Handles creating autoroutes")
 public class RouteCommand extends Command {
-   public LiteralArgumentBuilder<ClientCommandSource> build() {
-      return (LiteralArgumentBuilder<ClientCommandSource>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(
+   public LiteralArgumentBuilder<class_637> build() {
+      return (LiteralArgumentBuilder<class_637>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(
                            this.name()
                         )
                         .then(
@@ -125,13 +125,13 @@ public class RouteCommand extends Command {
          .then(literal("undo").executes(RouteCommand::undoNode));
    }
 
-   private static int loadNodes(CommandContext<ClientCommandSource> ctx) {
+   private static int loadNodes(CommandContext<class_637> ctx) {
       ((AutoRoutes)RSM.getModule(AutoRoutes.class)).load();
       RSA.chat("Loaded nodes");
       return 1;
    }
 
-   private static int clearNodes(CommandContext<ClientCommandSource> ctx) {
+   private static int clearNodes(CommandContext<class_637> ctx) {
       Room room = Map.getCurrentRoom();
       if (room != null && room.getUniqueRoom() != null) {
          if (!((AutoRoutes)RSM.getModule(AutoRoutes.class)).clearNodes(room.getUniqueRoom())) {
@@ -147,7 +147,7 @@ public class RouteCommand extends Command {
       }
    }
 
-   private static int removeNode(CommandContext<ClientCommandSource> ctx) {
+   private static int removeNode(CommandContext<class_637> ctx) {
       Room room = Map.getCurrentRoom();
       if (room != null && room.getUniqueRoom() != null) {
          if (!((AutoRoutes)RSM.getModule(AutoRoutes.class)).removeNearest(room.getUniqueRoom())) {
@@ -163,7 +163,7 @@ public class RouteCommand extends Command {
       }
    }
 
-   private static int undoNode(CommandContext<ClientCommandSource> ctx) {
+   private static int undoNode(CommandContext<class_637> ctx) {
       Room room = Map.getCurrentRoom();
       if (room != null && room.getUniqueRoom() != null) {
          if (!((AutoRoutes)RSM.getModule(AutoRoutes.class)).undoNode(room.getUniqueRoom())) {
@@ -178,7 +178,7 @@ public class RouteCommand extends Command {
       }
    }
 
-   private static int redoNode(CommandContext<ClientCommandSource> ctx) {
+   private static int redoNode(CommandContext<class_637> ctx) {
       Room room = Map.getCurrentRoom();
       if (room != null && room.getUniqueRoom() != null) {
          if (!((AutoRoutes)RSM.getModule(AutoRoutes.class)).redoNode(room.getUniqueRoom())) {
@@ -193,7 +193,7 @@ public class RouteCommand extends Command {
       }
    }
 
-   private static int addNode(CommandContext<ClientCommandSource> ctx, int secrets, boolean click, boolean start, boolean raytrace) {
+   private static int addNode(CommandContext<class_637> ctx, int secrets, boolean click, boolean start, boolean raytrace) {
       Room room = Map.getCurrentRoom();
       if (!Location.getArea().is(Island.Dungeon) || room == null) {
          RSA.chat("Failed to add node, please enter a dungeon!");
@@ -241,7 +241,7 @@ public class RouteCommand extends Command {
       private static final Collection<String> EXAMPLES = Stream.of(NodeType.ETHERWARP, NodeType.BOOM).map(NodeType::getName).collect(Collectors.toList());
       private static final NodeType[] VALUES = NodeType.values();
       private static final DynamicCommandExceptionType INVALID_NODE_EXCEPTION = new DynamicCommandExceptionType(
-         node -> Text.literal("Invalid node type : " + node)
+         node -> class_2561.method_43470("Invalid node type : " + node)
       );
 
       public NodeType parse(StringReader stringReader) throws CommandSyntaxException {
@@ -255,7 +255,7 @@ public class RouteCommand extends Command {
       }
 
       public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-         return context.getSource() instanceof CommandSource ? CommandSource.suggestMatching(Arrays.stream(VALUES).map(NodeType::getName), builder) : Suggestions.empty();
+         return context.getSource() instanceof class_2172 ? class_2172.method_9264(Arrays.stream(VALUES).map(NodeType::getName), builder) : Suggestions.empty();
       }
 
       public Collection<String> getExamples() {
@@ -266,7 +266,7 @@ public class RouteCommand extends Command {
          return new RouteCommand.NodeArgumentType();
       }
 
-      public static NodeType getNode(CommandContext<ClientCommandSource> context, String name) {
+      public static NodeType getNode(CommandContext<class_637> context, String name) {
          return (NodeType)context.getArgument(name, NodeType.class);
       }
    }

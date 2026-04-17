@@ -4,7 +4,7 @@ import com.ricedotwho.rsm.component.api.ModComponent;
 import com.ricedotwho.rsm.event.api.SubscribeEvent;
 import com.ricedotwho.rsm.event.impl.client.PacketEvent.Receive;
 import com.ricedotwho.rsm.event.impl.world.WorldEvent.Load;
-import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.class_2724;
 
 public class TickFreeze extends ModComponent {
    private static boolean frozen = false;
@@ -32,7 +32,7 @@ public class TickFreeze extends ModComponent {
    }
 
    public static void freeze(boolean lastTick) {
-      partialTick = lastTick ? lastTickPartialTicks : mc.getRenderTickCounter().getTickProgress(true);
+      partialTick = lastTick ? lastTickPartialTicks : mc.method_61966().method_60637(true);
       frozen = true;
    }
 
@@ -57,7 +57,7 @@ public class TickFreeze extends ModComponent {
 
    @SubscribeEvent
    public void onPacket(Receive event) {
-      if (event.getPacket() instanceof PlayerRespawnS2CPacket) {
+      if (event.getPacket() instanceof class_2724) {
          unFreeze();
       }
    }

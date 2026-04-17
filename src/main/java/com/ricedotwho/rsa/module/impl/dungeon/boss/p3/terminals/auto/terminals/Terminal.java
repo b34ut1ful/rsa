@@ -2,37 +2,35 @@ package com.ricedotwho.rsa.module.impl.dungeon.boss.p3.terminals.auto.terminals;
 
 import com.ricedotwho.rsa.RSA;
 import java.util.List;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
-import net.minecraft.component.DataComponentTypes;
+import net.minecraft.class_1703;
+import net.minecraft.class_1792;
+import net.minecraft.class_1799;
+import net.minecraft.class_2653;
+import net.minecraft.class_3917;
+import net.minecraft.class_3944;
+import net.minecraft.class_9334;
 
 public abstract class Terminal {
    private final TerminalType type;
    protected SolveState solveState;
    private final String title;
    private final int windowID;
-   protected final ScreenHandler terminalContainer;
+   protected final class_1703 terminalContainer;
    protected Solution solution;
 
-   protected Terminal(TerminalType type, OpenScreenS2CPacket packet, ScreenHandler terminalContainer) {
+   protected Terminal(TerminalType type, class_3944 packet, class_1703 terminalContainer) {
       this.type = type;
-      this.windowID = packet.getSyncId();
-      this.title = packet.getName().getString();
+      this.windowID = packet.method_17592();
+      this.title = packet.method_17594().getString();
       this.solveState = SolveState.NOT_LOADED;
       this.terminalContainer = terminalContainer;
    }
 
-   public void loadSlot(ScreenHandlerSlotUpdateS2CPacket packet) {
-      if (packet.getSyncId() != this.getWindowID()) {
-         RSA.chat("Window ID slot load mismatch! -> term : " + this.getWindowID() + " packet : " + packet.getSyncId());
-      } else if (packet.getSlot() > this.type.getSlotCount()) {
-         if (this.solveState == SolveState.NOT_LOADED) {
-            this.solveState = SolveState.LOADED;
-         }
+   public void loadSlot(class_2653 packet) {
+      if (packet.method_11452() != this.getWindowID()) {
+         RSA.chat("Window ID slot load mismatch! -> term : " + this.getWindowID() + " packet : " + packet.method_11452());
+      } else if (packet.method_11450() > this.type.getSlotCount() && this.solveState == SolveState.NOT_LOADED) {
+         this.solveState = SolveState.LOADED;
       }
    }
 
@@ -67,15 +65,15 @@ public abstract class Terminal {
       }
    }
 
-   public static Terminal fromPacket(OpenScreenS2CPacket packet, ScreenHandler menu) {
-      ScreenHandlerType<?> menuType = packet.getScreenHandlerType();
-      return menuType != ScreenHandlerType.GENERIC_9X4 && menuType != ScreenHandlerType.GENERIC_9X5 && menuType != ScreenHandlerType.GENERIC_9X6
+   public static Terminal fromPacket(class_3944 packet, class_1703 menu) {
+      class_3917<?> menuType = packet.method_17593();
+      return menuType != class_3917.field_18666 && menuType != class_3917.field_18667 && menuType != class_3917.field_17327
          ? null
          : findTerminalClass(packet, menu);
    }
 
-   private static Terminal findTerminalClass(OpenScreenS2CPacket packet, ScreenHandler menu) {
-      TerminalType terminalType = TerminalType.getType(packet.getName().getString());
+   private static Terminal findTerminalClass(class_3944 packet, class_1703 menu) {
+      TerminalType terminalType = TerminalType.getType(packet.method_17594().getString());
       return terminalType == null ? null : terminalType.supply(packet, menu);
    }
 
@@ -106,17 +104,17 @@ public abstract class Terminal {
       private int item;
       private int size;
 
-      protected HashInfo(ItemStack stack) {
-         this.enchanted = stack.isEnchantable() || Boolean.TRUE.equals(stack.get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE));
-         this.item = stack.getItem().hashCode();
-         this.size = stack.getCount();
+      protected HashInfo(class_1799 stack) {
+         this.enchanted = stack.method_7923() || Boolean.TRUE.equals(stack.method_58694(class_9334.field_49641));
+         this.item = stack.method_7909().hashCode();
+         this.size = stack.method_7947();
       }
 
       protected void setEnchanted(boolean bl) {
          this.enchanted = bl;
       }
 
-      protected void setItem(Item item) {
+      protected void setItem(class_1792 item) {
          this.item = item.hashCode();
       }
 

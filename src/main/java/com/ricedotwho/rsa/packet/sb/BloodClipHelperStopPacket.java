@@ -1,27 +1,27 @@
 package com.ricedotwho.rsa.packet.sb;
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.class_2540;
+import net.minecraft.class_2960;
+import net.minecraft.class_8710;
+import net.minecraft.class_9139;
+import net.minecraft.class_8710.class_9154;
 import org.jetbrains.annotations.NotNull;
 
-public record BloodClipHelperStopPacket() implements CustomPayload {
-   public static final PacketCodec<PacketByteBuf, BloodClipHelperStopPacket> CODEC = CustomPayload.codecOf(
+public record BloodClipHelperStopPacket() implements class_8710 {
+   public static final class_9139<class_2540, BloodClipHelperStopPacket> CODEC = class_8710.method_56484(
       BloodClipHelperStopPacket::write, BloodClipHelperStopPacket::new
    );
-   public static final Id<BloodClipHelperStopPacket> TYPE = new Id(Identifier.of("zero", "bloodcliphelper/stop"));
+   public static final class_9154<BloodClipHelperStopPacket> TYPE = new class_9154(class_2960.method_60655("zero", "bloodcliphelper/stop"));
 
-   public BloodClipHelperStopPacket(PacketByteBuf buf) {
+   public BloodClipHelperStopPacket(class_2540 buf) {
       this();
    }
 
-   public void write(PacketByteBuf buf) {
+   public void write(class_2540 buf) {
    }
 
    @NotNull
-   public Id<BloodClipHelperStopPacket> getId() {
+   public class_9154<BloodClipHelperStopPacket> method_56479() {
       return TYPE;
    }
 }

@@ -6,12 +6,12 @@ import com.ricedotwho.rsa.module.impl.dungeon.SecretAura;
 import com.ricedotwho.rsm.RSM;
 import com.ricedotwho.rsm.command.Command;
 import com.ricedotwho.rsm.command.api.CommandInfo;
-import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.class_637;
 
 @CommandInfo(name = "sa", aliases = "secretaura", description = "Developer")
 public class SecretAuraCommand extends Command {
-   public LiteralArgumentBuilder<ClientCommandSource> build() {
-      return (LiteralArgumentBuilder<ClientCommandSource>)((LiteralArgumentBuilder)literal(this.name()).then(literal("c").executes(ctx -> {
+   public LiteralArgumentBuilder<class_637> build() {
+      return (LiteralArgumentBuilder<class_637>)((LiteralArgumentBuilder)literal(this.name()).then(literal("c").executes(ctx -> {
          this.clear();
          return 1;
       }))).then(literal("clear").executes(ctx -> {

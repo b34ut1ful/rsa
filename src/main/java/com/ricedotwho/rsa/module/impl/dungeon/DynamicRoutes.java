@@ -29,12 +29,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_10185;
+import net.minecraft.class_2338;
+import net.minecraft.class_243;
+import net.minecraft.class_2708;
+import net.minecraft.class_310;
+import net.minecraft.class_746;
 
 @ModuleInfo(aliases = "Dynamic Routes", id = "Dynamicroutes", category = Category.MOVEMENT)
 public class DynamicRoutes extends Module {
@@ -86,7 +86,7 @@ public class DynamicRoutes extends Module {
 
    @SubscribeEvent
    public void onReceivePacket(Receive event) {
-      if (this.awaitState == 1 && event.getPacket() instanceof PlayerPositionLookS2CPacket packet) {
+      if (this.awaitState == 1 && event.getPacket() instanceof class_2708 packet) {
          this.awaitState = 2;
       }
    }
@@ -106,8 +106,8 @@ public class DynamicRoutes extends Module {
       this.tickTime++;
       if (this.awaitState == 0) {
          this.isRouting = false;
-         if (!(Boolean)this.editMode.getValue() && MinecraftClient.getInstance().player != null && !this.nodes.isEmpty()) {
-            Pos playerPos = new Pos(MinecraftClient.getInstance().player.getEntityPos());
+         if (!(Boolean)this.editMode.getValue() && class_310.method_1551().field_1724 != null && !this.nodes.isEmpty()) {
+            Pos playerPos = new Pos(class_310.method_1551().field_1724.method_73189());
             this.nodes.forEach(n -> n.updateNodeState(playerPos, this.tickTime));
 
             while (this.handleQueue(playerPos, this.nodes)) {
@@ -119,26 +119,26 @@ public class DynamicRoutes extends Module {
    @SubscribeEvent
    public void onPollInputs(InputPollEvent event) {
       if (this.isRouting()) {
-         PlayerInput oldInputs = event.getClientInput();
-         PlayerInput newInputs = new PlayerInput(
-            oldInputs.forward(), oldInputs.backward(), oldInputs.left(), oldInputs.right(), oldInputs.jump(), true, oldInputs.sprint()
+         class_10185 oldInputs = event.getClientInput();
+         class_10185 newInputs = new class_10185(
+            oldInputs.comp_3159(), oldInputs.comp_3160(), oldInputs.comp_3161(), oldInputs.comp_3162(), oldInputs.comp_3163(), true, oldInputs.comp_3165()
          );
          event.getInput().apply(newInputs);
       }
    }
 
-   public void pathGoals(BlockPos startPos, List<? extends Goal> goals) {
+   public void pathGoals(class_2338 startPos, List<? extends Goal> goals) {
       if (this.pathQueue.isEmpty() && !goals.isEmpty()) {
          this.pathQueue.addAll(goals);
          this.pathNextQueued(startPos);
       }
    }
 
-   private void pathNextQueued(BlockPos pos) {
+   private void pathNextQueued(class_2338 pos) {
       if (!this.pathQueue.isEmpty()) {
          Goal goal = this.pathQueue.removeFirst();
          PathfindingCalculationContext ctx = new PathfindingCalculationContext(
-            pos.mutableCopy(),
+            pos.method_25503(),
             ((BigDecimal)this.threadCount.getValue()).intValue(),
             ((BigDecimal)this.yawStep.getValue()).floatValue(),
             ((BigDecimal)this.pitchStep.getValue()).floatValue(),
@@ -149,9 +149,9 @@ public class DynamicRoutes extends Module {
       }
    }
 
-   public void executePath(BlockPos startPos, Goal goal) {
+   public void executePath(class_2338 startPos, Goal goal) {
       PathfindingCalculationContext ctx = new PathfindingCalculationContext(
-         startPos.mutableCopy(),
+         startPos.method_25503(),
          ((BigDecimal)this.threadCount.getValue()).intValue(),
          ((BigDecimal)this.yawStep.getValue()).floatValue(),
          ((BigDecimal)this.pitchStep.getValue()).floatValue(),
@@ -204,14 +204,14 @@ public class DynamicRoutes extends Module {
    }
 
    public boolean removeNearest() {
-      if (MinecraftClient.getInstance().player == null) {
+      if (class_310.method_1551().field_1724 == null) {
          return false;
       } else if (this.nodes.isEmpty()) {
          return false;
       } else {
          int bestIndex = -1;
          double bestDistance = Double.MAX_VALUE;
-         Vec3d playerPos = MinecraftClient.getInstance().player.getEntityPos();
+         class_243 playerPos = class_310.method_1551().field_1724.method_73189();
 
          for (int i = 0; i < this.nodes.size(); i++) {
             double d = this.nodes.get(i).getRealPos().squaredDistanceTo(playerPos);
@@ -230,7 +230,7 @@ public class DynamicRoutes extends Module {
       }
    }
 
-   public boolean addNode(ClientPlayerEntity player) {
+   public boolean addNode(class_746 player) {
       Node node = DynamicEtherwarpNode.supply(this.EMPTY_UNIQUE, player);
       this.addNode(node);
       return true;

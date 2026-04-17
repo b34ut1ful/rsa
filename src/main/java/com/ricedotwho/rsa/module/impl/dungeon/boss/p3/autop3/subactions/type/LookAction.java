@@ -10,8 +10,8 @@ public class LookAction extends SubAction {
 
    public LookAction() {
       super(SubActionType.LOOK);
-      this.yaw = mc.gameRenderer.getCamera().getCameraYaw();
-      this.pitch = mc.gameRenderer.getCamera().getPitch();
+      this.yaw = mc.field_1773.method_19418().method_71155();
+      this.pitch = mc.field_1773.method_19418().method_19329();
    }
 
    public LookAction(float yaw, float pitch) {
@@ -22,11 +22,11 @@ public class LookAction extends SubAction {
 
    @Override
    public boolean execute() {
-      if (mc.player == null) {
+      if (mc.field_1724 == null) {
          return false;
       } else {
-         mc.player.setYaw(this.yaw);
-         mc.player.setPitch(this.pitch);
+         mc.field_1724.method_36456(this.yaw);
+         mc.field_1724.method_36457(this.pitch);
          return true;
       }
    }

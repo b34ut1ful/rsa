@@ -1,30 +1,30 @@
 package com.ricedotwho.rsa.mixins;
 
 import com.ricedotwho.rsa.screen.SessionLoginScreen;
-import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.class_2561;
+import net.minecraft.class_310;
+import net.minecraft.class_4185;
+import net.minecraft.class_437;
+import net.minecraft.class_442;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TitleScreen.class)
-public class MixinTitleScreen extends Screen {
-   protected MixinTitleScreen(Text component) {
+@Mixin(class_442.class)
+public class MixinTitleScreen extends class_437 {
+   protected MixinTitleScreen(class_2561 component) {
       super(component);
    }
 
-   @Inject(at = @At("HEAD"), method = "init")
+   @Inject(at = @At("HEAD"), method = "method_25426()V")
    private void onInit(CallbackInfo ci) {
-      ButtonWidget theButton = ButtonWidget.builder(
-            Text.literal("Session Login"), button -> MinecraftClient.getInstance().setScreen(SessionLoginScreen.getInstance())
+      class_4185 theButton = class_4185.method_46430(
+            class_2561.method_43470("Session Login"), button -> class_310.method_1551().method_1507(SessionLoginScreen.getInstance())
          )
-         .width(100)
-         .position(this.width - 110, 20)
-         .build();
-      this.addDrawableChild(theButton);
+         .method_46432(100)
+         .method_46433(this.field_22789 - 110, 20)
+         .method_46431();
+      this.method_37063(theButton);
    }
 }

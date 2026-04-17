@@ -9,8 +9,8 @@ import com.ricedotwho.rsm.data.Colour;
 import com.ricedotwho.rsm.data.MutableInput;
 import com.ricedotwho.rsm.data.Pos;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.class_10185;
+import net.minecraft.class_310;
 
 public class WalkRing extends Ring {
    private final float yaw;
@@ -21,7 +21,7 @@ public class WalkRing extends Ring {
    }
 
    public WalkRing(Pos min, Pos max, ArgumentManager manage, SubActionManager actions, Map<String, Object> extra) {
-      this(min, max, (Float)extra.getOrDefault("yaw", MinecraftClient.getInstance().gameRenderer.getCamera().getCameraYaw()), manage, actions);
+      this(min, max, (Float)extra.getOrDefault("yaw", class_310.method_1551().field_1773.method_19418().method_71155()), manage, actions);
    }
 
    public WalkRing(Pos min, Pos max, float yaw, ArgumentManager manage, SubActionManager actions) {
@@ -45,16 +45,16 @@ public class WalkRing extends Ring {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
       if (this.hasInputPressed(input)) {
          return true;
       } else {
          autoP3.setDesync(true);
-         if ((Boolean)autoP3.getStrafe().getValue() && !mc.player.isOnGround()) {
-            mc.player.setYaw(this.yaw - 45.0F);
+         if ((Boolean)autoP3.getStrafe().getValue() && !mc.field_1724.method_24828()) {
+            mc.field_1724.method_36456(this.yaw - 45.0F);
             mutableInput.right(true);
          } else {
-            mc.player.setYaw(this.yaw);
+            mc.field_1724.method_36456(this.yaw);
          }
 
          mutableInput.forward(true);
@@ -63,8 +63,8 @@ public class WalkRing extends Ring {
       }
    }
 
-   private boolean hasInputPressed(PlayerInput input) {
-      return input.forward() || input.backward() || input.left() || input.right() || input.jump();
+   private boolean hasInputPressed(class_10185 input) {
+      return input.comp_3159() || input.comp_3160() || input.comp_3161() || input.comp_3162() || input.comp_3163();
    }
 
    @Override

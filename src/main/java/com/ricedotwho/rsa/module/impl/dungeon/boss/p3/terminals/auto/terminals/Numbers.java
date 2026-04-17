@@ -4,14 +4,14 @@ import com.ricedotwho.rsa.module.impl.dungeon.boss.p3.terminals.auto.AutoTerms;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import net.minecraft.class_1703;
+import net.minecraft.class_1713;
+import net.minecraft.class_1735;
+import net.minecraft.class_1802;
+import net.minecraft.class_3944;
 
 public class Numbers extends Terminal {
-   protected Numbers(OpenScreenS2CPacket packet, ScreenHandler menu) {
+   protected Numbers(class_3944 packet, class_1703 menu) {
       super(TerminalType.NUMBERS, packet, menu);
    }
 
@@ -24,10 +24,10 @@ public class Numbers extends Terminal {
          int changedIndex = this.solution.getNext().index();
 
          for (int i = 0; i < this.getType().getSlotCount(); i++) {
-            Slot slot = this.terminalContainer.getSlot(i);
-            Terminal.HashInfo hashInfo = new Terminal.HashInfo(slot.getStack());
-            if (slot.id == changedIndex) {
-               hashInfo.setItem(Items.LIME_STAINED_GLASS_PANE);
+            class_1735 slot = this.terminalContainer.method_7611(i);
+            Terminal.HashInfo hashInfo = new Terminal.HashInfo(slot.method_7677());
+            if (slot.field_7874 == changedIndex) {
+               hashInfo.setItem(class_1802.field_8581);
             }
 
             infos.add(hashInfo);
@@ -42,8 +42,8 @@ public class Numbers extends Terminal {
       List<Terminal.HashInfo> infos = new ArrayList<>(this.getType().getSlotCount());
 
       for (int i = 0; i < this.getType().getSlotCount(); i++) {
-         Slot slot = this.terminalContainer.getSlot(i);
-         infos.add(new Terminal.HashInfo(slot.getStack()));
+         class_1735 slot = this.terminalContainer.method_7611(i);
+         infos.add(new Terminal.HashInfo(slot.method_7677()));
       }
 
       return Terminal.getTerminalState(TerminalType.NUMBERS, infos);
@@ -53,11 +53,11 @@ public class Numbers extends Terminal {
    public void solve() {
       super.solve();
       List<SolutionClick> sortedSlots = this.terminalContainer
-         .slots
+         .field_7761
          .stream()
-         .filter(slot -> slot.getStack().getItem() == Items.RED_STAINED_GLASS_PANE)
-         .sorted(Comparator.comparingInt(slot -> slot.getStack().getCount()))
-         .map(slot -> new SolutionClick(SlotActionType.CLONE, slot.id, 0))
+         .filter(slot -> slot.method_7677().method_7909() == class_1802.field_8879)
+         .sorted(Comparator.comparingInt(slot -> slot.method_7677().method_7947()))
+         .map(slot -> new SolutionClick(class_1713.field_7796, slot.field_7874, 0))
          .toList();
       this.solution = new Solution(sortedSlots);
       this.solveState = SolveState.SOLVED;
@@ -68,7 +68,7 @@ public class Numbers extends Terminal {
       return AutoTerms.getTerminals().get("Numbers");
    }
 
-   protected static Numbers supply(OpenScreenS2CPacket packet, ScreenHandler menu) {
+   protected static Numbers supply(class_3944 packet, class_1703 menu) {
       return new Numbers(packet, menu);
    }
 }

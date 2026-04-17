@@ -1,21 +1,25 @@
 package com.ricedotwho.rsa.mixins;
 
 import com.ricedotwho.rsa.module.impl.dungeon.SecretHitboxes;
-import net.minecraft.world.BlockView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.world.RaycastContext;
+import net.minecraft.class_1922;
+import net.minecraft.class_2338;
+import net.minecraft.class_265;
+import net.minecraft.class_2680;
+import net.minecraft.class_3959;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(RaycastContext.class)
+@Mixin(class_3959.class)
 public class MixinClipContext {
-   @Inject(method = "getBlockShape", at = @At("HEAD"), cancellable = true)
-   private void getBlockShape(BlockState blockState, BlockView blockGetter, BlockPos blockPos, CallbackInfoReturnable<VoxelShape> cir) {
-      VoxelShape shape = SecretHitboxes.getShape(blockState, blockPos);
+   @Inject(
+      method = "method_17748(Lnet/minecraft/class_2680;Lnet/minecraft/class_1922;Lnet/minecraft/class_2338;)Lnet/minecraft/class_265;",
+      at = @At("HEAD"),
+      cancellable = true
+   )
+   private void getBlockShape(class_2680 blockState, class_1922 blockGetter, class_2338 blockPos, CallbackInfoReturnable<class_265> cir) {
+      class_265 shape = SecretHitboxes.getShape(blockState, blockPos);
       if (shape != null) {
          cir.setReturnValue(shape);
       }

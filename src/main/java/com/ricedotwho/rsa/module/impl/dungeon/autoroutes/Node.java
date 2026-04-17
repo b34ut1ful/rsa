@@ -52,9 +52,9 @@ public abstract class Node {
       }
    }
 
-   public abstract boolean run(Pos playerPos);
+   public abstract boolean run(Pos var1);
 
-   public abstract void render(boolean depth);
+   public abstract void render(boolean var1);
 
    protected boolean cancel() {
       this.reset();
@@ -66,14 +66,16 @@ public abstract class Node {
    }
 
    public boolean isInNode(Pos playerPos) {
-      if (!AutoRoutes.getCenterOnly().getValue()) {
-         return playerPos.squaredDistanceTo(this.realPos) <= this.radius * this.radius;
-      }
+      return !this.shouldUseCenterOnly()
+         ? playerPos.squaredDistanceTo(this.realPos) <= this.radius * this.radius
+         : this.realPos.x() == playerPos.x()
+            && playerPos.y() >= this.realPos.y() - 0.05
+            && playerPos.y() <= this.realPos.y() + 0.05
+            && this.realPos.z() == playerPos.z();
+   }
 
-      return this.realPos.x() == playerPos.x()
-         && playerPos.y() >= this.realPos.y() - 0.05
-         && playerPos.y() <= this.realPos.y() + 0.05
-         && this.realPos.z() == playerPos.z();
+   protected boolean shouldUseCenterOnly() {
+      return (Boolean)AutoRoutes.getCenterOnly().getValue() || !this.isStart() && (Boolean)AutoRoutes.getCenterOnlyOnNonStartNodes().getValue();
    }
 
    public void updateLastTickTime(int lastTickTime) {
@@ -89,21 +91,28 @@ public abstract class Node {
       this.triggered = true;
    }
 
+   public boolean isReadyToRun(int tickTime) {
+      return true;
+   }
+
    public boolean updateNodeState(Pos playerPos, int tickTime) {
       if (tickTime <= this.lastTickTime) {
          return false;
-      }
+      } else {
+         boolean inNode = this.isInNode(playerPos);
+         if (inNode && !this.triggered) {
+            return true;
+         } else {
+            if (!inNode) {
+               this.onNodeInactive();
+               if (this.triggered) {
+                  this.reset();
+               }
+            }
 
-      boolean inNode = this.isInNode(playerPos);
-      if (inNode && !this.triggered) {
-         return true;
+            return false;
+         }
       }
-
-      if (!inNode && this.triggered) {
-         this.reset();
-      }
-
-      return false;
    }
 
    public abstract String getName();
@@ -125,6 +134,9 @@ public abstract class Node {
 
    public void reset() {
       this.triggered = false;
+   }
+
+   protected void onNodeInactive() {
    }
 
    public float getRadius() {

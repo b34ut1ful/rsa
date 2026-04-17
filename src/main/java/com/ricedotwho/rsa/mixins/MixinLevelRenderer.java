@@ -1,36 +1,36 @@
 package com.ricedotwho.rsa.mixins;
 
 import com.ricedotwho.rsa.module.impl.dungeon.SecretHitboxes;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.class_2338;
+import net.minecraft.class_265;
+import net.minecraft.class_2680;
+import net.minecraft.class_310;
+import net.minecraft.class_3965;
+import net.minecraft.class_638;
+import net.minecraft.class_761;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(WorldRenderer.class)
+@Mixin(class_761.class)
 public class MixinLevelRenderer {
    @Shadow
-   private ClientWorld world;
+   private class_638 field_4085;
    @Shadow
    @Final
-   private MinecraftClient client;
+   private class_310 field_4088;
 
-   @ModifyVariable(method = "fillEntityOutlineRenderStates", at = @At(value = "STORE", ordinal = 0), ordinal = 0)
-   private VoxelShape extractBlockOutline(VoxelShape original) {
-      if (this.world == null || !(this.client.crosshairTarget instanceof BlockHitResult hit)) {
-         return original;
-      } else {
-         BlockPos blockPos = hit.getBlockPos();
-         BlockState state = this.world.getBlockState(blockPos);
-         VoxelShape shape = SecretHitboxes.getShape(state, blockPos);
+   @ModifyVariable(method = "method_74923(Lnet/minecraft/class_4184;Lnet/minecraft/class_11658;)V", at = @At(value = "STORE", ordinal = 0), ordinal = 0)
+   private class_265 extractBlockOutline(class_265 original) {
+      if (this.field_4085 != null && this.field_4088.field_1765 instanceof class_3965 hit) {
+         class_2338 var6 = hit.method_17777();
+         class_2680 state = this.field_4085.method_8320(var6);
+         class_265 shape = SecretHitboxes.getShape(state, var6);
          return shape != null ? shape : original;
+      } else {
+         return original;
       }
    }
 }

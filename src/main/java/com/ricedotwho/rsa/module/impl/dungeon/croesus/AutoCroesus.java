@@ -35,24 +35,24 @@ import java.util.Map.Entry;
 import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.util.Formatting;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.text.TextColor;
-import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.class_124;
+import net.minecraft.class_1297;
+import net.minecraft.class_1531;
+import net.minecraft.class_1657;
+import net.minecraft.class_1707;
+import net.minecraft.class_1713;
+import net.minecraft.class_1735;
+import net.minecraft.class_1799;
+import net.minecraft.class_1802;
+import net.minecraft.class_2371;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
+import net.minecraft.class_2561;
+import net.minecraft.class_2815;
+import net.minecraft.class_310;
+import net.minecraft.class_3966;
+import net.minecraft.class_5251;
+import net.minecraft.class_239.class_240;
 
 @ModuleInfo(aliases = "Auto Croesus", id = "AutoCroesus", category = Category.DUNGEONS)
 public class AutoCroesus extends Module {
@@ -69,7 +69,7 @@ public class AutoCroesus extends Module {
    private final Pattern essencePattern = Pattern.compile("^§d(\\w+) Essence §8x(\\d+)$");
    private final Map<String, String> ITEM_REPLACEMENTS = new HashMap<>();
    private static final double AURA_RANGE = 3.5;
-   private static final TextColor ULT_COLOUR = TextColor.fromFormatting(Formatting.LIGHT_PURPLE);
+   private static final class_5251 ULT_COLOUR = class_5251.method_27718(class_124.field_1076);
    private boolean running = false;
    private AutoCroesus.Action action = AutoCroesus.Action.IDLE;
    private boolean kismetting = false;
@@ -109,7 +109,7 @@ public class AutoCroesus extends Module {
    }
 
    public static void modMessage(String text) {
-      RSA.chat(Formatting.YELLOW + "AutoCroesus » " + Formatting.RESET + text);
+      RSA.chat(class_124.field_1054 + "AutoCroesus » " + class_124.field_1070 + text);
    }
 
    public void start() {
@@ -141,36 +141,36 @@ public class AutoCroesus extends Module {
       if (this.action != AutoCroesus.Action.CROESUS) {
          return false;
       } else {
-         PlayerEntity entity = this.findCroesus();
+         class_1657 entity = this.findCroesus();
          if (entity == null) {
             modMessage("No croesus entity returned!");
             return false;
          } else {
-            double dist = entity.squaredDistanceTo(mc.player);
+            double dist = entity.method_5858(mc.field_1724);
             if (dist > 16.0) {
                modMessage("Croesus too far! " + dist);
                return false;
-            } else if (MinecraftClient.getInstance().crosshairTarget instanceof EntityHitResult entityHitResult && entityHitResult.getType() != Type.MISS) {
-               Entity e = entityHitResult.getEntity();
-               if (entity.squaredDistanceTo(e) > 9.0) {
-                  RSA.chat(Formatting.RED + "Blocked by entity!");
+            } else if (class_310.method_1551().field_1765 instanceof class_3966 entityHitResult && entityHitResult.method_17783() != class_240.field_1333) {
+               class_1297 e = entityHitResult.method_17782();
+               if (entity.method_5858(e) > 9.0) {
+                  RSA.chat(class_124.field_1061 + "Blocked by entity!");
                   return false;
                } else {
                   PacketOrderManager.register(PacketOrderManager.STATE.ATTACK, () -> InteractUtils.attackEntity(entity));
                   return true;
                }
             } else {
-               RSA.chat(Formatting.RED + "Not looking at an entity");
+               RSA.chat(class_124.field_1061 + "Not looking at an entity");
                return false;
             }
          }
       }
    }
 
-   private PlayerEntity findCroesus() {
-      Vec3d eyePos = mc.player.getEntityPos().add(0.0, mc.player.getStandingEyeHeight(), 0.0);
-      Box box = new Box(eyePos, eyePos).expand(3.5, 3.5, 3.5);
-      List<ArmorStandEntity> stands = mc.world.getEntitiesByClass(ArmorStandEntity.class, box, e -> e.getDisplayName().getString().contains("Croesus"));
+   private class_1657 findCroesus() {
+      class_243 eyePos = mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_5751(), 0.0);
+      class_238 box = new class_238(eyePos, eyePos).method_1009(3.5, 3.5, 3.5);
+      List<class_1531> stands = mc.field_1687.method_8390(class_1531.class, box, e -> e.method_5476().getString().contains("Croesus"));
       if (stands.isEmpty()) {
          modMessage("Failed to find an entity named Croesus!");
          return null;
@@ -178,9 +178,9 @@ public class AutoCroesus extends Module {
          modMessage("found mode than one croesus stand??");
          return null;
       } else {
-         ArmorStandEntity stand = stands.getFirst();
-         mc.world.getEntitiesByClass(PlayerEntity.class, box, e -> e.squaredDistanceTo(stand) == 0.0);
-         List<PlayerEntity> list = mc.world.getEntitiesByClass(PlayerEntity.class, box, e -> e.squaredDistanceTo(stand) == 0.0);
+         class_1531 stand = stands.getFirst();
+         mc.field_1687.method_8390(class_1657.class, box, e -> e.method_5858(stand) == 0.0);
+         List<class_1657> list = mc.field_1687.method_8390(class_1657.class, box, e -> e.method_5858(stand) == 0.0);
          if (list.isEmpty()) {
             modMessage("no croesus?");
             return null;
@@ -195,31 +195,31 @@ public class AutoCroesus extends Module {
 
    @SubscribeEvent
    public void onGuiOpen(Loaded event) {
-      if (mc.player != null
-         && mc.player.currentScreenHandler instanceof GenericContainerScreenHandler menu
+      if (mc.field_1724 != null
+         && mc.field_1724.field_7512 instanceof class_1707 menu
          && this.running
          && this.action == AutoCroesus.Action.CROESUS
-         && mc.currentScreen != null
-         && mc.currentScreen.getTitle().getString().equals("Croesus")
+         && mc.field_1755 != null
+         && mc.field_1755.method_25440().getString().equals("Croesus")
          && Location.getArea().is(Island.DungeonHub)) {
-         this.currentPage = this.getPage(menu.slots);
+         this.currentPage = this.getPage(menu.field_7761);
 
-         for (Slot slot : menu.slots) {
-            ItemStack stack = slot.getStack();
-            if (stack.getItem().equals(Items.PLAYER_HEAD)) {
-               AutoCroesus.RunType type = AutoCroesus.RunType.findByDisplayName(stack.getName().getString());
+         for (class_1735 slot : menu.field_7761) {
+            class_1799 stack = slot.method_7677();
+            if (stack.method_7909().equals(class_1802.field_8575)) {
+               AutoCroesus.RunType type = AutoCroesus.RunType.findByDisplayName(stack.method_7964().getString());
                if (type != AutoCroesus.RunType.NONE && !ItemUtils.getCleanLore(stack).stream().noneMatch(s -> s.contains("No chests opened yet!"))) {
                   TaskComponent.onMilli(((BigDecimal)this.getClickDelay().getValue()).longValue(), () -> {
                      this.action = AutoCroesus.Action.REWARDS;
-                     this.click(slot.id, this.inCroesus());
+                     this.click(slot.field_7874, this.inCroesus());
                   });
                   return;
                }
             }
          }
 
-         ItemStack nextArrow = ((Slot)menu.slots.get(53)).getStack();
-         if (nextArrow.getItem() == Items.ARROW) {
+         class_1799 nextArrow = ((class_1735)menu.field_7761.get(53)).method_7677();
+         if (nextArrow.method_7909() == class_1802.field_8107) {
             this.clickOnDelay(53, this::inCroesus);
          } else {
             modMessage("All chests looted!");
@@ -231,13 +231,13 @@ public class AutoCroesus extends Module {
 
    @SubscribeEvent
    public void onRewards(Loaded event) {
-      if (mc.player != null
-         && mc.player.currentScreenHandler instanceof GenericContainerScreenHandler menu
+      if (mc.field_1724 != null
+         && mc.field_1724.field_7512 instanceof class_1707 menu
          && this.running
          && this.action == AutoCroesus.Action.REWARDS
-         && mc.currentScreen != null
+         && mc.field_1755 != null
          && Location.getArea().is(Island.DungeonHub)) {
-         String title = mc.currentScreen.getTitle().getString();
+         String title = mc.field_1755.method_25440().getString();
          AutoCroesus.RunType type = AutoCroesus.RunType.findByTitle(title);
          if (type != AutoCroesus.RunType.NONE) {
             Floor floor = Floor.findByIndex(NumberUtils.convertRomanToArabic(title.split("- Floor")[1].trim()));
@@ -247,17 +247,17 @@ public class AutoCroesus extends Module {
 
             List<AutoCroesus.Reward> chests = new ArrayList<>();
 
-            for (Slot slot : menu.slots) {
-               if (menu.slots.indexOf(slot) > 45) {
+            for (class_1735 slot : menu.field_7761) {
+               if (menu.field_7761.indexOf(slot) > 45) {
                   break;
                }
 
-               ItemStack stack = slot.getStack();
-               if (stack.getItem().equals(Items.PLAYER_HEAD)) {
-                  List<Text> components = ItemUtils.getLore(stack);
+               class_1799 stack = slot.method_7677();
+               if (stack.method_7909().equals(class_1802.field_8575)) {
+                  List<class_2561> components = ItemUtils.getLore(stack);
                   List<String> lore = ItemUtils.getCleanLore(stack);
                   AutoCroesus.ChestType chestType = (AutoCroesus.ChestType)Utils.findEnumByName(
-                     AutoCroesus.ChestType.class, Formatting.strip(stack.getName().getString()), AutoCroesus.ChestType.NONE
+                     AutoCroesus.ChestType.class, class_124.method_539(stack.method_7964().getString()), AutoCroesus.ChestType.NONE
                   );
                   if (chestType != AutoCroesus.ChestType.NONE) {
                      int costLine = lore.indexOf("Cost");
@@ -266,8 +266,8 @@ public class AutoCroesus extends Module {
                         return;
                      }
 
-                     chest.slot = slot.id;
-                     chest.name = stack.getName().getString();
+                     chest.slot = slot.field_7874;
+                     chest.name = stack.method_7964().getString();
                      chest.chest.type = chestType;
                      chests.add(chest);
                   }
@@ -276,12 +276,12 @@ public class AutoCroesus extends Module {
 
             Optional<AutoCroesus.Reward> bedrock = chests.stream().filter(c -> c.chest.type == AutoCroesus.ChestType.BEDROCK).findFirst();
             Optional<AutoCroesus.Reward> alwaysBuy = chests.stream().filter(c -> c.alwaysBuy).findFirst();
-            ItemStack modifiers = ((Slot)menu.slots.get(32)).getStack();
-            List<Text> modiLore = ItemUtils.getLore(modifiers);
-            Optional<Text> kismetLine = modiLore.stream().filter(s -> s.getString().contains("Kismet Feather")).findAny();
+            class_1799 modifiers = ((class_1735)menu.field_7761.get(32)).method_7677();
+            List<class_2561> modiLore = ItemUtils.getLore(modifiers);
+            Optional<class_2561> kismetLine = modiLore.stream().filter(s -> s.getString().contains("Kismet Feather")).findAny();
             boolean canKismet = kismetLine.isPresent()
-               && kismetLine.get().getSiblings().size() > 1
-               && !((Text)kismetLine.get().getSiblings().get(1)).getStyle().isStrikethrough();
+               && kismetLine.get().method_10855().size() > 1
+               && !((class_2561)kismetLine.get().method_10855().get(1)).method_10866().method_10986();
             if (bedrock.isPresent()
                && (Boolean)this.getKismets().getValue()
                && canKismet
@@ -292,18 +292,18 @@ public class AutoCroesus extends Module {
                if (bedrock.get().slot >= 0 && bedrock.get().slot <= 45) {
                   this.clickOnDelay(bedrock.get().slot, this::inRewards);
                } else {
-                  modMessage(Formatting.DARK_RED + "Invalid slot! (" + bedrock.get().slot + ")");
+                  modMessage(class_124.field_1079 + "Invalid slot! (" + bedrock.get().slot + ")");
                   this.reset();
                }
             } else {
                AutoCroesus.Reward best = alwaysBuy.orElseGet(() -> this.getBestProfit(chests));
                if (best.slot >= 0 && best.slot <= 45) {
-                  modMessage("Claiming the " + best.name + Formatting.RESET + " chest, Profit: " + best.chest.profit);
+                  modMessage("Claiming the " + best.name + class_124.field_1070 + " chest, Profit: " + best.chest.profit);
                   this.action = AutoCroesus.Action.CHEST;
                   this.clickOnDelay(best.slot, this::inRewards);
                   CroesusLoader.addRunLog(best.chest);
                } else {
-                  modMessage(Formatting.DARK_RED + "Invalid slot! (" + best.slot + ")");
+                  modMessage(class_124.field_1079 + "Invalid slot! (" + best.slot + ")");
                   this.reset();
                }
             }
@@ -313,22 +313,22 @@ public class AutoCroesus extends Module {
 
    @SubscribeEvent
    public void onChest(Loaded event) {
-      if (mc.player != null
-         && mc.player.currentScreenHandler instanceof GenericContainerScreenHandler menu
+      if (mc.field_1724 != null
+         && mc.field_1724.field_7512 instanceof class_1707 menu
          && this.running
          && this.action == AutoCroesus.Action.CHEST
-         && mc.currentScreen != null
+         && mc.field_1755 != null
          && Location.getArea().is(Island.DungeonHub)) {
-         String title = mc.currentScreen.getTitle().getString();
+         String title = mc.field_1755.method_25440().getString();
          AutoCroesus.ChestType chestType = (AutoCroesus.ChestType)Utils.findEnumByName(
-            AutoCroesus.ChestType.class, Formatting.strip(title.split(" ")[0]), AutoCroesus.ChestType.NONE
+            AutoCroesus.ChestType.class, class_124.method_539(title.split(" ")[0]), AutoCroesus.ChestType.NONE
          );
          if (chestType != AutoCroesus.ChestType.NONE) {
             if (this.kismetting) {
                this.kismetting = false;
-               ItemStack kismetStack = ((Slot)menu.slots.get(50)).getStack();
+               class_1799 kismetStack = ((class_1735)menu.field_7761.get(50)).method_7677();
                if (ItemUtils.getCleanLore(kismetStack).stream().anyMatch(s -> s.contains("Bring a Kismet Feather"))) {
-                  modMessage(Formatting.RED + "No kismets!");
+                  modMessage(class_124.field_1061 + "No kismets!");
                   this.reset();
                   this.close();
                } else {
@@ -346,52 +346,50 @@ public class AutoCroesus extends Module {
 
    @SubscribeEvent
    public void onClose(Send event) {
-      if (event.getPacket() instanceof CloseHandledScreenC2SPacket && Location.getArea().is(Island.DungeonHub)) {
-         if (!this.action.equals(AutoCroesus.Action.IDLE)) {
-            modMessage("Stopped!");
-            this.reset();
-         }
+      if (event.getPacket() instanceof class_2815 && Location.getArea().is(Island.DungeonHub) && !this.action.equals(AutoCroesus.Action.IDLE)) {
+         modMessage("Stopped!");
+         this.reset();
       }
    }
 
    private boolean inCroesus() {
-      return mc.currentScreen != null && mc.currentScreen.getTitle().getString().equals("Croesus");
+      return mc.field_1755 != null && mc.field_1755.method_25440().getString().equals("Croesus");
    }
 
    private boolean inRewards() {
-      if (mc.currentScreen == null) {
+      if (mc.field_1755 == null) {
          return false;
       } else {
-         AutoCroesus.RunType type = AutoCroesus.RunType.findByTitle(mc.currentScreen.getTitle().getString());
+         AutoCroesus.RunType type = AutoCroesus.RunType.findByTitle(mc.field_1755.method_25440().getString());
          return type != AutoCroesus.RunType.NONE;
       }
    }
 
    private boolean inChest() {
-      if (mc.currentScreen == null) {
+      if (mc.field_1755 == null) {
          return false;
       } else {
-         String title = Formatting.strip(mc.currentScreen.getTitle().getString());
+         String title = class_124.method_539(mc.field_1755.method_25440().getString());
          return Utils.findEnumByName(AutoCroesus.ChestType.class, title.split(" ")[0].trim(), AutoCroesus.ChestType.NONE) != AutoCroesus.ChestType.NONE;
       }
    }
 
    private void close() {
       TaskComponent.onTick(0L, () -> {
-         if (mc.player != null) {
-            mc.player.closeHandledScreen();
+         if (mc.field_1724 != null) {
+            mc.field_1724.method_7346();
          }
       });
    }
 
-   private int getPage(DefaultedList<Slot> inv) {
-      ItemStack nextArrow = ((Slot)inv.get(53)).getStack();
-      ItemStack lastArrow = ((Slot)inv.get(45)).getStack();
-      if (nextArrow.getItem() == Items.ARROW) {
-         String line = Formatting.strip((String)ItemUtils.getCleanLore(nextArrow).getFirst());
+   private int getPage(class_2371<class_1735> inv) {
+      class_1799 nextArrow = ((class_1735)inv.get(53)).method_7677();
+      class_1799 lastArrow = ((class_1735)inv.get(45)).method_7677();
+      if (nextArrow.method_7909() == class_1802.field_8107) {
+         String line = class_124.method_539((String)ItemUtils.getCleanLore(nextArrow).getFirst());
          return Integer.parseInt(line.split(" ")[1]) - 1;
-      } else if (lastArrow.getItem() == Items.ARROW) {
-         String line = Formatting.strip((String)ItemUtils.getCleanLore(lastArrow).getFirst());
+      } else if (lastArrow.method_7909() == class_1802.field_8107) {
+         String line = class_124.method_539((String)ItemUtils.getCleanLore(lastArrow).getFirst());
          return Integer.parseInt(line.split(" ")[1]) + 1;
       } else {
          return 1;
@@ -399,10 +397,10 @@ public class AutoCroesus extends Module {
    }
 
    private void click(int slot, boolean inWindow) {
-      if (mc.player != null && mc.interactionManager != null && inWindow) {
-         int wid = mc.player.currentScreenHandler.syncId;
+      if (mc.field_1724 != null && mc.field_1761 != null && inWindow) {
+         int wid = mc.field_1724.field_7512.field_7763;
          if (wid >= 0 && wid <= 100) {
-            mc.interactionManager.clickSlot(wid, slot, 0, SlotActionType.PICKUP, mc.player);
+            mc.field_1761.method_2906(wid, slot, 0, class_1713.field_7790, mc.field_1724);
          }
       }
    }
@@ -436,10 +434,10 @@ public class AutoCroesus extends Module {
       return best;
    }
 
-   private AutoCroesus.Reward getRewards(List<String> itemLines, String cost, List<Text> components) {
+   private AutoCroesus.Reward getRewards(List<String> itemLines, String cost, List<class_2561> components) {
       AutoCroesus.ChestInfo chestInfo = new AutoCroesus.ChestInfo();
       if (!cost.equals("§aFREE")) {
-         Matcher matcher = this.costPattern.matcher(Formatting.strip(cost));
+         Matcher matcher = this.costPattern.matcher(class_124.method_539(cost));
          if (matcher.find()) {
             chestInfo.cost = Integer.parseInt(matcher.group(1).replace(",", ""));
          }
@@ -449,12 +447,12 @@ public class AutoCroesus extends Module {
 
       for (int i = 0; i < itemLines.size(); i++) {
          String itemLine = itemLines.get(i);
-         Text component = components.get(i);
+         class_2561 component = components.get(i);
          AutoCroesus.ChestItem item = this.parseItem(itemLine, component);
          if (item != null) {
             double price = this.getSellPrice(item.getId(), true);
             if (price == -1.0) {
-               modMessage(Formatting.DARK_RED + "Failed to get a price! Exiting early");
+               modMessage(class_124.field_1079 + "Failed to get a price! Exiting early");
                return null;
             }
 
@@ -480,7 +478,7 @@ public class AutoCroesus extends Module {
          return (Double)PriceData.getBinCache().get(sbId);
       } else {
          modMessage(
-            Formatting.RED
+            class_124.field_1061
                + "Failed to get price for "
                + sbId
                + "! ("
@@ -493,16 +491,16 @@ public class AutoCroesus extends Module {
       }
    }
 
-   private AutoCroesus.ChestItem parseItem(String item, Text component) {
+   private AutoCroesus.ChestItem parseItem(String item, class_2561 component) {
       if (item.contains("Enchanted Book")) {
          Matcher matcher = this.bookPattern.matcher(item);
          if (!matcher.find()) {
             return null;
          } else {
             boolean ult = false;
-            if (component.getSiblings().size() > 1) {
-               Text comp = (Text)component.getSiblings().get(1);
-               ult = comp.getStyle().isBold() && comp.getStyle().getColor() != null && comp.getStyle().getColor().equals(ULT_COLOUR);
+            if (component.method_10855().size() > 1) {
+               class_2561 comp = (class_2561)component.method_10855().get(1);
+               ult = comp.method_10866().method_10984() && comp.method_10866().method_10973() != null && comp.method_10866().method_10973().equals(ULT_COLOUR);
             }
 
             String bookName = matcher.group(2);
@@ -528,7 +526,7 @@ public class AutoCroesus extends Module {
             return new AutoCroesus.ChestItem("ESSENCE_" + type.toUpperCase(), Integer.parseInt(amount));
          }
       } else {
-         String ite = Formatting.strip(item);
+         String ite = class_124.method_539(item);
          if (this.ITEM_REPLACEMENTS.containsKey(ite)) {
             return new AutoCroesus.ChestItem(this.ITEM_REPLACEMENTS.get(ite), 1);
          } else {
@@ -673,12 +671,12 @@ public class AutoCroesus extends Module {
       }
 
       public static AutoCroesus.RunType findByDisplayName(String nameFormatted) {
-         String name = Formatting.strip(nameFormatted);
+         String name = class_124.method_539(nameFormatted);
          return Arrays.stream(values()).filter(type -> name.equals(type.getDisplayName())).findFirst().orElse(NONE);
       }
 
       public static AutoCroesus.RunType findByTitle(String title) {
-         String name = Formatting.strip(title);
+         String name = class_124.method_539(title);
          return Arrays.stream(values()).filter(type -> name.startsWith(type.getRewardsTitle())).findFirst().orElse(NONE);
       }
 

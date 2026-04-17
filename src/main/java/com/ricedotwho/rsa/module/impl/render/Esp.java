@@ -25,20 +25,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.BatEntity;
-import net.minecraft.entity.boss.WitherEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.EndermanEntity;
-import net.minecraft.entity.mob.GiantEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.StringHelper;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_1297;
+import net.minecraft.class_1309;
+import net.minecraft.class_1420;
+import net.minecraft.class_1528;
+import net.minecraft.class_1531;
+import net.minecraft.class_1560;
+import net.minecraft.class_1570;
+import net.minecraft.class_1657;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
+import net.minecraft.class_310;
+import net.minecraft.class_3544;
+import net.minecraft.class_638;
+import net.minecraft.class_746;
 
 @ModuleInfo(aliases = "Esp", id = "Esp", category = Category.RENDER)
 public class Esp extends Module {
@@ -118,28 +118,26 @@ public class Esp extends Module {
 
    @SubscribeEvent
    public void onRender3dEvent(Extract event) {
-      if (mc.player != null && mc.world != null) {
-         if (Location.getArea() == Island.Dungeon) {
-            float partialTicks = event.getContext().tickCounter().getTickProgress(false);
-            if ((Boolean)this.showStarredMobs.getValue() && !this.starredMobs.isEmpty()) {
-               this.handleRender(this.starredMobs, this.getStarredOutline().getValue(), this.getStarredFill().getValue(), partialTicks);
-            }
+      if (mc.field_1724 != null && mc.field_1687 != null && Location.getArea() == Island.Dungeon) {
+         float partialTicks = event.getContext().tickCounter().method_60637(false);
+         if ((Boolean)this.showStarredMobs.getValue() && !this.starredMobs.isEmpty()) {
+            this.handleRender(this.starredMobs, this.getStarredOutline().getValue(), this.getStarredFill().getValue(), partialTicks);
+         }
 
-            if ((Boolean)this.drawBloodMobs.getValue() && !this.bloodMobs.isEmpty()) {
-               this.handleRender(this.bloodMobs, this.getBloodOutline().getValue(), this.getBloodFill().getValue(), partialTicks);
-            }
+         if ((Boolean)this.drawBloodMobs.getValue() && !this.bloodMobs.isEmpty()) {
+            this.handleRender(this.bloodMobs, this.getBloodOutline().getValue(), this.getBloodFill().getValue(), partialTicks);
+         }
 
-            if ((Boolean)this.bats.getValue() && !this.batMobs.isEmpty()) {
-               this.handleRender(this.batMobs, this.getBatOutline().getValue(), this.getBatFill().getValue(), partialTicks);
-            }
+         if ((Boolean)this.bats.getValue() && !this.batMobs.isEmpty()) {
+            this.handleRender(this.batMobs, this.getBatOutline().getValue(), this.getBatFill().getValue(), partialTicks);
+         }
 
-            if ((Boolean)this.withers.getValue() && this.wither != -1) {
-               Entity entity = mc.world.getEntityById(this.wither);
-               if (entity != null) {
-                  this.renderEntityBox(entity, this.getWitherOutline().getValue(), this.getWitherFill().getValue(), partialTicks);
-               } else {
-                  this.wither = -1;
-               }
+         if ((Boolean)this.withers.getValue() && this.wither != -1) {
+            class_1297 entity = mc.field_1687.method_8469(this.wither);
+            if (entity != null) {
+               this.renderEntityBox(entity, this.getWitherOutline().getValue(), this.getWitherFill().getValue(), partialTicks);
+            } else {
+               this.wither = -1;
             }
          }
       }
@@ -147,60 +145,58 @@ public class Esp extends Module {
 
    @SubscribeEvent
    public void onTick(Start event) {
-      if (mc.world != null && mc.player != null && Location.getArea().is(Island.Dungeon)) {
-         if ((float)event.getTime() % this.updateInterval == 0.0F) {
-            this.updateTrackedEntities(mc.world);
-         }
+      if (mc.field_1687 != null && mc.field_1724 != null && Location.getArea().is(Island.Dungeon) && (float)event.getTime() % this.updateInterval == 0.0F) {
+         this.updateTrackedEntities(mc.field_1687);
       }
    }
 
-   private void updateTrackedEntities(ClientWorld level) {
+   private void updateTrackedEntities(class_638 level) {
       this.starredMobs.clear();
       this.bloodMobs.clear();
       this.wither = -1;
       this.witherDistance = Double.MAX_VALUE;
 
-      for (Entity entity : level.getEntities()) {
-         if ((Boolean)this.showStarredMobs.getValue() && entity instanceof ArmorStandEntity stand) {
+      for (class_1297 entity : level.method_18112()) {
+         if ((Boolean)this.showStarredMobs.getValue() && entity instanceof class_1531 stand) {
             if (this.isValidStarredEntity(stand)) {
-               Entity mob = this.getMobEntity(stand, level);
+               class_1297 mob = this.getMobEntity(stand, level);
                if (mob != null) {
-                  this.starredMobs.add(mob.getId());
-                  stand.setCustomNameVisible(true);
-                  mob.setInvisible(false);
+                  this.starredMobs.add(mob.method_5628());
+                  stand.method_5880(true);
+                  mob.method_5648(false);
                }
             }
-         } else if ((Boolean)this.showStarredMobs.getValue() && entity instanceof PlayerEntity && !(entity instanceof ClientPlayerEntity)) {
-            String name = entity.getName().getString().trim();
+         } else if ((Boolean)this.showStarredMobs.getValue() && entity instanceof class_1657 && !(entity instanceof class_746)) {
+            String name = entity.method_5477().getString().trim();
             if (name.hashCode() == -662331259) {
-               this.starredMobs.add(entity.getId());
-               entity.setInvisible(false);
+               this.starredMobs.add(entity.method_5628());
+               entity.method_5648(false);
             }
-         } else if ((Boolean)this.showStarredMobs.getValue() && entity instanceof EndermanEntity) {
-            if (entity.getName().getString().hashCode() == -1005553066) {
-               entity.setInvisible(false);
+         } else if ((Boolean)this.showStarredMobs.getValue() && entity instanceof class_1560) {
+            if (entity.method_5477().getString().hashCode() == -1005553066) {
+               entity.method_5648(false);
             }
-         } else if ((Boolean)this.drawBloodMobs.getValue() && entity instanceof PlayerEntity && !(entity instanceof ClientPlayerEntity)) {
-            String name = entity.getName().getString().trim();
+         } else if ((Boolean)this.drawBloodMobs.getValue() && entity instanceof class_1657 && !(entity instanceof class_746)) {
+            String name = entity.method_5477().getString().trim();
             if (this.bloodNames.contains(name.hashCode())) {
-               this.bloodMobs.add(entity.getId());
-               entity.setInvisible(false);
+               this.bloodMobs.add(entity.method_5628());
+               entity.method_5648(false);
             }
-         } else if ((Boolean)this.drawBloodMobs.getValue() && entity instanceof GiantEntity && !Dungeon.isInBoss()) {
-            this.bloodMobs.add(entity.getId());
-            entity.setInvisible(false);
-         } else if ((Boolean)this.bats.getValue() && entity instanceof BatEntity && !entity.isInvisible()) {
-            this.batMobs.add(entity.getId());
-         } else if ((Boolean)this.withers.getValue() && entity instanceof WitherEntity e && !entity.isInvisible()) {
-            ClientPlayerEntity Player = MinecraftClient.getInstance().player;
-            if (e.getMaxHealth() != 300.0F) {
+         } else if ((Boolean)this.drawBloodMobs.getValue() && entity instanceof class_1570 && !Dungeon.isInBoss()) {
+            this.bloodMobs.add(entity.method_5628());
+            entity.method_5648(false);
+         } else if ((Boolean)this.bats.getValue() && entity instanceof class_1420 && !entity.method_5767()) {
+            this.batMobs.add(entity.method_5628());
+         } else if ((Boolean)this.withers.getValue() && entity instanceof class_1528 e && !entity.method_5767()) {
+            class_746 Player = class_310.method_1551().field_1724;
+            if (e.method_6063() != 300.0F) {
                if (this.wither == -1) {
-                  this.wither = entity.getId();
+                  this.wither = entity.method_5628();
                } else {
-                  double dist = entity.squaredDistanceTo(Player);
+                  double dist = entity.method_5858(Player);
                   if (dist < this.witherDistance) {
                      this.witherDistance = dist;
-                     this.wither = entity.getId();
+                     this.wither = entity.method_5628();
                   }
                }
             }
@@ -209,16 +205,16 @@ public class Esp extends Module {
    }
 
    private void handleRender(Set<Integer> entityIds, Colour outlineColor, Colour fillColor, float partialTicks) {
-      ClientWorld level = MinecraftClient.getInstance().world;
+      class_638 level = class_310.method_1551().field_1687;
       if (level != null) {
          List<Integer> toRemove = new ArrayList<>();
 
          for (int entityId : entityIds) {
-            Entity entity = level.getEntityById(entityId);
-            if (entity != null && !(entity instanceof LivingEntity living && living.isDead())) {
-               this.renderEntityBox(entity, outlineColor, fillColor, partialTicks);
-            } else {
+            class_1297 entity = level.method_8469(entityId);
+            if (entity == null || entity instanceof class_1309 living && living.method_29504()) {
                toRemove.add(entityId);
+            } else {
+               this.renderEntityBox(entity, outlineColor, fillColor, partialTicks);
             }
          }
 
@@ -226,17 +222,17 @@ public class Esp extends Module {
       }
    }
 
-   private void renderEntityBox(Entity entity, Colour outline, Colour fill, float partialTicks) {
-      Vec3d interpolatedPos = entity.getLerpedPos(partialTicks);
-      float width = entity.getWidth();
-      float height = entity.getHeight();
-      Box aabb = new Box(
-         interpolatedPos.x - width / 2.0F,
-         interpolatedPos.y,
-         interpolatedPos.z - width / 2.0F,
-         interpolatedPos.x + width / 2.0F,
-         interpolatedPos.y + height,
-         interpolatedPos.z + width / 2.0F
+   private void renderEntityBox(class_1297 entity, Colour outline, Colour fill, float partialTicks) {
+      class_243 interpolatedPos = entity.method_30950(partialTicks);
+      float width = entity.method_17681();
+      float height = entity.method_17682();
+      class_238 aabb = new class_238(
+         interpolatedPos.field_1352 - width / 2.0F,
+         interpolatedPos.field_1351,
+         interpolatedPos.field_1350 - width / 2.0F,
+         interpolatedPos.field_1352 + width / 2.0F,
+         interpolatedPos.field_1351 + height,
+         interpolatedPos.field_1350 + width / 2.0F
       );
       switch (this.renderMode.getIndex()) {
          case 0:
@@ -250,21 +246,21 @@ public class Esp extends Module {
       }
    }
 
-   private boolean isValidStarredEntity(ArmorStandEntity entity) {
-      if (!entity.hasCustomName()) {
+   private boolean isValidStarredEntity(class_1531 entity) {
+      if (!entity.method_16914()) {
          return false;
       } else {
-         String name = StringHelper.stripTextFormat(Objects.requireNonNull(entity.getCustomName()).getString());
+         String name = class_3544.method_15440(Objects.requireNonNull(entity.method_5797()).getString());
          return name.contains("✯ ") && name.endsWith("❤");
       }
    }
 
-   private Entity getMobEntity(ArmorStandEntity stand, ClientWorld level) {
-      Box searchBox = stand.getBoundingBox().offset(0.0, -1.0, 0.0);
-      return level.getOtherEntities(stand, searchBox)
+   private class_1297 getMobEntity(class_1531 stand, class_638 level) {
+      class_238 searchBox = stand.method_5829().method_989(0.0, -1.0, 0.0);
+      return level.method_8335(stand, searchBox)
          .stream()
-         .filter(e -> e instanceof LivingEntity && !(e instanceof ArmorStandEntity) && !(e instanceof ClientPlayerEntity) && (!(e instanceof WitherEntity) || !e.isInvisible()))
-         .min(Comparator.comparingDouble(e -> e.squaredDistanceTo(stand)))
+         .filter(e -> e instanceof class_1309 && !(e instanceof class_1531) && !(e instanceof class_746) && (!(e instanceof class_1528) || !e.method_5767()))
+         .min(Comparator.comparingDouble(e -> e.method_5858(stand)))
          .orElse(null);
    }
 

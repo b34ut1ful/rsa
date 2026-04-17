@@ -14,17 +14,17 @@ import com.ricedotwho.rsm.data.Colour;
 import com.ricedotwho.rsm.data.MutableInput;
 import com.ricedotwho.rsm.data.Pos;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.class_10185;
+import net.minecraft.class_243;
+import net.minecraft.class_310;
+import net.minecraft.class_3532;
 
 public class BlinkRing extends Ring {
    private final String route;
    private final int size;
    private int ticks = -1;
-   private Vec3d endPos;
-   private Vec3d endVelo;
+   private class_243 endPos;
+   private class_243 endVelo;
 
    public BlinkRing(Pos min, Pos max, ArgumentManager manage, SubActionManager actions, Map<String, Object> extra) {
       this(min, max, (String)extra.getOrDefault("route", MovementRecorder.getData().getFileName()), manage, actions, (Integer)extra.getOrDefault("blink", 17));
@@ -32,7 +32,7 @@ public class BlinkRing extends Ring {
 
    public BlinkRing(Pos min, Pos max, String route, ArgumentManager manage, SubActionManager actions, int length) {
       super(min, max, RingType.BLINK.getRenderSizeOffset(), manage, actions);
-      this.size = MathHelper.clamp(1, length, 17);
+      this.size = class_3532.method_15340(1, length, 17);
       this.route = route;
       this.endPos = null;
       this.endVelo = null;
@@ -45,7 +45,7 @@ public class BlinkRing extends Ring {
 
    @Override
    public boolean run() {
-      if (MinecraftClient.getInstance().player == null) {
+      if (class_310.method_1551().field_1724 == null) {
          return false;
       } else {
          Blink blink = (Blink)RSM.getModule(Blink.class);
@@ -91,9 +91,9 @@ public class BlinkRing extends Ring {
          blink.onKeyToggle();
       }
 
-      if (MinecraftClient.getInstance().player != null) {
-         MinecraftClient.getInstance().player.setPosition(this.endPos);
-         MinecraftClient.getInstance().player.setVelocity(this.endVelo);
+      if (class_310.method_1551().field_1724 != null) {
+         class_310.method_1551().field_1724.method_33574(this.endPos);
+         class_310.method_1551().field_1724.method_18799(this.endVelo);
          if ((Boolean)((AutoP3)RSM.getModule(AutoP3.class)).getFreecamBlink().getValue()) {
             Freecam freecam = (Freecam)RSM.getModule(Freecam.class);
             if (freecam.isEnabled()) {
@@ -116,17 +116,17 @@ public class BlinkRing extends Ring {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
-      if (MinecraftClient.getInstance().player != null && this.ticks >= 0) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
+      if (class_310.method_1551().field_1724 != null && this.ticks >= 0) {
          this.ticks++;
          if (this.ticks <= this.size + 1) {
-            this.endPos = MinecraftClient.getInstance().player.getEntityPos();
-            this.endVelo = MinecraftClient.getInstance().player.getVelocity();
+            this.endPos = class_310.method_1551().field_1724.method_73189();
+            this.endVelo = class_310.method_1551().field_1724.method_18798();
          }
 
          if (this.ticks == this.size + 1) {
-            MinecraftClient.getInstance().player.setPosition(this.endPos);
-            MinecraftClient.getInstance().player.setVelocity(0.0, 0.0, 0.0);
+            class_310.method_1551().field_1724.method_33574(this.endPos);
+            class_310.method_1551().field_1724.method_18800(0.0, 0.0, 0.0);
             MovementRecorder.pauseRecording();
          }
 

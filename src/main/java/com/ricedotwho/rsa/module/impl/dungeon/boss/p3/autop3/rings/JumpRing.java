@@ -10,7 +10,7 @@ import com.ricedotwho.rsm.data.Colour;
 import com.ricedotwho.rsm.data.MutableInput;
 import com.ricedotwho.rsm.data.Pos;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
+import net.minecraft.class_10185;
 
 public class JumpRing extends Ring {
    public JumpRing(Pos min, Pos max, ArgumentManager manager, SubActionManager actions) {
@@ -45,7 +45,7 @@ public class JumpRing extends Ring {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
       return true;
    }
 

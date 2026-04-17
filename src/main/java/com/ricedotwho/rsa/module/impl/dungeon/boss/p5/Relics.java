@@ -33,14 +33,14 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.Formatting;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.class_10185;
+import net.minecraft.class_124;
+import net.minecraft.class_1304;
+import net.minecraft.class_1531;
+import net.minecraft.class_2338;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
+import net.minecraft.class_2824;
 import org.apache.commons.lang3.EnumUtils;
 
 @ModuleInfo(aliases = "Relics", id = "Relics", category = Category.DUNGEONS)
@@ -83,22 +83,22 @@ public class Relics extends Module {
 
    @SubscribeEvent
    public void onSendPacket(Send event) {
-      if (event.getPacket() instanceof PlayerInteractEntityC2SPacket packet
-         && mc.player != null
+      if (event.getPacket() instanceof class_2824 packet
+         && mc.field_1724 != null
          && (Boolean)this.look.getValue()
          && Location.getArea().is(Island.Dungeon)
          && DungeonUtils.isPhase(Phase7.P5)
          && Dungeon.isInBoss()
          && !this.hasRelic()) {
          try {
-            Field idField = PlayerInteractEntityC2SPacket.class.getDeclaredField("entityId");
+            Field idField = class_2824.class.getDeclaredField("entityId");
             idField.setAccessible(true);
             int id = idField.getInt(packet);
-            if (!(mc.world.getEntityById(id) instanceof ArmorStandEntity stand)) {
+            if (!(mc.field_1687.method_8469(id) instanceof class_1531 stand)) {
                return;
             }
 
-            String name = Formatting.strip(stand.getEquippedStack(EquipmentSlot.HEAD).getName().getString());
+            String name = class_124.method_539(stand.method_6118(class_1304.field_6169).method_7964().getString());
             Relics.Type type = Relics.Type.getTypeByName(name);
             if (type == Relics.Type.NONE) {
                return;
@@ -109,7 +109,7 @@ public class Relics extends Module {
                return;
             }
 
-            if ((Boolean)this.leapInMenu.getValue() && mc.currentScreen != null && mc.currentScreen.getTitle().getString().equals("Spirit Leap")) {
+            if ((Boolean)this.leapInMenu.getValue() && mc.field_1755 != null && mc.field_1755.method_25440().getString().equals("Spirit Leap")) {
                DungeonPlayer player = Dungeon.getClazz(this.getClassForRelic(type));
                if (player == null) {
                   RSA.chat("Failed to find player!");
@@ -124,16 +124,16 @@ public class Relics extends Module {
                   }
                });
             }
-         } catch (IllegalAccessException | NoSuchFieldException exception) {
-            RSA.getLogger().error("Error while finding entityId!", exception);
+         } catch (NoSuchFieldException | IllegalAccessException var9) {
+            RSA.getLogger().error("Error while finding entityId!", var9);
          }
       }
    }
 
    @SubscribeEvent
    public void onChat(Chat event) {
-      if (this.leaping && mc.player != null && (Boolean)this.lookAfterLeap.getValue() && this.relic != Relics.Type.NONE) {
-         String message = Formatting.strip(event.getMessage().getString());
+      if (this.leaping && mc.field_1724 != null && (Boolean)this.lookAfterLeap.getValue() && this.relic != Relics.Type.NONE) {
+         String message = class_124.method_539(event.getMessage().getString());
          if (leapPattern.matcher(message).find()) {
             this.leaping = false;
             this.doRelicLook(this.relic);
@@ -143,7 +143,7 @@ public class Relics extends Module {
    }
 
    private boolean hasRelic() {
-      return mc.player == null || Relics.Type.getTypeByName(mc.player.getInventory().getStack(8).getName().getString()) == Relics.Type.NONE;
+      return mc.field_1724 == null || Relics.Type.getTypeByName(mc.field_1724.method_31548().method_5438(8).method_7964().getString()) == Relics.Type.NONE;
    }
 
    private DungeonClass getClassForRelic(Relics.Type type) {
@@ -157,10 +157,10 @@ public class Relics extends Module {
    private void doRelicLook(Relics.Type type) {
       if (type != Relics.Type.NONE) {
          Rotation rot = RotationUtils.getRotation(
-            mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0), type.place
+            mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0), type.place
          );
-         mc.player.setPitch(rot.getPitch());
-         mc.player.setYaw(rot.getYaw());
+         mc.field_1724.method_36457(rot.getPitch());
+         mc.field_1724.method_36456(rot.getYaw());
          this.walk = true;
       }
    }
@@ -168,9 +168,9 @@ public class Relics extends Module {
    @SubscribeEvent
    public void onPollInputs(InputPollEvent event) {
       if (this.walk && Location.getArea().is(Island.Dungeon) && DungeonUtils.isPhase(Phase7.P5) && Dungeon.isInBoss()) {
-         PlayerInput input = event.getClientInput();
-         if (!input.forward() && !input.backward() && !input.left() && !(input.right() | input.sneak())) {
-            event.getInput().apply(new PlayerInput(true, false, false, false, false, false, true));
+         class_10185 input = event.getClientInput();
+         if (!input.comp_3159() && !input.comp_3160() && !input.comp_3161() && !(input.comp_3162() | input.comp_3164())) {
+            event.getInput().apply(new class_10185(true, false, false, false, false, false, true));
          } else {
             this.walk = false;
             RSA.chat("Relic look cancelled");
@@ -184,16 +184,16 @@ public class Relics extends Module {
          && Location.getArea().is(Island.Dungeon)
          && DungeonUtils.isPhase(Phase7.P5)
          && Dungeon.isInBoss()
-         && mc.player != null
-         && mc.world != null) {
+         && mc.field_1724 != null
+         && mc.field_1687 != null) {
          long now = System.currentTimeMillis();
          if (now - this.lastClick >= ((BigDecimal)this.delay.getValue()).longValue()) {
             double max = ((BigDecimal)this.auraRange.getValue()).doubleValue() * ((BigDecimal)this.auraRange.getValue()).doubleValue();
             if ((Boolean)this.placeAura.getValue()) {
-               Relics.Type type = Relics.Type.getTypeByName(mc.player.getInventory().getStack(8).getName().getString());
-               if (type != Relics.Type.NONE && mc.player.squaredDistanceTo(type.place) < max) {
+               Relics.Type type = Relics.Type.getTypeByName(mc.field_1724.method_31548().method_5438(8).method_7964().getString());
+               if (type != Relics.Type.NONE && mc.field_1724.method_5707(type.place) < max) {
                   SwapManager.swapSlot(8);
-                  InteractUtils.interactOnBlock(BlockPos.ofFloored(type.place), true);
+                  InteractUtils.interactOnBlock(class_2338.method_49638(type.place), true);
                   this.lastClick = now;
                   this.walk = false;
                   return;
@@ -201,14 +201,14 @@ public class Relics extends Module {
             }
 
             if ((Boolean)this.aura.getValue() && !this.hasRelic()) {
-               Vec3d eye = mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0);
-               Box box = new Box(eye, eye).expand(4.5, 4.5, 4.5);
+               class_243 eye = mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0);
+               class_238 box = new class_238(eye, eye).method_1009(4.5, 4.5, 4.5);
 
-               for (ArmorStandEntity stand : mc.world.getNonSpectatingEntities(ArmorStandEntity.class, box)) {
-                  String name = Formatting.strip(stand.getEquippedStack(EquipmentSlot.HEAD).getName().getString());
+               for (class_1531 stand : mc.field_1687.method_18467(class_1531.class, box)) {
+                  String name = class_124.method_539(stand.method_6118(class_1304.field_6169).method_7964().getString());
                   Relics.Type type = Relics.Type.getTypeByName(name);
                   if (type != Relics.Type.NONE) {
-                     double dist = mc.player.squaredDistanceTo(stand);
+                     double dist = mc.field_1724.method_5858(stand);
                      if (!(dist > max)) {
                         InteractUtils.interactOnEntity(stand);
                         this.lastClick = now;
@@ -295,23 +295,23 @@ public class Relics extends Module {
    }
 
    private static enum Type {
-      RED(new Vec3d(51.5, 7.5, 42.5), new Vec3d(20.0, 6.0, 59.0)),
-      ORANGE(new Vec3d(57.5, 7.5, 42.5), new Vec3d(92.0, 6.0, 56.0)),
-      GREEN(new Vec3d(49.5, 7.5, 44.5), new Vec3d(20.0, 6.0, 94.0)),
-      BLUE(new Vec3d(59.5, 7.5, 44.5), new Vec3d(91.0, 6.0, 94.0)),
-      PURPLE(new Vec3d(54.5, 7.5, 41.5), new Vec3d(56.0, 8.0, 132.0)),
+      RED(new class_243(51.5, 7.5, 42.5), new class_243(20.0, 6.0, 59.0)),
+      ORANGE(new class_243(57.5, 7.5, 42.5), new class_243(92.0, 6.0, 56.0)),
+      GREEN(new class_243(49.5, 7.5, 44.5), new class_243(20.0, 6.0, 94.0)),
+      BLUE(new class_243(59.5, 7.5, 44.5), new class_243(91.0, 6.0, 94.0)),
+      PURPLE(new class_243(54.5, 7.5, 41.5), new class_243(56.0, 8.0, 132.0)),
       NONE(null, null);
 
-      public final Vec3d pickup;
-      public final Vec3d place;
+      public final class_243 pickup;
+      public final class_243 place;
 
-      private Type(Vec3d place, Vec3d pickup) {
+      private Type(class_243 place, class_243 pickup) {
          this.place = place;
          this.pickup = pickup;
       }
 
       public static Relics.Type getTypeByName(String itemName) {
-         String name = Formatting.strip(itemName.toLowerCase());
+         String name = class_124.method_539(itemName.toLowerCase());
          if (name.contains("corrupted") && name.contains("relic")) {
             for (Relics.Type t : values()) {
                if (name.contains(t.name().toLowerCase())) {

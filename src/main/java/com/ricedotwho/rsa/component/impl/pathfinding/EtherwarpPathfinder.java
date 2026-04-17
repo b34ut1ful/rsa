@@ -6,8 +6,8 @@ import com.ricedotwho.rsm.data.Pair;
 import com.ricedotwho.rsm.utils.EtherUtils;
 import java.util.HashMap;
 import java.util.HashSet;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.class_2338;
+import net.minecraft.class_243;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public class EtherwarpPathfinder {
@@ -166,15 +166,13 @@ public class EtherwarpPathfinder {
          this.bestNode = node;
          this.bestCachedPath = new CachedPath(node);
          this.solved = true;
-      } else {
-         if (this.bestNode.getHeuristicCost() - node.getHeuristicCost() > 1.0
-            && this.bestNode.getMoveCost(this.context.newNodeCost()) < this.getBestNodeMoveCost()) {
-            this.bestNode = node;
-         }
+      } else if (this.bestNode.getHeuristicCost() - node.getHeuristicCost() > 1.0
+         && this.bestNode.getMoveCost(this.context.newNodeCost()) < this.getBestNodeMoveCost()) {
+         this.bestNode = node;
       }
    }
 
-   public synchronized PathNode getNodeAt(BlockPos pos, long hashcode, PathNode parent) {
+   public synchronized PathNode getNodeAt(class_2338 pos, long hashcode, PathNode parent) {
       PathNode node = this.cache.get(hashcode);
       if (node == null) {
          node = new PathNode(pos, parent, this.goal);
@@ -186,7 +184,9 @@ public class EtherwarpPathfinder {
 
    private void consumeRaycastBlocks(PathNode parent, TriConsumer<PathNode, Float, Float> consumer) {
       HashSet<Integer> blockPosCache = new HashSet<>();
-      Vec3d eyePos = new Vec3d(parent.getPos().getX() + 0.5, parent.getPos().getY() + 1.05 + 1.54F, parent.getPos().getZ() + 0.5);
+      class_243 eyePos = new class_243(
+         parent.getPos().method_10263() + 0.5, parent.getPos().method_10264() + 1.05 + 1.54F, parent.getPos().method_10260() + 0.5
+      );
       float pitch = -90.0F;
 
       while (pitch <= 90.0F) {
@@ -194,8 +194,8 @@ public class EtherwarpPathfinder {
          float yawStepAtThisPitch = this.context.yawStep() / Math.max(0.01F, (float)Math.cos(pitchRadians));
 
          for (float yaw = 0.0F; yaw < 360.0F; yaw += yawStepAtThisPitch) {
-            Pair<BlockPos, Boolean> prediction = EtherUtils.getEtherPosFromOrigin(eyePos, yaw, pitch, 61);
-            BlockPos etherPos = prediction.getFirst();
+            Pair<class_2338, Boolean> prediction = EtherUtils.getEtherPosFromOrigin(eyePos, yaw, pitch, 61);
+            class_2338 etherPos = (class_2338)prediction.getFirst();
             if (Boolean.TRUE.equals(prediction.getSecond()) && etherPos != null) {
                int hash = PathNode.hashCode(etherPos);
                if (blockPosCache.add(hash)) {

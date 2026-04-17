@@ -10,7 +10,7 @@ public class GroundArg extends Argument<Object> {
 
    @Override
    public boolean check() {
-      return mc.player != null && mc.player.isOnGround();
+      return mc.field_1724 != null && mc.field_1724.method_24828();
    }
 
    @Override

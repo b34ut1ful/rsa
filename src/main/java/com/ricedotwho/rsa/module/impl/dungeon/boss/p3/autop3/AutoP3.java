@@ -42,20 +42,20 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.MutableText;
+import net.minecraft.class_10185;
+import net.minecraft.class_124;
+import net.minecraft.class_243;
+import net.minecraft.class_2561;
+import net.minecraft.class_310;
+import net.minecraft.class_5250;
 
 @ModuleInfo(aliases = "Auto P3", id = "AutoP3", category = Category.DUNGEONS, hasKeybind = true)
 public class AutoP3 extends Module implements ClientRotationProvider {
-   private static final MutableText PREFIX = Text.empty()
-      .append(Text.literal("[").formatted(Formatting.GOLD))
-      .append(Text.literal("byebyebalding").formatted(Formatting.DARK_GRAY))
-      .append(Text.literal("] ").formatted(Formatting.GOLD))
-      .append(Text.empty().formatted(Formatting.WHITE));
+   private static final class_5250 PREFIX = class_2561.method_43473()
+      .method_10852(class_2561.method_43470("[").method_27692(class_124.field_1065))
+      .method_10852(class_2561.method_43470("byebyebalding").method_27692(class_124.field_1063))
+      .method_10852(class_2561.method_43470("] ").method_27692(class_124.field_1065))
+      .method_10852(class_2561.method_43473().method_27692(class_124.field_1068));
    private final BooleanSetting forceSkyblock = new BooleanSetting("Force Skyblock", false);
    private final BooleanSetting yap = new BooleanSetting("Feedback", false);
    private final KeybindSetting triggerBind = new KeybindSetting("Trigger", new Keybind(0, true, this::trigger));
@@ -92,9 +92,9 @@ public class AutoP3 extends Module implements ClientRotationProvider {
 
    @SubscribeEvent
    public void onTickEnd(End event) {
-      if (!this.desync && this.lastDesync && MinecraftClient.getInstance().player != null) {
-         MinecraftClient.getInstance().player.setYaw(ClientRotationHandler.getClientYaw());
-         MinecraftClient.getInstance().player.setPitch(ClientRotationHandler.getClientPitch());
+      if (!this.desync && this.lastDesync && class_310.method_1551().field_1724 != null) {
+         class_310.method_1551().field_1724.method_36456(ClientRotationHandler.getClientYaw());
+         class_310.method_1551().field_1724.method_36457(ClientRotationHandler.getClientPitch());
       }
 
       this.lastDesync = this.desync;
@@ -116,18 +116,16 @@ public class AutoP3 extends Module implements ClientRotationProvider {
 
    @SubscribeEvent
    public void onPollInputs(InputPollEvent event) {
-      if (this.dungeonCheck()) {
-         if (!this.activeRings.isEmpty()) {
-            MutableInput mutableInput = event.getInput();
-            PlayerInput input = event.getClientInput();
+      if (this.dungeonCheck() && !this.activeRings.isEmpty()) {
+         MutableInput mutableInput = event.getInput();
+         class_10185 input = event.getClientInput();
 
-            for (int i = 0; i < this.activeRings.size(); i++) {
-               Ring r = this.activeRings.get(i);
-               boolean bl2 = r.isActive() && r.tick(mutableInput, input, this);
-               if (bl2) {
-                  r.setInactive();
-                  this.activeRings.remove(i--);
-               }
+         for (int i = 0; i < this.activeRings.size(); i++) {
+            Ring r = this.activeRings.get(i);
+            boolean bl2 = r.isActive() && r.tick(mutableInput, input, this);
+            if (bl2) {
+               r.setInactive();
+               this.activeRings.remove(i--);
             }
          }
       }
@@ -140,17 +138,17 @@ public class AutoP3 extends Module implements ClientRotationProvider {
 
    protected void onDesyncEnable() {
       ClientRotationHandler.registerProvider(this);
-      if (MinecraftClient.getInstance().player != null) {
-         ClientRotationHandler.setYaw(MinecraftClient.getInstance().player.getYaw());
+      if (class_310.method_1551().field_1724 != null) {
+         ClientRotationHandler.setYaw(class_310.method_1551().field_1724.method_36454());
       }
    }
 
    @SubscribeEvent
    public void onTick(Start event) {
-      if (this.dungeonCheck() && mc.player != null) {
+      if (this.dungeonCheck() && mc.field_1724 != null) {
          this.desync = false;
-         Vec3d playerPos = mc.player.getEntityPos();
-         Vec3d oldPos = mc.player.getLastRenderPos();
+         class_243 playerPos = mc.field_1724.method_73189();
+         class_243 oldPos = mc.field_1724.method_61411();
          List<Ring> sorted;
          synchronized (this.rings) {
             sorted = this.rings
@@ -236,15 +234,15 @@ public class AutoP3 extends Module implements ClientRotationProvider {
    }
 
    private <T> void consumeArg(Class<? extends Argument<T>> clazz, T value) {
-      if (mc.player != null) {
-         Vec3d playerPos = mc.player.getEntityPos();
-         Vec3d oldPos = mc.player.getLastRenderPos();
+      if (mc.field_1724 != null) {
+         class_243 playerPos = mc.field_1724.method_73189();
+         class_243 oldPos = mc.field_1724.method_61411();
          this.activeRings.stream().filter(s -> s.isInNode(playerPos, oldPos)).toList().forEach(r -> r.consumeArg(clazz, value));
       }
    }
 
    private boolean dungeonCheck() {
-      return (Boolean)this.forceSkyblock.getValue() || mc.player != null && Location.getArea().is(Island.Dungeon) && Dungeon.isInBoss();
+      return (Boolean)this.forceSkyblock.getValue() || mc.field_1724 != null && Location.getArea().is(Island.Dungeon) && Dungeon.isInBoss();
    }
 
    public void addRing(Ring ring) {
@@ -255,7 +253,7 @@ public class AutoP3 extends Module implements ClientRotationProvider {
 
       this.save();
       modMessage(
-         "Added %s %s%s", Utils.capitalise(ring.getType().getName()), Formatting.GRAY, ring.getArgManager().getList(ring.getSubManager().getList())
+         "Added %s %s%s", Utils.capitalise(ring.getType().getName()), class_124.field_1080, ring.getArgManager().getList(ring.getSubManager().getList())
       );
    }
 
@@ -286,7 +284,7 @@ public class AutoP3 extends Module implements ClientRotationProvider {
       return true;
    }
 
-   public void removeNearest(Vec3d pos) {
+   public void removeNearest(class_243 pos) {
       synchronized (this.rings) {
          int index = IntStream.range(0, this.rings.size()).boxed().min(Comparator.comparingDouble(i -> this.rings.get(i).getDistanceSq(pos))).orElse(-1);
          if (index >= 0) {
@@ -354,7 +352,7 @@ public class AutoP3 extends Module implements ClientRotationProvider {
    }
 
    public static void modMessage(Object message, Object... objects) {
-      ChatUtils.chatClean(PREFIX.copy().append(String.format(message.toString(), objects)));
+      ChatUtils.chatClean(PREFIX.method_27661().method_27693(String.format(message.toString(), objects)));
    }
 
    public BooleanSetting getForceSkyblock() {

@@ -35,13 +35,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.text.Text;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.client.network.ClientCommandSource;
-import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.class_2172;
+import net.minecraft.class_243;
+import net.minecraft.class_2561;
+import net.minecraft.class_310;
+import net.minecraft.class_3532;
+import net.minecraft.class_637;
+import net.minecraft.class_239.class_240;
 import org.apache.commons.lang3.EnumUtils;
 
 @CommandInfo(name = "bbg", aliases = "p3", description = "Auto P3 command")
@@ -49,8 +49,8 @@ public class BBGCommand extends Command {
    private final Pattern argPattern = Pattern.compile("^(\\w+?)(?:(\\d*\\.?\\d*)|\"([^\"]*)\")$");
    private final Pattern splitter = Pattern.compile("\\w+(?:\\d+(?:\\.\\d+)?|\"[^\"]*\")?");
 
-   public LiteralArgumentBuilder<ClientCommandSource> build() {
-      return (LiteralArgumentBuilder<ClientCommandSource>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(
+   public LiteralArgumentBuilder<class_637> build() {
+      return (LiteralArgumentBuilder<class_637>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(
                                  this.name()
                               )
                               .then(
@@ -124,8 +124,8 @@ public class BBGCommand extends Command {
          );
    }
 
-   private int addRing(CommandContext<ClientCommandSource> ctx, String args) {
-      if (MinecraftClient.getInstance().player == null) {
+   private int addRing(CommandContext<class_637> ctx, String args) {
+      if (class_310.method_1551().field_1724 == null) {
          return 0;
       } else {
          RingType type = BBGCommand.RingArgumentType.getRing(ctx, "ring");
@@ -238,9 +238,9 @@ public class BBGCommand extends Command {
          }
       }
 
-      if (type.getHitResult() != null && mc.crosshairTarget != null && mc.crosshairTarget.getType() != type.getHitResult()) {
+      if (type.getHitResult() != null && mc.field_1765 != null && mc.field_1765.method_17783() != type.getHitResult()) {
          AutoP3.modMessage(
-            "Failed to place ring! %s requires you to look at %s!", type.getName(), type.getHitResult() == Type.BLOCK ? "block" : "entity"
+            "Failed to place ring! %s requires you to look at %s!", type.getName(), type.getHitResult() == class_240.field_1332 ? "block" : "entity"
          );
          return null;
       } else {
@@ -250,24 +250,24 @@ public class BBGCommand extends Command {
    }
 
    private Pos getPlayerPos(boolean exact) {
-      Vec3d pos = mc.player.getEntityPos();
+      class_243 pos = mc.field_1724.method_73189();
       return exact
          ? new Pos(pos)
-         : new Pos(Math.round(pos.getX() * 2.0) / 2.0, Math.round(pos.getY() * 2.0) / 2.0, Math.round(pos.getZ() * 2.0) / 2.0);
+         : new Pos(Math.round(pos.method_10216() * 2.0) / 2.0, Math.round(pos.method_10214() * 2.0) / 2.0, Math.round(pos.method_10215() * 2.0) / 2.0);
    }
 
-   private int undo(CommandContext<ClientCommandSource> ctx) {
+   private int undo(CommandContext<class_637> ctx) {
       ((AutoP3)RSM.getModule(AutoP3.class)).undo();
       return 1;
    }
 
-   private int redo(CommandContext<ClientCommandSource> ctx) {
+   private int redo(CommandContext<class_637> ctx) {
       ((AutoP3)RSM.getModule(AutoP3.class)).redo();
       return 1;
    }
 
-   private int removeRing(CommandContext<ClientCommandSource> ctx, int index) {
-      if (MinecraftClient.getInstance().player == null) {
+   private int removeRing(CommandContext<class_637> ctx, int index) {
+      if (class_310.method_1551().field_1724 == null) {
          return 0;
       } else if (((AutoP3)RSM.getModule(AutoP3.class)).removeIndexed(index)) {
          ChatUtils.chat("Removed ring at index " + index, new Object[0]);
@@ -278,11 +278,11 @@ public class BBGCommand extends Command {
       }
    }
 
-   private int removeRing(CommandContext<ClientCommandSource> ctx) {
-      if (MinecraftClient.getInstance().player == null) {
+   private int removeRing(CommandContext<class_637> ctx) {
+      if (class_310.method_1551().field_1724 == null) {
          return 0;
       } else {
-         Vec3d position = MinecraftClient.getInstance().player.getEntityPos();
+         class_243 position = class_310.method_1551().field_1724.method_73189();
          ((AutoP3)RSM.getModule(AutoP3.class)).removeNearest(position);
          return 1;
       }
@@ -316,30 +316,30 @@ public class BBGCommand extends Command {
       }
    }
 
-   private int center(CommandContext<ClientCommandSource> ctx) {
+   private int center(CommandContext<class_637> ctx) {
       CenterType centerType = BBGCommand.CenterArgumentType.getType(ctx, "centerType");
       return this.center(centerType);
    }
 
    private void centerYaw() {
-      if (MinecraftClient.getInstance().player != null) {
-         MinecraftClient.getInstance().player.setYaw(Math.round(mc.player.getYaw() / 45.0F) * 45.0F);
+      if (class_310.method_1551().field_1724 != null) {
+         class_310.method_1551().field_1724.method_36456(Math.round(mc.field_1724.method_36454() / 45.0F) * 45.0F);
       }
    }
 
    private void centerPitch() {
-      if (MinecraftClient.getInstance().player != null) {
-         MinecraftClient.getInstance().player.setPitch(0.0F);
+      if (class_310.method_1551().field_1724 != null) {
+         class_310.method_1551().field_1724.method_36457(0.0F);
       }
    }
 
    private void centerPos() {
-      if (MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().isConnectedToLocalServer()) {
-         Vec3d position = MinecraftClient.getInstance().player.getEntityPos();
-         Vec3d target = new Vec3d(
-            MathHelper.floor(position.x) + 0.5, position.y, MathHelper.floor(position.z) + 0.5
+      if (class_310.method_1551().field_1724 != null && class_310.method_1551().method_47392()) {
+         class_243 position = class_310.method_1551().field_1724.method_73189();
+         class_243 target = new class_243(
+            class_3532.method_15357(position.field_1352) + 0.5, position.field_1351, class_3532.method_15357(position.field_1350) + 0.5
          );
-         MinecraftClient.getInstance().player.setPosition(target);
+         class_310.method_1551().field_1724.method_33574(target);
       }
    }
 
@@ -347,7 +347,7 @@ public class BBGCommand extends Command {
       private static final Collection<String> EXAMPLES = Stream.of(CenterType.POS, CenterType.ANGLES).map(CenterType::getName).collect(Collectors.toList());
       private static final CenterType[] VALUES = CenterType.values();
       private static final DynamicCommandExceptionType INVALID_CENTER_EXCEPTION = new DynamicCommandExceptionType(
-         ring -> Text.literal("Invalid center type : " + ring)
+         ring -> class_2561.method_43470("Invalid center type : " + ring)
       );
 
       public CenterType parse(StringReader stringReader) throws CommandSyntaxException {
@@ -361,8 +361,8 @@ public class BBGCommand extends Command {
       }
 
       public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-         return context.getSource() instanceof CommandSource
-            ? CommandSource.suggestMatching(Arrays.stream(VALUES).map(CenterType::getName), builder)
+         return context.getSource() instanceof class_2172
+            ? class_2172.method_9264(Arrays.stream(VALUES).map(CenterType::getName), builder)
             : Suggestions.empty();
       }
 
@@ -374,7 +374,7 @@ public class BBGCommand extends Command {
          return new BBGCommand.CenterArgumentType();
       }
 
-      public static CenterType getType(CommandContext<ClientCommandSource> context, String name) {
+      public static CenterType getType(CommandContext<class_637> context, String name) {
          return (CenterType)context.getArgument(name, CenterType.class);
       }
    }
@@ -383,7 +383,7 @@ public class BBGCommand extends Command {
       private static final Collection<String> EXAMPLES = Stream.of(RingType.ALIGN, RingType.WALK).map(RingType::getName).collect(Collectors.toList());
       private static final RingType[] VALUES = RingType.values();
       private static final DynamicCommandExceptionType INVALID_RING_EXCEPTION = new DynamicCommandExceptionType(
-         ring -> Text.literal("Invalid ring type : " + ring)
+         ring -> class_2561.method_43470("Invalid ring type : " + ring)
       );
 
       public RingType parse(StringReader stringReader) throws CommandSyntaxException {
@@ -397,7 +397,7 @@ public class BBGCommand extends Command {
       }
 
       public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-         return context.getSource() instanceof CommandSource ? CommandSource.suggestMatching(Arrays.stream(VALUES).map(RingType::getName), builder) : Suggestions.empty();
+         return context.getSource() instanceof class_2172 ? class_2172.method_9264(Arrays.stream(VALUES).map(RingType::getName), builder) : Suggestions.empty();
       }
 
       public Collection<String> getExamples() {
@@ -408,7 +408,7 @@ public class BBGCommand extends Command {
          return new BBGCommand.RingArgumentType();
       }
 
-      public static RingType getRing(CommandContext<ClientCommandSource> context, String name) {
+      public static RingType getRing(CommandContext<class_637> context, String name) {
          return (RingType)context.getArgument(name, RingType.class);
       }
    }

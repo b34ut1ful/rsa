@@ -6,12 +6,12 @@ import com.ricedotwho.rsa.module.impl.movement.VelocityBuffer;
 import com.ricedotwho.rsm.RSM;
 import com.ricedotwho.rsm.command.Command;
 import com.ricedotwho.rsm.command.api.CommandInfo;
-import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.class_637;
 
 @CommandInfo(name = "velobuffer", aliases = "vb", description = "Toggle and pop buffered velocity")
 public class VelocityBufferCommand extends Command {
-   public LiteralArgumentBuilder<ClientCommandSource> build() {
-      return (LiteralArgumentBuilder<ClientCommandSource>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(this.name())
+   public LiteralArgumentBuilder<class_637> build() {
+      return (LiteralArgumentBuilder<class_637>)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)literal(this.name())
                   .then(literal("t").executes(ctx -> {
                      VelocityBuffer vb = (VelocityBuffer)RSM.getModule(VelocityBuffer.class);
                      vb.toggle();

@@ -38,22 +38,22 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.screen.sync.ItemStackHash;
-import net.minecraft.util.Formatting;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.class_10938;
+import net.minecraft.class_124;
+import net.minecraft.class_1657;
+import net.minecraft.class_1703;
+import net.minecraft.class_1707;
+import net.minecraft.class_1713;
+import net.minecraft.class_1735;
+import net.minecraft.class_1799;
+import net.minecraft.class_1802;
+import net.minecraft.class_2371;
+import net.minecraft.class_2653;
+import net.minecraft.class_2813;
+import net.minecraft.class_2815;
+import net.minecraft.class_310;
+import net.minecraft.class_3944;
+import net.minecraft.class_634;
 
 @ModuleInfo(aliases = "Fast Leap", id = "FastLeap", category = Category.DUNGEONS)
 public class FastLeap extends Module {
@@ -88,7 +88,7 @@ public class FastLeap extends Module {
    private static long lastUsed = 0L;
    private boolean windowOpen = false;
    private static boolean queuedLeap = false;
-   private ScreenHandler container;
+   private class_1703 container;
 
    public FastLeap() {
       this.registerProperty(
@@ -136,13 +136,13 @@ public class FastLeap extends Module {
       FastLeap module = (FastLeap)RSM.getModule(FastLeap.class);
       if ((!(Boolean)module.flP3.getValue() || DungeonUtils.isPhase(Phase7.P3))
          && Location.getArea().is(Island.Dungeon)
-         && mc.player != null
-         && mc.world != null
-         && Utils.equalsOneOf(ItemUtils.getID(mc.player.getInventory().getSelectedStack()), new Object[]{"SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP"})
+         && mc.field_1724 != null
+         && mc.field_1687 != null
+         && Utils.equalsOneOf(ItemUtils.getID(mc.field_1724.method_31548().method_7391()), new Object[]{"SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP"})
          && System.currentTimeMillis() - lastUsed >= ((BigDecimal)module.cooldown.getValue()).longValue()
          && !module.windowOpen
          && !openingGui
-         && (Terminals.isInTerminal() || mc.currentScreen == null)
+         && (Terminals.isInTerminal() || mc.field_1755 == null)
          && module.container == null
          && Dungeon.isInBoss()) {
          if (Terminals.isInTerminal()) {
@@ -151,11 +151,11 @@ public class FastLeap extends Module {
             return true;
          } else {
             String leap = getLeap();
-            if (leap != null && !"NONE".equals(leap) && !mc.player.getName().getString().equalsIgnoreCase(leap)) {
+            if (leap != null && !"NONE".equals(leap) && !mc.field_1724.method_5477().getString().equalsIgnoreCase(leap)) {
                doLeap(leap);
                return true;
             } else {
-               module.modMessage(Formatting.RED + "Couldn't find who to leap to! (" + leap + ")");
+               module.modMessage(class_124.field_1061 + "Couldn't find who to leap to! (" + leap + ")");
                return false;
             }
          }
@@ -168,7 +168,7 @@ public class FastLeap extends Module {
       toLeap = name;
       openingGui = true;
       lastUsed = System.currentTimeMillis();
-      PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> SwapManager.sendAirC08(mc.player.lastYaw, mc.player.lastPitch, false));
+      PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> SwapManager.sendAirC08(mc.field_1724.field_5982, mc.field_1724.field_6004, false));
    }
 
    public static void doLeap(DungeonPlayer player) {
@@ -180,23 +180,23 @@ public class FastLeap extends Module {
    }
 
    public static boolean doLeapFromOpenMenu(String leap) {
-      if (mc.player != null
-         && mc.player.currentScreenHandler instanceof GenericContainerScreenHandler menu
-         && mc.currentScreen != null
-         && mc.currentScreen.getTitle().getString().equals("Spirit Leap")) {
-         for (Slot slot : menu.slots) {
-            ItemStack item = slot.getStack();
-            if (item.getItem().equals(Items.PLAYER_HEAD)) {
-               String name = Formatting.strip(item.getName().getString());
+      if (mc.field_1724 != null
+         && mc.field_1724.field_7512 instanceof class_1707 menu
+         && mc.field_1755 != null
+         && mc.field_1755.method_25440().getString().equals("Spirit Leap")) {
+         for (class_1735 slot : menu.field_7761) {
+            class_1799 item = slot.method_7677();
+            if (item.method_7909().equals(class_1802.field_8575)) {
+               String name = class_124.method_539(item.method_7964().getString());
                if (name.equals(leap)) {
-                  sendWindowClick(slot.id, mc.player, menu);
+                  sendWindowClick(slot.field_7874, mc.field_1724, menu);
                   FastLeap fl = (FastLeap)RSM.getModule(FastLeap.class);
                   if (fl == null) {
                      return true;
                   }
 
                   if ((Boolean)fl.getFlMessage().getValue()) {
-                     mc.getNetworkHandler().sendChatCommand("pc Leaping to " + toLeap);
+                     mc.method_1562().method_45730("pc Leaping to " + toLeap);
                   } else {
                      fl.modMessage("Leaping to " + toLeap);
                   }
@@ -223,51 +223,51 @@ public class FastLeap extends Module {
 
    @SubscribeEvent
    public void onOpenWindow(Receive event) {
-      if (event.getPacket() instanceof OpenScreenS2CPacket packet) {
-         if (packet.getSyncId() < 1 || packet.getSyncId() > 100 || mc.player == null || !Location.getArea().is(Island.Dungeon)) {
+      if (event.getPacket() instanceof class_3944 packet) {
+         if (packet.method_17592() < 1 || packet.method_17592() > 100 || mc.field_1724 == null || !Location.getArea().is(Island.Dungeon)) {
             return;
          }
 
-         if (openingGui && "Spirit Leap".equals(packet.getName().getString())) {
+         if (openingGui && "Spirit Leap".equals(packet.method_17594().getString())) {
             openingGui = false;
             this.windowOpen = true;
-            this.container = packet.getScreenHandlerType().create(packet.getSyncId(), mc.player.getInventory());
+            this.container = packet.method_17593().method_17434(packet.method_17592(), mc.field_1724.method_31548());
             event.setCancelled(true);
          } else {
             this.reset();
          }
-      } else if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet) {
-         if (packet.getSyncId() < 1
-            || packet.getSyncId() > 100
-            || mc.player == null
+      } else if (event.getPacket() instanceof class_2653 packet) {
+         if (packet.method_11452() < 1
+            || packet.method_11452() > 100
+            || mc.field_1724 == null
             || !this.windowOpen
             || openingGui
-            || this.container.syncId != packet.getSyncId()
-            || packet.getSlot() < 11
+            || this.container.field_7763 != packet.method_11452()
+            || packet.method_11450() < 11
             || toLeap == null) {
             return;
          }
 
-         this.container.setStackInSlot(packet.getSlot(), packet.getRevision(), packet.getStack());
-         if (packet.getSlot() > 16) {
-            this.modMessage(Formatting.RED + "Failed to find player!");
+         this.container.method_7619(packet.method_11450(), packet.method_37439(), packet.method_11449());
+         if (packet.method_11450() > 16) {
+            this.modMessage(class_124.field_1061 + "Failed to find player!");
             this.close();
             return;
          }
 
-         ItemStack item = packet.getStack();
-         if (!item.getItem().equals(Items.PLAYER_HEAD)) {
+         class_1799 item = packet.method_11449();
+         if (!item.method_7909().equals(class_1802.field_8575)) {
             return;
          }
 
-         String name = Formatting.strip(item.getName().getString());
+         String name = class_124.method_539(item.method_7964().getString());
          if (!name.equals(toLeap)) {
             return;
          }
 
-         sendWindowClick(packet.getSlot(), mc.player, this.container);
+         sendWindowClick(packet.method_11450(), mc.field_1724, this.container);
          if ((Boolean)this.getFlMessage().getValue()) {
-            mc.getNetworkHandler().sendChatCommand("pc Leaping to " + toLeap);
+            mc.method_1562().method_45730("pc Leaping to " + toLeap);
          } else {
             this.modMessage("Leaping to " + toLeap);
          }
@@ -277,42 +277,42 @@ public class FastLeap extends Module {
    }
 
    private void close() {
-      if (this.container != null && mc.getNetworkHandler() != null) {
-         mc.getNetworkHandler().sendPacket(new CloseHandledScreenC2SPacket(this.container.syncId));
+      if (this.container != null && mc.method_1562() != null) {
+         mc.method_1562().method_52787(new class_2815(this.container.field_7763));
          this.reset();
       }
    }
 
-   private static void sendWindowClick(int slotNumber, PlayerEntity player, ScreenHandler abstractContainerMenu) {
-      ClientPlayNetworkHandler connection = MinecraftClient.getInstance().getNetworkHandler();
+   private static void sendWindowClick(int slotNumber, class_1657 player, class_1703 abstractContainerMenu) {
+      class_634 connection = class_310.method_1551().method_1562();
       if (connection != null) {
-         DefaultedList<Slot> nonNullList = abstractContainerMenu.slots;
+         class_2371<class_1735> nonNullList = abstractContainerMenu.field_7761;
          int l = nonNullList.size();
-         List<ItemStack> list = Lists.newArrayListWithCapacity(l);
+         List<class_1799> list = Lists.newArrayListWithCapacity(l);
 
-         for (Slot slot : nonNullList) {
-            list.add(slot.getStack().copy());
+         for (class_1735 slot : nonNullList) {
+            list.add(slot.method_7677().method_7972());
          }
 
-         abstractContainerMenu.onSlotClick(slotNumber, 0, SlotActionType.CLONE, player);
-         Int2ObjectMap<ItemStackHash> int2ObjectMap = new Int2ObjectOpenHashMap();
+         abstractContainerMenu.method_7593(slotNumber, 0, class_1713.field_7796, player);
+         Int2ObjectMap<class_10938> int2ObjectMap = new Int2ObjectOpenHashMap();
 
          for (int m = 0; m < l; m++) {
-            ItemStack itemStack = list.get(m);
-            ItemStack itemStack2 = ((Slot)nonNullList.get(m)).getStack();
-            if (!ItemStack.areEqual(itemStack, itemStack2)) {
-               int2ObjectMap.put(m, ItemStackHash.fromItemStack(itemStack2, connection.getComponentHasher()));
+            class_1799 itemStack = list.get(m);
+            class_1799 itemStack2 = ((class_1735)nonNullList.get(m)).method_7677();
+            if (!class_1799.method_7973(itemStack, itemStack2)) {
+               int2ObjectMap.put(m, class_10938.method_68853(itemStack2, connection.method_68823()));
             }
          }
 
-         ItemStackHash hashedStack = ItemStackHash.fromItemStack(abstractContainerMenu.getCursorStack(), connection.getComponentHasher());
-         connection.sendPacket(
-            new ClickSlotC2SPacket(
-               abstractContainerMenu.syncId,
-               abstractContainerMenu.getRevision(),
+         class_10938 hashedStack = class_10938.method_68853(abstractContainerMenu.method_34255(), connection.method_68823());
+         connection.method_52787(
+            new class_2813(
+               abstractContainerMenu.field_7763,
+               abstractContainerMenu.method_37421(),
                Shorts.checkedCast(slotNumber),
                SignedBytes.checkedCast(0L),
-               SlotActionType.CLONE,
+               class_1713.field_7796,
                int2ObjectMap,
                hashedStack
             )
@@ -399,7 +399,7 @@ public class FastLeap extends Module {
    }
 
    private void modMessage(String message) {
-      RSA.chat(Formatting.BLUE + "Fast Leap » " + Formatting.RESET + message);
+      RSA.chat(class_124.field_1078 + "Fast Leap » " + class_124.field_1070 + message);
    }
 
    public KeybindSetting getKey() {
@@ -494,7 +494,7 @@ public class FastLeap extends Module {
       return this.windowOpen;
    }
 
-   public ScreenHandler getContainer() {
+   public class_1703 getContainer() {
       return this.container;
    }
 }

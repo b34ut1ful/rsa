@@ -13,17 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import net.minecraft.block.Block;
-import net.minecraft.block.ButtonBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.block.WallMountedBlock;
-import net.minecraft.util.math.Direction;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.block.SkullBlock;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.BlockFace;
+import net.minecraft.class_2248;
+import net.minecraft.class_2269;
+import net.minecraft.class_2338;
+import net.minecraft.class_2341;
+import net.minecraft.class_2350;
+import net.minecraft.class_2401;
+import net.minecraft.class_2484;
+import net.minecraft.class_259;
+import net.minecraft.class_265;
+import net.minecraft.class_2680;
+import net.minecraft.class_2738;
 
 @ModuleInfo(aliases = "Hitboxes", id = "SecretHitboxes", category = Category.DUNGEONS)
 public class SecretHitboxes extends Module {
@@ -32,8 +32,8 @@ public class SecretHitboxes extends Module {
    private final BooleanSetting ssButtonsOnly = new BooleanSetting("SS Buttons Only", false);
    private final ModeSetting levers = new ModeSetting("Levers", "Off", List.of("Full", "Half", "1.8", "Off"));
    private final ModeSetting preDevLevers = new ModeSetting("Predev Levers", "Off", List.of("Full", "Half", "1.8", "Off"));
-   private static final SecretHitboxes.ShapeData V47_LEVERS = new SecretHitboxes.ShapeData(Block.createCuboidShape(4.0, 0.0, 4.0, 12.0, 10.0, 12.0));
-   private static final SecretHitboxes.ShapeData HALF_LEVERS = new SecretHitboxes.ShapeData(Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 10.0, 16.0));
+   private static final SecretHitboxes.ShapeData V47_LEVERS = new SecretHitboxes.ShapeData(class_2248.method_9541(4.0, 0.0, 4.0, 12.0, 10.0, 12.0));
+   private static final SecretHitboxes.ShapeData HALF_LEVERS = new SecretHitboxes.ShapeData(class_2248.method_9541(0.0, 0.0, 0.0, 16.0, 10.0, 16.0));
    private static final SecretHitboxes.ShapeData BUTTON;
    private static final SecretHitboxes.ShapeData BUTTON_POWERED;
 
@@ -41,37 +41,38 @@ public class SecretHitboxes extends Module {
       this.registerProperty(new Setting[]{this.essence, this.buttons, this.ssButtonsOnly, this.levers, this.preDevLevers});
    }
 
-   public static VoxelShape getShape(BlockState state, BlockPos pos) {
+   public static class_265 getShape(class_2680 state, class_2338 pos) {
       SecretHitboxes module = (SecretHitboxes)RSM.getModule(SecretHitboxes.class);
-      if (Location.getArea().is(Island.Dungeon) && module != null && module.isEnabled() && mc.world != null) {
-         Block block = state.getBlock();
+      if (Location.getArea().is(Island.Dungeon) && module != null && module.isEnabled() && mc.field_1687 != null) {
+         class_2248 block = state.method_26204();
+         Objects.requireNonNull(block);
          Objects.requireNonNull(block);
 
          return switch (block) {
-            case SkullBlock ignored when SecretAura.isValidSkull(pos, mc.world) -> module.essence.getValue() ? VoxelShapes.fullCube() : null;
-            case LeverBlock ignoredx -> {
+            case class_2484 ignored when SecretAura.isValidSkull(pos, mc.field_1687) -> module.essence.getValue() ? class_259.method_1077() : null;
+            case class_2401 ignoredx -> {
                switch (isLamps(pos) ? module.preDevLevers.getValue() : module.levers.getValue()) {
                   case "Full":
-                     yield VoxelShapes.fullCube();
+                     yield class_259.method_1077();
                   case "Half":
-                     yield HALF_LEVERS.getShape((BlockFace)state.get(WallMountedBlock.FACE), (Direction)state.get(WallMountedBlock.FACING));
+                     yield HALF_LEVERS.getShape((class_2738)state.method_11654(class_2341.field_11007), (class_2350)state.method_11654(class_2341.field_11177));
                   case "1.8":
-                     yield V47_LEVERS.getShape((BlockFace)state.get(WallMountedBlock.FACE), (Direction)state.get(WallMountedBlock.FACING));
+                     yield V47_LEVERS.getShape((class_2738)state.method_11654(class_2341.field_11007), (class_2350)state.method_11654(class_2341.field_11177));
                   case null:
                   default:
                      yield null;
                }
             }
-            case ButtonBlock ignoredxx -> {
+            case class_2269 ignoredxx -> {
                if (module.buttons.is("Off")) {
                   yield null;
                } else if ((Boolean)module.ssButtonsOnly.getValue() && !isSS(pos)) {
                   yield null;
                } else if (module.buttons.is("Full")) {
-                  yield VoxelShapes.fullCube();
+                  yield class_259.method_1077();
                } else {
-                  SecretHitboxes.ShapeData data = state.get(ButtonBlock.POWERED) ? BUTTON_POWERED : BUTTON;
-                  yield data.getShape((BlockFace)state.get(WallMountedBlock.FACE), (Direction)state.get(WallMountedBlock.FACING));
+                  SecretHitboxes.ShapeData data = state.method_11654(class_2269.field_10729) ? BUTTON_POWERED : BUTTON;
+                  yield data.getShape((class_2738)state.method_11654(class_2341.field_11007), (class_2350)state.method_11654(class_2341.field_11177));
                }
             }
             default -> null;
@@ -81,12 +82,12 @@ public class SecretHitboxes extends Module {
       }
    }
 
-   private static boolean isSS(BlockPos pos) {
-      return pos.getX() == 110 && pos.getY() >= 120 && pos.getY() <= 123 && pos.getZ() >= 91 && pos.getZ() <= 95;
+   private static boolean isSS(class_2338 pos) {
+      return pos.method_10263() == 110 && pos.method_10264() >= 120 && pos.method_10264() <= 123 && pos.method_10260() >= 91 && pos.method_10260() <= 95;
    }
 
-   private static boolean isLamps(BlockPos pos) {
-      return pos.getX() >= 58 && pos.getX() <= 62 && pos.getY() >= 133 && pos.getY() <= 136 && pos.getZ() == 142;
+   private static boolean isLamps(class_2338 pos) {
+      return pos.method_10263() >= 58 && pos.method_10263() <= 62 && pos.method_10264() >= 133 && pos.method_10264() <= 136 && pos.method_10260() == 142;
    }
 
    public BooleanSetting getEssence() {
@@ -110,62 +111,62 @@ public class SecretHitboxes extends Module {
    }
 
    static {
-      V47_LEVERS.add(Direction.DOWN, Block.createCuboidShape(4.0, 0.0, 4.0, 12.0, 10.0, 12.0));
-      V47_LEVERS.add(Direction.NORTH, Block.createCuboidShape(5.0, 3.0, 10.0, 11.0, 13.0, 16.0));
-      V47_LEVERS.add(Direction.SOUTH, Block.createCuboidShape(5.0, 3.0, 0.0, 11.0, 13.0, 6.0));
-      V47_LEVERS.add(Direction.EAST, Block.createCuboidShape(0.0, 3.0, 5.0, 6.0, 13.0, 11.0));
-      V47_LEVERS.add(Direction.WEST, Block.createCuboidShape(10.0, 3.0, 5.0, 16.0, 13.0, 11.0));
-      HALF_LEVERS.add(Direction.DOWN, Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 10.0, 16.0));
-      HALF_LEVERS.add(Direction.NORTH, Block.createCuboidShape(0.0, 0.0, 10.0, 16.0, 16.0, 16.0));
-      HALF_LEVERS.add(Direction.SOUTH, Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 16.0, 6.0));
-      HALF_LEVERS.add(Direction.EAST, Block.createCuboidShape(0.0, 0.0, 0.0, 6.0, 16.0, 16.0));
-      HALF_LEVERS.add(Direction.WEST, Block.createCuboidShape(10.0, 0.0, 0.0, 16.0, 16.0, 16.0));
+      V47_LEVERS.add(class_2350.field_11033, class_2248.method_9541(4.0, 0.0, 4.0, 12.0, 10.0, 12.0));
+      V47_LEVERS.add(class_2350.field_11043, class_2248.method_9541(5.0, 3.0, 10.0, 11.0, 13.0, 16.0));
+      V47_LEVERS.add(class_2350.field_11035, class_2248.method_9541(5.0, 3.0, 0.0, 11.0, 13.0, 6.0));
+      V47_LEVERS.add(class_2350.field_11034, class_2248.method_9541(0.0, 3.0, 5.0, 6.0, 13.0, 11.0));
+      V47_LEVERS.add(class_2350.field_11039, class_2248.method_9541(10.0, 3.0, 5.0, 16.0, 13.0, 11.0));
+      HALF_LEVERS.add(class_2350.field_11033, class_2248.method_9541(0.0, 0.0, 0.0, 16.0, 10.0, 16.0));
+      HALF_LEVERS.add(class_2350.field_11043, class_2248.method_9541(0.0, 0.0, 10.0, 16.0, 16.0, 16.0));
+      HALF_LEVERS.add(class_2350.field_11035, class_2248.method_9541(0.0, 0.0, 0.0, 16.0, 16.0, 6.0));
+      HALF_LEVERS.add(class_2350.field_11034, class_2248.method_9541(0.0, 0.0, 0.0, 6.0, 16.0, 16.0));
+      HALF_LEVERS.add(class_2350.field_11039, class_2248.method_9541(10.0, 0.0, 0.0, 16.0, 16.0, 16.0));
       double pow = 0.0625;
       BUTTON_POWERED = new SecretHitboxes.ShapeData(
-         VoxelShapes.cuboid(0.0, 1.0 - pow, 0.0, 1.0, 1.0, 1.0), VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 0.0 + pow, 1.0)
+         class_259.method_1081(0.0, 1.0 - pow, 0.0, 1.0, 1.0, 1.0), class_259.method_1081(0.0, 0.0, 0.0, 1.0, 0.0 + pow, 1.0)
       );
-      BUTTON_POWERED.add(Direction.EAST, VoxelShapes.cuboid(0.0, 0.0, 0.0, pow, 1.0, 1.0));
-      BUTTON_POWERED.add(Direction.WEST, VoxelShapes.cuboid(1.0 - pow, 0.0, 0.0, 1.0, 1.0, 1.0));
-      BUTTON_POWERED.add(Direction.SOUTH, VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 1.0, pow));
-      BUTTON_POWERED.add(Direction.NORTH, VoxelShapes.cuboid(0.0, 0.0, 1.0 - pow, 1.0, 1.0, 1.0));
-      BUTTON_POWERED.add(Direction.UP, VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 0.0 + pow, 1.0));
-      BUTTON_POWERED.add(Direction.DOWN, VoxelShapes.cuboid(0.0, 1.0 - pow, 0.0, 1.0, 1.0, 1.0));
+      BUTTON_POWERED.add(class_2350.field_11034, class_259.method_1081(0.0, 0.0, 0.0, pow, 1.0, 1.0));
+      BUTTON_POWERED.add(class_2350.field_11039, class_259.method_1081(1.0 - pow, 0.0, 0.0, 1.0, 1.0, 1.0));
+      BUTTON_POWERED.add(class_2350.field_11035, class_259.method_1081(0.0, 0.0, 0.0, 1.0, 1.0, pow));
+      BUTTON_POWERED.add(class_2350.field_11043, class_259.method_1081(0.0, 0.0, 1.0 - pow, 1.0, 1.0, 1.0));
+      BUTTON_POWERED.add(class_2350.field_11036, class_259.method_1081(0.0, 0.0, 0.0, 1.0, 0.0 + pow, 1.0));
+      BUTTON_POWERED.add(class_2350.field_11033, class_259.method_1081(0.0, 1.0 - pow, 0.0, 1.0, 1.0, 1.0));
       double unpow = 0.125;
       BUTTON = new SecretHitboxes.ShapeData(
-         VoxelShapes.cuboid(0.0, 1.0 - unpow, 0.0, 1.0, 1.0, 1.0), VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 0.0 + unpow, 1.0)
+         class_259.method_1081(0.0, 1.0 - unpow, 0.0, 1.0, 1.0, 1.0), class_259.method_1081(0.0, 0.0, 0.0, 1.0, 0.0 + unpow, 1.0)
       );
-      BUTTON.add(Direction.EAST, VoxelShapes.cuboid(0.0, 0.0, 0.0, unpow, 1.0, 1.0));
-      BUTTON.add(Direction.WEST, VoxelShapes.cuboid(1.0 - unpow, 0.0, 0.0, 1.0, 1.0, 1.0));
-      BUTTON.add(Direction.SOUTH, VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 1.0, unpow));
-      BUTTON.add(Direction.NORTH, VoxelShapes.cuboid(0.0, 0.0, 1.0 - unpow, 1.0, 1.0, 1.0));
-      BUTTON.add(Direction.UP, VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 0.0 + unpow, 1.0));
-      BUTTON.add(Direction.DOWN, VoxelShapes.cuboid(0.0, 1.0 - unpow, 0.0, 1.0, 1.0, 1.0));
+      BUTTON.add(class_2350.field_11034, class_259.method_1081(0.0, 0.0, 0.0, unpow, 1.0, 1.0));
+      BUTTON.add(class_2350.field_11039, class_259.method_1081(1.0 - unpow, 0.0, 0.0, 1.0, 1.0, 1.0));
+      BUTTON.add(class_2350.field_11035, class_259.method_1081(0.0, 0.0, 0.0, 1.0, 1.0, unpow));
+      BUTTON.add(class_2350.field_11043, class_259.method_1081(0.0, 0.0, 1.0 - unpow, 1.0, 1.0, 1.0));
+      BUTTON.add(class_2350.field_11036, class_259.method_1081(0.0, 0.0, 0.0, 1.0, 0.0 + unpow, 1.0));
+      BUTTON.add(class_2350.field_11033, class_259.method_1081(0.0, 1.0 - unpow, 0.0, 1.0, 1.0, 1.0));
    }
 
    private static class ShapeData {
-      private final VoxelShape ceil;
-      private final VoxelShape floor;
-      private final Map<Direction, VoxelShape> directions = new HashMap<>();
+      private final class_265 ceil;
+      private final class_265 floor;
+      private final Map<class_2350, class_265> directions = new HashMap<>();
 
-      public ShapeData(VoxelShape ceil, VoxelShape floor) {
+      public ShapeData(class_265 ceil, class_265 floor) {
          this.ceil = ceil;
          this.floor = floor;
       }
 
-      public ShapeData(VoxelShape ceil) {
+      public ShapeData(class_265 ceil) {
          this.ceil = ceil;
          this.floor = ceil;
       }
 
-      public void add(Direction dir, VoxelShape shape) {
+      public void add(class_2350 dir, class_265 shape) {
          this.directions.put(dir, shape);
       }
 
-      public VoxelShape getShape(BlockFace face, Direction direction) {
+      public class_265 getShape(class_2738 face, class_2350 direction) {
          return switch (face) {
-            case FLOOR -> this.floor;
-            case CEILING -> this.ceil;
-            default -> (VoxelShape)this.directions.getOrDefault(direction, null);
+            case field_12475 -> this.floor;
+            case field_12473 -> this.ceil;
+            default -> (class_265)this.directions.getOrDefault(direction, null);
          };
       }
    }

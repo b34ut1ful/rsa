@@ -11,15 +11,15 @@ import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import java.math.BigDecimal;
 import java.util.List;
-import net.minecraft.util.Hand;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.StringHelper;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_1268;
+import net.minecraft.class_1792;
+import net.minecraft.class_1799;
+import net.minecraft.class_1802;
+import net.minecraft.class_243;
+import net.minecraft.class_2886;
+import net.minecraft.class_310;
+import net.minecraft.class_3544;
+import net.minecraft.class_746;
 import org.joml.Vector2f;
 
 @ModuleInfo(aliases = "Auto Jax", id = "AutoJax", category = Category.OTHER)
@@ -47,7 +47,7 @@ public class AutoJax extends Module {
    private int currentIndex = 0;
    private boolean isRunning = false;
    private int tickDelay;
-   private final Vec3d startPos = new Vec3d(-55.5, 62.0, -81.5);
+   private final class_243 startPos = new class_243(-55.5, 62.0, -81.5);
    private static final int ROTATE_TO_CLICK_DELAY = 2;
    private int rotateToClickTicks = 0;
    private boolean pendingClick = false;
@@ -80,25 +80,25 @@ public class AutoJax extends Module {
 
    @SubscribeEvent
    public void onChat(Chat event) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null) {
-         Vec3d pos = player.getEntityPos();
-         String unformatted = StringHelper.stripTextFormat(event.getMessage().getString());
-         if (pos.distanceTo(this.startPos) < 0.3) {
+         class_243 pos = player.method_73189();
+         String unformatted = class_3544.method_15440(event.getMessage().getString());
+         if (pos.method_1022(this.startPos) < 0.3) {
             RSA.chat("at start area.");
             this.atstart = true;
          }
 
-         ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
-         Item item = itemStack.getItem();
-         if (unformatted.contains("Goal:") && this.atstart && item == Items.BOW) {
+         class_1799 itemStack = player.method_5998(class_1268.field_5808);
+         class_1792 item = itemStack.method_7909();
+         if (unformatted.contains("Goal:") && this.atstart && item == class_1802.field_8102) {
             RSA.chat("Shooting All Targets in 3s.");
             this.isRunning = true;
             this.currentIndex = 0;
             this.tickDelay = ((BigDecimal)this.startDelay.getValue()).intValue();
             this.pendingClick = false;
             this.rotateToClickTicks = 0;
-         } else if (unformatted.contains("Goal:") && this.atstart && item != Items.BOW) {
+         } else if (unformatted.contains("Goal:") && this.atstart && item != class_1802.field_8102) {
             this.isRunning = false;
             RSA.chat("Hold a bow, and go back onto the pad.");
          }
@@ -116,7 +116,7 @@ public class AutoJax extends Module {
 
    @SubscribeEvent
    public void onTick(ServerTickEvent event) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (this.isRunning) {
          if (this.pendingClick) {
             if (this.rotateToClickTicks > 0) {
@@ -135,8 +135,8 @@ public class AutoJax extends Module {
             if (this.tickDelay > 0) {
                this.tickDelay--;
             } else {
-               player.setPitch(targetPos.y);
-               player.setYaw(targetPos.x);
+               player.method_36457(targetPos.y);
+               player.method_36456(targetPos.x);
                this.tickDelay = ((BigDecimal)this.shootAfterDelay.getValue()).intValue();
                this.pendingClick = true;
                this.rotateToClickTicks = 2;
@@ -146,10 +146,10 @@ public class AutoJax extends Module {
    }
 
    private void rightClick() {
-      ClientPlayerEntity player = mc.player;
+      class_746 player = mc.field_1724;
       if (player != null) {
-         player.networkHandler.sendPacket(new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, 0, player.getYaw(), player.getPitch()));
-         player.swingHand(Hand.MAIN_HAND);
+         player.field_3944.method_52787(new class_2886(class_1268.field_5808, 0, player.method_36454(), player.method_36455()));
+         player.method_6104(class_1268.field_5808);
       }
    }
 
@@ -181,7 +181,7 @@ public class AutoJax extends Module {
       return this.isRunning;
    }
 
-   public Vec3d getStartPos() {
+   public class_243 getStartPos() {
       return this.startPos;
    }
 

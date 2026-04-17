@@ -12,7 +12,7 @@ public class JumpAction extends SubAction {
 
    @Override
    public boolean execute() {
-      if (mc.player != null && mc.player.isOnGround()) {
+      if (mc.field_1724 != null && mc.field_1724.method_24828()) {
          Jump.jump();
          return true;
       } else {

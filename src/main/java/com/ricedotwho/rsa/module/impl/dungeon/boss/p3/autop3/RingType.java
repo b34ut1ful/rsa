@@ -24,8 +24,8 @@ import com.ricedotwho.rsm.data.Pos;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.class_310;
+import net.minecraft.class_239.class_240;
 
 public enum RingType {
    ALIGN("align", AlignRing::new, 0.0F, Set.of(), null),
@@ -38,7 +38,7 @@ public enum RingType {
    EDGE("edge", EdgeRing::new, 0.06F, Set.of(), null),
    MOVEMENT("movement", MovementRing::new, 0.07F, Set.of("route"), null),
    LOOK("look", LookRing::new, 0.08F, Set.of(), null),
-   BOOM("boom", BoomRing::new, 0.009F, Set.of(), Type.BLOCK),
+   BOOM("boom", BoomRing::new, 0.009F, Set.of(), class_240.field_1332),
    LEAP("leap", LeapRing::new, 0.01F, Set.of(), null),
    USE("use", UseRing::new, 0.011F, Set.of(), null),
    CHAT("chat", ChatRing::new, 0.012F, Set.of("message"), null),
@@ -49,14 +49,14 @@ public enum RingType {
    private final Function5<Pos, Pos, ArgumentManager, SubActionManager, Map<String, Object>, Ring> factory;
    private final float renderSizeOffset;
    private final Set<String> required;
-   private final Type hitResult;
+   private final class_240 hitResult;
 
    private RingType(
       String s,
       Function5<Pos, Pos, ArgumentManager, SubActionManager, Map<String, Object>, Ring> factory,
       float renderSizeOffset,
       Set<String> required,
-      Type hitResult
+      class_240 hitResult
    ) {
       this.name = s;
       this.renderSizeOffset = renderSizeOffset;
@@ -66,7 +66,7 @@ public enum RingType {
    }
 
    public Ring supply(Pos min, Pos max, ArgumentManager manager, SubActionManager actions, Map<String, Object> extraData) {
-      return this.factory != null && MinecraftClient.getInstance().player != null ? (Ring)this.factory.apply(min, max, manager, actions, extraData) : null;
+      return this.factory != null && class_310.method_1551().field_1724 != null ? (Ring)this.factory.apply(min, max, manager, actions, extraData) : null;
    }
 
    public static RingType byName(String name) {
@@ -85,7 +85,7 @@ public enum RingType {
       return this.required;
    }
 
-   public Type getHitResult() {
+   public class_240 getHitResult() {
       return this.hitResult;
    }
 }

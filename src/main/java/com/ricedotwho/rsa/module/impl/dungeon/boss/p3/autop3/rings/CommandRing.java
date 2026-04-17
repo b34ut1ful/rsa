@@ -10,7 +10,7 @@ import com.ricedotwho.rsm.data.MutableInput;
 import com.ricedotwho.rsm.data.Pos;
 import com.ricedotwho.rsm.utils.Accessor;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
+import net.minecraft.class_10185;
 
 public class CommandRing extends Ring implements Accessor {
    private final String command;
@@ -32,9 +32,9 @@ public class CommandRing extends Ring implements Accessor {
    @Override
    public boolean run() {
       if (this.command.startsWith("`")) {
-         mc.getNetworkHandler().sendChatMessage(this.command);
+         mc.method_1562().method_45729(this.command);
       } else {
-         mc.getNetworkHandler().sendChatCommand(this.command);
+         mc.method_1562().method_45730(this.command);
       }
 
       return true;
@@ -51,7 +51,7 @@ public class CommandRing extends Ring implements Accessor {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
       return true;
    }
 

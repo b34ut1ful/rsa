@@ -34,22 +34,22 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.math.BigDecimal;
 import java.util.List;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.screen.sync.ItemStackHash;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.network.packet.s2c.play.CloseScreenS2CPacket;
-import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.SetCursorItemS2CPacket;
+import net.minecraft.class_10185;
+import net.minecraft.class_10938;
+import net.minecraft.class_1657;
+import net.minecraft.class_1703;
+import net.minecraft.class_1735;
+import net.minecraft.class_1799;
+import net.minecraft.class_2371;
+import net.minecraft.class_2645;
+import net.minecraft.class_2649;
+import net.minecraft.class_2653;
+import net.minecraft.class_2813;
+import net.minecraft.class_2815;
+import net.minecraft.class_310;
+import net.minecraft.class_3944;
+import net.minecraft.class_634;
+import net.minecraft.class_9834;
 
 @ModuleInfo(aliases = "AutoTerms", id = "AutoTerms", category = Category.DUNGEONS)
 public class AutoTerms extends Module {
@@ -57,7 +57,7 @@ public class AutoTerms extends Module {
    private boolean clickedWindow = false;
    private boolean firstClick = true;
    private Terminal terminal;
-   private ScreenHandler terminalContainer;
+   private class_1703 terminalContainer;
    private final ClickedSlotsTracker clickedSlotsTracker;
    private TerminalState predictedState = null;
    private final NumberSetting firstClickDelay = new NumberSetting("First Click Delay", 200.0, 600.0, 400.0, 5.0);
@@ -103,24 +103,20 @@ public class AutoTerms extends Module {
                this.predictedState = null;
             }
 
-            if (this.terminal.isEnabled()) {
-               if (!this.firstClick || System.currentTimeMillis() - this.lastClickTime >= ((BigDecimal)this.firstClickDelay.getValue()).longValue()) {
-                  if (System.currentTimeMillis() - this.lastClickTime >= ((BigDecimal)this.delay.getValue()).longValue()) {
-                     if (System.currentTimeMillis() - this.lastClickTime > ((BigDecimal)this.breakThreshold.getValue()).longValue()) {
-                        this.clickedWindow = false;
-                     }
+            if (this.terminal.isEnabled()
+               && (!this.firstClick || System.currentTimeMillis() - this.lastClickTime >= ((BigDecimal)this.firstClickDelay.getValue()).longValue())
+               && System.currentTimeMillis() - this.lastClickTime >= ((BigDecimal)this.delay.getValue()).longValue()) {
+               if (System.currentTimeMillis() - this.lastClickTime > ((BigDecimal)this.breakThreshold.getValue()).longValue()) {
+                  this.clickedWindow = false;
+               }
 
-                     if (this.isInTerm() && !this.clickedWindow) {
-                        if (this.terminal.isSolved()) {
-                           Solution solution = this.terminal.getSolution();
-                           if (solution.getLength() >= 1) {
-                              this.sendWindowClick(solution.getNext());
-                              this.lastClickTime = System.currentTimeMillis();
-                              this.clickedWindow = true;
-                              this.firstClick = false;
-                           }
-                        }
-                     }
+               if (this.isInTerm() && !this.clickedWindow && this.terminal.isSolved()) {
+                  Solution solution = this.terminal.getSolution();
+                  if (solution.getLength() >= 1) {
+                     this.sendWindowClick(solution.getNext());
+                     this.lastClickTime = System.currentTimeMillis();
+                     this.clickedWindow = true;
+                     this.firstClick = false;
                   }
                }
             }
@@ -128,36 +124,36 @@ public class AutoTerms extends Module {
       }
    }
 
-   private static void sendWindowClick(int windowID, SolutionClick click, PlayerEntity player, ScreenHandler abstractContainerMenu) {
-      if (windowID != abstractContainerMenu.syncId) {
+   private static void sendWindowClick(int windowID, SolutionClick click, class_1657 player, class_1703 abstractContainerMenu) {
+      if (windowID != abstractContainerMenu.field_7763) {
          RSA.chat("Window ID mismatch!");
       } else {
-         ClientPlayNetworkHandler connection = MinecraftClient.getInstance().getNetworkHandler();
+         class_634 connection = class_310.method_1551().method_1562();
          if (connection != null) {
-            DefaultedList<Slot> nonNullList = abstractContainerMenu.slots;
+            class_2371<class_1735> nonNullList = abstractContainerMenu.field_7761;
             int l = nonNullList.size();
-            List<ItemStack> list = Lists.newArrayListWithCapacity(l);
+            List<class_1799> list = Lists.newArrayListWithCapacity(l);
 
-            for (Slot slot : nonNullList) {
-               list.add(slot.getStack().copy());
+            for (class_1735 slot : nonNullList) {
+               list.add(slot.method_7677().method_7972());
             }
 
-            abstractContainerMenu.onSlotClick(click.index(), click.button(), click.type(), player);
-            Int2ObjectMap<ItemStackHash> int2ObjectMap = new Int2ObjectOpenHashMap();
+            abstractContainerMenu.method_7593(click.index(), click.button(), click.type(), player);
+            Int2ObjectMap<class_10938> int2ObjectMap = new Int2ObjectOpenHashMap();
 
             for (int m = 0; m < l; m++) {
-               ItemStack itemStack = list.get(m);
-               ItemStack itemStack2 = ((Slot)nonNullList.get(m)).getStack();
-               if (!ItemStack.areEqual(itemStack, itemStack2)) {
-                  int2ObjectMap.put(m, ItemStackHash.fromItemStack(itemStack2, connection.getComponentHasher()));
+               class_1799 itemStack = list.get(m);
+               class_1799 itemStack2 = ((class_1735)nonNullList.get(m)).method_7677();
+               if (!class_1799.method_7973(itemStack, itemStack2)) {
+                  int2ObjectMap.put(m, class_10938.method_68853(itemStack2, connection.method_68823()));
                }
             }
 
-            ItemStackHash hashedStack = ItemStackHash.fromItemStack(abstractContainerMenu.getCursorStack(), connection.getComponentHasher());
-            connection.sendPacket(
-               new ClickSlotC2SPacket(
+            class_10938 hashedStack = class_10938.method_68853(abstractContainerMenu.method_34255(), connection.method_68823());
+            connection.method_52787(
+               new class_2813(
                   windowID,
-                  abstractContainerMenu.getRevision(),
+                  abstractContainerMenu.method_37421(),
                   Shorts.checkedCast(click.index()),
                   SignedBytes.checkedCast(click.button()),
                   click.type(),
@@ -170,25 +166,23 @@ public class AutoTerms extends Module {
    }
 
    public void sendWindowClick(SolutionClick click) {
-      if (MinecraftClient.getInstance().player != null) {
-         if (this.isInTerm() && click.index() >= 0 && click.index() < this.terminal.getType().getSlotCount()) {
-            if (this.terminal instanceof StartsWith || this.terminal instanceof Colors) {
-               this.clickedSlotsTracker.clickSlot(this.terminalContainer.getSlot(click.index()));
-            }
-
-            sendWindowClick(this.terminal.getWindowID(), click, MinecraftClient.getInstance().player, this.terminalContainer);
+      if (class_310.method_1551().field_1724 != null && this.isInTerm() && click.index() >= 0 && click.index() < this.terminal.getType().getSlotCount()) {
+         if (this.terminal instanceof StartsWith || this.terminal instanceof Colors) {
+            this.clickedSlotsTracker.clickSlot(this.terminalContainer.method_7611(click.index()));
          }
+
+         sendWindowClick(this.terminal.getWindowID(), click, class_310.method_1551().field_1724, this.terminalContainer);
       }
    }
 
    @SubscribeEvent
    public void onPollInput(InputPollEvent event) {
       if (((InvWalk)this.invWalkGroup.getValue()).melodyMoveCounter >= 1) {
-         if (MinecraftClient.getInstance().currentScreen == null && !this.isInTerm()) {
+         if (class_310.method_1551().field_1755 == null && !this.isInTerm()) {
             ((InvWalk)this.invWalkGroup.getValue()).melodyMoveCounter = 0;
          } else {
-            PlayerInput oldInputs = event.getClientInput();
-            PlayerInput newInputs = new PlayerInput(false, false, false, false, false, oldInputs.sneak(), false);
+            class_10185 oldInputs = event.getClientInput();
+            class_10185 newInputs = new class_10185(false, false, false, false, false, oldInputs.comp_3164(), false);
             event.getInput().apply(newInputs);
             ((InvWalk)this.invWalkGroup.getValue()).melodyMoveCounter--;
          }
@@ -213,38 +207,36 @@ public class AutoTerms extends Module {
 
    @SubscribeEvent(priority = EventPriority.HIGH)
    public void onReceivePacket(Receive event) {
-      if (event.getPacket() instanceof OpenScreenS2CPacket packet) {
-         if (packet.getSyncId() >= 1 && packet.getSyncId() <= 100) {
-            if (MinecraftClient.getInstance().player != null) {
-               TerminalState predictionState = new TerminalState(null, 0);
-               if (this.terminal != null && this.terminal.isSolved()) {
-                  predictionState = this.terminal.getNextState();
-               }
+      if (event.getPacket() instanceof class_3944 packet) {
+         if (packet.method_17592() >= 1 && packet.method_17592() <= 100 && class_310.method_1551().field_1724 != null) {
+            TerminalState predictionState = new TerminalState(null, 0);
+            if (this.terminal != null && this.terminal.isSolved()) {
+               predictionState = this.terminal.getNextState();
+            }
 
-               this.terminalContainer = packet.getScreenHandlerType().create(packet.getSyncId(), MinecraftClient.getInstance().player.getInventory());
-               this.terminal = Terminal.fromPacket(packet, this.terminalContainer);
-               if (this.terminal == null) {
-                  this.terminalContainer = null;
-               } else {
-                  this.predictedState = predictionState;
-                  this.clickedWindow = false;
-                  ((InvWalk)this.invWalkGroup.getValue()).getTerminalRenderer().newWindow(this.terminalContainer);
-                  if (((InvWalk)this.invWalkGroup.getValue()).isEnabled()) {
-                     event.setCancelled(true);
-                  }
+            this.terminalContainer = packet.method_17593().method_17434(packet.method_17592(), class_310.method_1551().field_1724.method_31548());
+            this.terminal = Terminal.fromPacket(packet, this.terminalContainer);
+            if (this.terminal == null) {
+               this.terminalContainer = null;
+            } else {
+               this.predictedState = predictionState;
+               this.clickedWindow = false;
+               ((InvWalk)this.invWalkGroup.getValue()).getTerminalRenderer().newWindow(this.terminalContainer);
+               if (((InvWalk)this.invWalkGroup.getValue()).isEnabled()) {
+                  event.setCancelled(true);
                }
             }
          }
-      } else if (this.isInTerm() && event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packetx) {
-         if (packetx.getSyncId() != 0 && packetx.getSyncId() == this.terminalContainer.syncId) {
-            this.terminalContainer.setStackInSlot(packetx.getSlot(), packetx.getRevision(), packetx.getStack());
+      } else if (this.isInTerm() && event.getPacket() instanceof class_2653 packetx) {
+         if (packetx.method_11452() != 0 && packetx.method_11452() == this.terminalContainer.field_7763) {
+            this.terminalContainer.method_7619(packetx.method_11450(), packetx.method_37439(), packetx.method_11449());
             this.terminal.loadSlot(packetx);
             if (((InvWalk)this.invWalkGroup.getValue()).isEnabled()) {
                event.setCancelled(true);
             }
          }
-      } else if (this.isInTerm() && event.getPacket() instanceof CloseScreenS2CPacket packetxx) {
-         if (packetxx.getSyncId() != this.terminalContainer.syncId) {
+      } else if (this.isInTerm() && event.getPacket() instanceof class_2645 packetxx) {
+         if (packetxx.method_36148() != this.terminalContainer.field_7763) {
             RSA.chat("Container ID mismatch on close!");
          }
 
@@ -252,14 +244,15 @@ public class AutoTerms extends Module {
          if (((InvWalk)this.invWalkGroup.getValue()).isEnabled()) {
             event.setCancelled(true);
          }
-      } else if (this.isInTerm() && event.getPacket() instanceof SetCursorItemS2CPacket packetxx) {
+      } else if (this.isInTerm() && event.getPacket() instanceof class_9834 packetxx) {
          if (((InvWalk)this.invWalkGroup.getValue()).isEnabled()) {
             event.setCancelled(true);
          }
-      } else if (this.isInTerm() && event.getPacket() instanceof InventoryS2CPacket packetxx) {
-         if (packetxx.syncId() != 0 && ((InvWalk)this.invWalkGroup.getValue()).isEnabled()) {
-            event.setCancelled(true);
-         }
+      } else if (this.isInTerm()
+         && event.getPacket() instanceof class_2649 packetxxx
+         && packetxxx.comp_3837() != 0
+         && ((InvWalk)this.invWalkGroup.getValue()).isEnabled()) {
+         event.setCancelled(true);
       }
    }
 
@@ -275,7 +268,7 @@ public class AutoTerms extends Module {
 
    @SubscribeEvent
    public void onSendPacket(Send event) {
-      if (this.isInTerm() && event.getPacket() instanceof CloseHandledScreenC2SPacket packet) {
+      if (this.isInTerm() && event.getPacket() instanceof class_2815 packet) {
          this.close();
       }
    }
@@ -304,7 +297,7 @@ public class AutoTerms extends Module {
       return this.terminal;
    }
 
-   public ScreenHandler getTerminalContainer() {
+   public class_1703 getTerminalContainer() {
       return this.terminalContainer;
    }
 

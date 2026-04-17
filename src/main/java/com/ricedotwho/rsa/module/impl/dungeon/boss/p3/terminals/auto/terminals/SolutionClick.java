@@ -1,19 +1,19 @@
 package com.ricedotwho.rsa.module.impl.dungeon.boss.p3.terminals.auto.terminals;
 
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.class_1713;
 
 public class SolutionClick {
-   private final SlotActionType type;
+   private final class_1713 type;
    private final int index;
    private final int button;
 
-   public SolutionClick(SlotActionType type, int index, int button) {
+   public SolutionClick(class_1713 type, int index, int button) {
       this.type = type;
       this.index = index;
       this.button = button;
    }
 
-   public SlotActionType type() {
+   public class_1713 type() {
       return this.type;
    }
 

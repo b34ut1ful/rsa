@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.minecraft.util.Formatting;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.OpenScreenS2CPacket;
+import net.minecraft.class_124;
+import net.minecraft.class_1703;
+import net.minecraft.class_1713;
+import net.minecraft.class_1735;
+import net.minecraft.class_1799;
+import net.minecraft.class_3944;
 
 public class StartsWith extends Terminal {
-   protected StartsWith(OpenScreenS2CPacket packet, ScreenHandler menu) {
+   protected StartsWith(class_3944 packet, class_1703 menu) {
       super(TerminalType.STARTSWITH, packet, menu);
    }
 
@@ -27,9 +27,9 @@ public class StartsWith extends Terminal {
          int changedIndex = this.solution.getNext().index();
 
          for (int i = 0; i < this.getType().getSlotCount(); i++) {
-            Slot slot = this.terminalContainer.getSlot(i);
-            Terminal.HashInfo hashInfo = new Terminal.HashInfo(slot.getStack());
-            if (slot.id == changedIndex) {
+            class_1735 slot = this.terminalContainer.method_7611(i);
+            Terminal.HashInfo hashInfo = new Terminal.HashInfo(slot.method_7677());
+            if (slot.field_7874 == changedIndex) {
                hashInfo.setEnchanted(true);
             }
 
@@ -45,8 +45,8 @@ public class StartsWith extends Terminal {
       List<Terminal.HashInfo> infos = new ArrayList<>(this.getType().getSlotCount());
 
       for (int i = 0; i < this.getType().getSlotCount(); i++) {
-         Slot slot = this.terminalContainer.getSlot(i);
-         infos.add(new Terminal.HashInfo(slot.getStack()));
+         class_1735 slot = this.terminalContainer.method_7611(i);
+         infos.add(new Terminal.HashInfo(slot.method_7677()));
       }
 
       return Terminal.getTerminalState(TerminalType.STARTSWITH, infos);
@@ -61,12 +61,12 @@ public class StartsWith extends Terminal {
          String matchLetter = matcher.group(1).toLowerCase();
          List<SolutionClick> solutionClicks = new ArrayList<>();
 
-         for (Slot slot : this.terminalContainer.slots) {
-            ItemStack stack = slot.getStack();
-            if (!stack.isEmpty() && !((AutoTerms)RSM.getModule(AutoTerms.class)).getClickedSlotsTracker().contains(slot)) {
-               String name = Formatting.strip(stack.getName().getString()).toLowerCase();
+         for (class_1735 slot : this.terminalContainer.field_7761) {
+            class_1799 stack = slot.method_7677();
+            if (!stack.method_7960() && !((AutoTerms)RSM.getModule(AutoTerms.class)).getClickedSlotsTracker().contains(slot)) {
+               String name = class_124.method_539(stack.method_7964().getString()).toLowerCase();
                if (name.startsWith(matchLetter)) {
-                  solutionClicks.add(new SolutionClick(SlotActionType.CLONE, slot.id, 0));
+                  solutionClicks.add(new SolutionClick(class_1713.field_7796, slot.field_7874, 0));
                }
             }
          }
@@ -81,7 +81,7 @@ public class StartsWith extends Terminal {
       return AutoTerms.getTerminals().get("Starts With");
    }
 
-   protected static StartsWith supply(OpenScreenS2CPacket packet, ScreenHandler menu) {
+   protected static StartsWith supply(class_3944 packet, class_1703 menu) {
       return new StartsWith(packet, menu);
    }
 }

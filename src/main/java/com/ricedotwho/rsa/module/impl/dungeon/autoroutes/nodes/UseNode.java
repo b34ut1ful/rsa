@@ -18,11 +18,11 @@ import com.ricedotwho.rsm.data.Pos;
 import com.ricedotwho.rsm.utils.EtherUtils;
 import com.ricedotwho.rsm.utils.FileUtils;
 import com.ricedotwho.rsm.utils.ItemUtils;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_243;
+import net.minecraft.class_304;
+import net.minecraft.class_310;
+import net.minecraft.class_4050;
+import net.minecraft.class_746;
 
 public class UseNode extends Node {
    private final Pos rotationVec;
@@ -46,16 +46,16 @@ public class UseNode extends Node {
 
    @Override
    public boolean run(Pos playerPos) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player == null) {
          return this.cancel();
       } else {
-         KeyBinding.unpressAll();
+         class_304.method_1437();
          AutoRoutes autoRoutes = (AutoRoutes)RSM.getModule(AutoRoutes.class);
          autoRoutes.setForceSneak(!this.sneak);
          if (!SwapManager.reserveSwap(this.itemID)) {
             return this.cancel();
-         } else if (MinecraftClient.getInstance().player.getLastPlayerInput().sneak() != this.sneak) {
+         } else if (class_310.method_1551().field_1724.method_71091().comp_3164() != this.sneak) {
             return this.cancel();
          } else {
             boolean swap = SwapManager.isDesynced();
@@ -72,12 +72,12 @@ public class UseNode extends Node {
                         "Big fuck up! : "
                            + swap
                            + ", "
-                           + MinecraftClient.getInstance().player.getInventory().getStack(SwapManager.getServerSlot()).getItem()
+                           + class_310.method_1551().field_1724.method_31548().method_5438(SwapManager.getServerSlot()).method_7909()
                      );
                   }
                }
             );
-            playerPos.selfAdd(0.0, player.getEyeHeight(EntityPose.STANDING), 0.0).selfAdd(this.realRotationVector.multiply(12.0));
+            playerPos.selfAdd(0.0, player.method_18381(class_4050.field_18076), 0.0).selfAdd(this.realRotationVector.multiply(12.0));
             autoRoutes.setForceSneak(!this.sneak);
             return true;
          }
@@ -86,8 +86,8 @@ public class UseNode extends Node {
 
    @Override
    public void render(boolean depth) {
-      Vec3d playerRealPos = this.getRealPos().asVec3();
-      Renderer3D.addTask(new Ring(playerRealPos.add(0.0, 0.1, 0.0), depth, this.getRadius(), this.getColour()));
+      class_243 playerRealPos = this.getRealPos().asVec3();
+      Renderer3D.addTask(new Ring(playerRealPos.method_1031(0.0, 0.1, 0.0), depth, this.getRadius(), this.getColour()));
    }
 
    @Override
@@ -114,11 +114,11 @@ public class UseNode extends Node {
       return json;
    }
 
-   public static UseNode supply(UniqueRoom fullRoom, ClientPlayerEntity player, AwaitManager awaits, boolean start) {
+   public static UseNode supply(UniqueRoom fullRoom, class_746 player, AwaitManager awaits, boolean start) {
       Room mainRoom = fullRoom.getMainRoom();
-      Pos playerRelative = RoomUtils.getRelativePosition(new Pos(player.getEntityPos()), mainRoom);
-      Pos targetRelative = RoomUtils.rotateRelativeFixed(new Pos(player.getRotationVec(1.0F)), fullRoom.getRotation());
-      String itemID = ItemUtils.getID(MinecraftClient.getInstance().player.getInventory().getSelectedStack());
+      Pos playerRelative = RoomUtils.getRelativePosition(new Pos(player.method_73189()), mainRoom);
+      Pos targetRelative = RoomUtils.rotateRelativeFixed(new Pos(player.method_5828(1.0F)), fullRoom.getRotation());
+      String itemID = ItemUtils.getID(class_310.method_1551().field_1724.method_31548().method_7391());
       return itemID.isBlank() ? null : new UseNode(playerRelative, targetRelative, itemID, false, awaits, start);
    }
 

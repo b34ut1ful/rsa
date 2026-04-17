@@ -10,12 +10,12 @@ import com.ricedotwho.rsm.component.impl.location.Island;
 import com.ricedotwho.rsm.component.impl.location.Location;
 import com.ricedotwho.rsm.component.impl.map.Map;
 import com.ricedotwho.rsm.component.impl.map.map.RoomType;
-import net.minecraft.client.network.ClientCommandSource;
+import net.minecraft.class_637;
 
 @CommandInfo(name = "bloodblink", aliases = "bb", description = "Handles blood blinking rooms")
 public class BloodBlinkCommand extends Command {
-   public LiteralArgumentBuilder<ClientCommandSource> build() {
-      return (LiteralArgumentBuilder<ClientCommandSource>)literal(this.name()).executes(source -> {
+   public LiteralArgumentBuilder<class_637> build() {
+      return (LiteralArgumentBuilder<class_637>)literal(this.name()).executes(source -> {
          if (!Location.getArea().is(Island.Dungeon)) {
             RSA.chat("I don't think there's a blood room outside dungeons yo");
             return 0;

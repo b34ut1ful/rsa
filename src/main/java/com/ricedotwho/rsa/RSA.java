@@ -59,21 +59,21 @@ import java.nio.file.Path;
 import java.util.List;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Formatting;
-import net.minecraft.text.Text;
-import net.minecraft.text.MutableText;
+import net.minecraft.class_124;
+import net.minecraft.class_2561;
+import net.minecraft.class_5250;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RSA implements Addon {
    private static final Logger logger = LogManager.getLogger("rsa");
    public static Path SOUNDS_FOLDER;
-   private static final MutableText prefix = Text.empty()
-      .append(Text.literal("[").formatted(Formatting.DARK_GRAY))
-      .append(Text.literal("R").withColor(11690975))
-      .append(Text.literal("S").withColor(12942314))
-      .append(Text.literal("A").withColor(14128116))
-      .append(Text.literal("] ").formatted(Formatting.DARK_GRAY));
+   private static final class_5250 prefix = class_2561.method_43473()
+      .method_10852(class_2561.method_43470("[").method_27692(class_124.field_1063))
+      .method_10852(class_2561.method_43470("R").method_54663(11690975))
+      .method_10852(class_2561.method_43470("S").method_54663(12942314))
+      .method_10852(class_2561.method_43470("A").method_54663(14128116))
+      .method_10852(class_2561.method_43470("] ").method_27692(class_124.field_1063));
 
    public void onInitialize() {
       PayloadTypeRegistry.playC2S().register(BloodClipHelperStartPacket.TYPE, BloodClipHelperStartPacket.CODEC);
@@ -151,22 +151,22 @@ public class RSA implements Addon {
    }
 
    public static void chat(Object message, Object... objects) {
-      ChatUtils.chatClean(getPrefix().copy().append(String.format(message.toString(), objects)));
+      ChatUtils.chatClean(getPrefix().method_27661().method_27693(String.format(message.toString(), objects)));
    }
 
    public static void chat(String text) {
-      ChatUtils.chatClean(getPrefix().copy().append(text));
+      ChatUtils.chatClean(getPrefix().method_27661().method_27693(text));
    }
 
-   public static void chat(Text component) {
-      ChatUtils.chatClean(getPrefix().copy().append(component));
+   public static void chat(class_2561 component) {
+      ChatUtils.chatClean(getPrefix().method_27661().method_10852(component));
    }
 
    public static Logger getLogger() {
       return logger;
    }
 
-   public static MutableText getPrefix() {
+   public static class_5250 getPrefix() {
       return prefix;
    }
 }

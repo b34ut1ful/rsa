@@ -18,9 +18,9 @@ import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import com.ricedotwho.rsm.utils.DungeonUtils;
 import java.math.BigDecimal;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.class_124;
+import net.minecraft.class_243;
+import net.minecraft.class_2828;
 
 @ModuleInfo(aliases = "InstaMid", id = "InstaMid", category = Category.DUNGEONS)
 public class InstaMid extends Module {
@@ -44,13 +44,13 @@ public class InstaMid extends Module {
 
    @SubscribeEvent
    public void onPacketSend(Send event) {
-      if (event.getPacket() instanceof PlayerMoveC2SPacket packet
+      if (event.getPacket() instanceof class_2828 packet
          && Location.getArea().is(Island.Dungeon)
          && (Location.getFloor() == Floor.F7 || Location.getFloor() == Floor.M7)
          && Dungeon.isInBoss()
          && DungeonUtils.isPhase(Phase7.P4)
          && this.startOnNextFlying
-         && !packet.isOnGround()
+         && !packet.method_12273()
          && this.isOnPlatform()) {
          this.airTicks++;
          if (this.airTicks > 3) {
@@ -61,14 +61,14 @@ public class InstaMid extends Module {
 
    @SubscribeEvent
    public void onChat(Chat event) {
-      String unformatted = Formatting.strip(event.getMessage().getString());
+      String unformatted = class_124.method_539(event.getMessage().getString());
       if (Location.getArea().is(Island.Dungeon)
          && (Location.getFloor() == Floor.F7 || Location.getFloor() == Floor.M7)
          && DungeonUtils.isPhase(Phase7.P4)
          && "[BOSS] Necron: You went further than any human before, congratulations.".equals(unformatted)
          && this.isOnPlatform()
-         && mc.player != null) {
-         if (mc.player.isOnGround()) {
+         && mc.field_1724 != null) {
+         if (mc.field_1724.method_24828()) {
             this.startOnNextFlying = true;
             Jump.jump();
          } else {
@@ -86,16 +86,16 @@ public class InstaMid extends Module {
    public void freeze() {
       try {
          Thread.sleep(((BigDecimal)this.millis.getValue()).longValue());
-      } catch (InterruptedException interruptedException) {
-         throw new RuntimeException(interruptedException);
+      } catch (InterruptedException var2) {
+         throw new RuntimeException(var2);
       }
    }
 
    private boolean isOnPlatform() {
-      Vec3d pos = mc.player.getEntityPos();
-      return pos.getY() > 63.0
-         && pos.getY() < 100.0
-         && Math.pow(Math.abs(pos.getX() - 54.5), 2.0) + Math.pow(Math.abs(pos.getZ() - 76.5), 2.0) < 56.25;
+      class_243 pos = mc.field_1724.method_73189();
+      return pos.method_10214() > 63.0
+         && pos.method_10214() < 100.0
+         && Math.pow(Math.abs(pos.method_10216() - 54.5), 2.0) + Math.pow(Math.abs(pos.method_10215() - 76.5), 2.0) < 56.25;
    }
 
    public NumberSetting getMillis() {

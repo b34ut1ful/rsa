@@ -9,9 +9,9 @@ import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.ModeSetting;
 import com.ricedotwho.rsm.utils.Utils;
 import java.util.Arrays;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.boss.WitherEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.class_1297;
+import net.minecraft.class_1528;
+import net.minecraft.class_1657;
 
 @ModuleInfo(aliases = "Hide", id = "HideEntity", category = Category.RENDER, isOverwrite = true)
 public class HidePlayers extends com.ricedotwho.rsm.module.impl.render.HidePlayers {
@@ -21,12 +21,12 @@ public class HidePlayers extends com.ricedotwho.rsm.module.impl.render.HidePlaye
       this.registerProperty(new Setting[]{this.hitThroughMode});
    }
 
-   public static boolean shouldHitThrough(Entity e) {
+   public static boolean shouldHitThrough(class_1297 e) {
       HidePlayers hidePlayers = (HidePlayers)RSM.getModule(HidePlayers.class);
       if (hidePlayers != null && hidePlayers.isEnabled()) {
-         return hidePlayers.getWither().getValue() && e instanceof WitherEntity wither && wither.getMaxHealth() == 300.0F
+         return hidePlayers.getWither().getValue() && e instanceof class_1528 wither && wither.method_6063() == 300.0F
             ? true
-            : e instanceof PlayerEntity
+            : e instanceof class_1657
                && (
                   hidePlayers.getHitThroughMode().getIndex() == 1 && Utils.equalsOneOf(Location.getArea(), new Object[]{Island.Dungeon, Island.Kuudra})
                      || hidePlayers.getHitThroughMode().getIndex() == 2

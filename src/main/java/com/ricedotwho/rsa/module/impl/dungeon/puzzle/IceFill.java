@@ -15,9 +15,9 @@ import com.ricedotwho.rsm.utils.EtherUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.class_1802;
+import net.minecraft.class_243;
+import net.minecraft.class_2708;
 
 @SubModuleInfo(name = "Ice Fill", alwaysDisabled = false)
 public class IceFill extends com.ricedotwho.rsm.module.impl.dungeon.puzzle.IceFill {
@@ -45,9 +45,9 @@ public class IceFill extends com.ricedotwho.rsm.module.impl.dungeon.puzzle.IceFi
             } else {
                int delay = ((BigDecimal)this.autoDelay.getValue()).intValue();
                if (delay >= 1) {
-                  assert mc.player != null;
+                  assert mc.field_1724 != null;
 
-                  if (mc.player.getMainHandStack().getItem() == Items.DIAMOND_SHOVEL) {
+                  if (mc.field_1724.method_6047().method_7909() == class_1802.field_8250) {
                      this.autoTicks++;
                      if (this.autoTicks >= delay) {
                         this.autoTicks = 0;
@@ -64,35 +64,33 @@ public class IceFill extends com.ricedotwho.rsm.module.impl.dungeon.puzzle.IceFi
 
    @SubscribeEvent
    public void onPacketReceive(Receive event) {
-      if ((Boolean)this.autoEnabled.getValue()) {
-         if (event.getPacket() instanceof PlayerPositionLookS2CPacket packet) {
-            if (this.path == null) {
-               this.autoPath = null;
-            } else {
-               if (this.autoPath == null) {
-                  this.buildAutoPath();
-               }
+      if ((Boolean)this.autoEnabled.getValue() && event.getPacket() instanceof class_2708 packet) {
+         if (this.path == null) {
+            this.autoPath = null;
+         } else {
+            if (this.autoPath == null) {
+               this.buildAutoPath();
+            }
 
-               assert mc.player != null;
+            assert mc.field_1724 != null;
 
-               if (mc.player.getMainHandStack().getItem() == Items.DIAMOND_SHOVEL) {
-                  int index = this.findIndex(packet.change().position());
-                  int delay = ((BigDecimal)this.autoDelay.getValue()).intValue();
-                  if (index >= 0 && index < this.autoPath.size() - 1) {
-                     if (this.autoIndex < 0) {
-                        this.autoIndex = index;
-                        this.autoTicks = 0;
-                        if (delay > 0) {
-                           this.doTeleport(index);
-                        }
-                     }
-
-                     if (delay < 1) {
+            if (mc.field_1724.method_6047().method_7909() == class_1802.field_8250) {
+               int index = this.findIndex(packet.comp_3228().comp_3148());
+               int delay = ((BigDecimal)this.autoDelay.getValue()).intValue();
+               if (index >= 0 && index < this.autoPath.size() - 1) {
+                  if (this.autoIndex < 0) {
+                     this.autoIndex = index;
+                     this.autoTicks = 0;
+                     if (delay > 0) {
                         this.doTeleport(index);
                      }
-                  } else {
-                     this.autoIndex = -1;
                   }
+
+                  if (delay < 1) {
+                     this.doTeleport(index);
+                  }
+               } else {
+                  this.autoIndex = -1;
                }
             }
          }
@@ -106,7 +104,7 @@ public class IceFill extends com.ricedotwho.rsm.module.impl.dungeon.puzzle.IceFi
       float yaw = EtherUtils.getYawAndPitch(diff.x, diff.y, diff.z)[0];
       float pitch = diff.y > 0.0 ? 14.0F : 48.0F;
       PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> {
-         if (SwapManager.checkClientItem(Items.DIAMOND_SHOVEL) && SwapManager.checkServerItem(Items.DIAMOND_SHOVEL)) {
+         if (SwapManager.checkClientItem(class_1802.field_8250) && SwapManager.checkServerItem(class_1802.field_8250)) {
             SwapManager.sendAirC08(yaw, pitch, false, false);
          }
       });
@@ -138,7 +136,7 @@ public class IceFill extends com.ricedotwho.rsm.module.impl.dungeon.puzzle.IceFi
       }
    }
 
-   private int findIndex(Vec3d pos) {
+   private int findIndex(class_243 pos) {
       for (int i = 0; i < this.autoPath.size(); i++) {
          if (this.autoPath.get(i).squaredDistanceTo(pos) < 1.0E-6) {
             return i;

@@ -7,12 +7,12 @@ import com.ricedotwho.rsa.module.impl.dungeon.boss.p3.autop3.subactions.SubActio
 import com.ricedotwho.rsm.data.Colour;
 import com.ricedotwho.rsm.data.Pos;
 import java.util.Map;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.class_243;
+import net.minecraft.class_310;
+import net.minecraft.class_6373;
 
 public class FastBonzoRing extends BonzoRing {
-   public FastBonzoRing(Vec3d pos) {
+   public FastBonzoRing(class_243 pos) {
       super(pos);
    }
 
@@ -24,8 +24,8 @@ public class FastBonzoRing extends BonzoRing {
       this(
          min,
          max,
-         (Float)extra.getOrDefault("yaw", MinecraftClient.getInstance().gameRenderer.getCamera().getCameraYaw()),
-         (Float)extra.getOrDefault("pitch", MinecraftClient.getInstance().gameRenderer.getCamera().getPitch()),
+         (Float)extra.getOrDefault("yaw", class_310.method_1551().field_1773.method_19418().method_71155()),
+         (Float)extra.getOrDefault("pitch", class_310.method_1551().field_1773.method_19418().method_19329()),
          manager,
          actions
       );
@@ -34,9 +34,9 @@ public class FastBonzoRing extends BonzoRing {
    @Override
    protected void registerWaitCondition() {
       PacketOrderManager.registerReceiveListener(p -> {
-         if (MinecraftClient.getInstance().player == null || this.state < 1) {
+         if (class_310.method_1551().field_1724 == null || this.state < 1) {
             return true;
-         } else if (!(p instanceof CommonPingS2CPacket)) {
+         } else if (!(p instanceof class_6373)) {
             return false;
          } else {
             this.state++;

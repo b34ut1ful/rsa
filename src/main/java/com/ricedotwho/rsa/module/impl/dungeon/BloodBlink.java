@@ -47,22 +47,21 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_10185;
+import net.minecraft.class_1799;
+import net.minecraft.class_1802;
+import net.minecraft.class_2246;
+import net.minecraft.class_2248;
+import net.minecraft.class_2350;
+import net.minecraft.class_243;
+import net.minecraft.class_2596;
+import net.minecraft.class_2708;
+import net.minecraft.class_2761;
+import net.minecraft.class_2817;
+import net.minecraft.class_304;
+import net.minecraft.class_310;
+import net.minecraft.class_3532;
+import net.minecraft.class_746;
 
 @ModuleInfo(aliases = "Blood Blink", id = "BloodBlink", category = Category.DUNGEONS)
 public class BloodBlink extends Module {
@@ -71,7 +70,7 @@ public class BloodBlink extends Module {
    private static final Pos SLAB_BLOCK_OFFSET_3 = new Pos(-5.5, 82.0, -12.5);
    private static final Pos SLAB_BLOCK_OFFSET_4 = new Pos(6.5, 82.0, -12.5);
    private static final Pos SLAB_BLOCK_OFFSET_5 = new Pos(10.5, 82.0, -12.5);
-   private static final Vec3d MIDDLE_MAP_COORDS = new Vec3d(-104.5, 0.0, -104.5);
+   private static final class_243 MIDDLE_MAP_COORDS = new class_243(-104.5, 0.0, -104.5);
    private Room targetRoom;
    private Room startRoom;
    private int serverTickTimer = -1;
@@ -164,8 +163,8 @@ public class BloodBlink extends Module {
 
    @SubscribeEvent
    public void onTickStart(Start event) {
-      if (Location.getArea() == Island.Dungeon && mc.player != null && !Dungeon.isInBoss()) {
-         ClientPlayerEntity player = mc.player;
+      if (Location.getArea() == Island.Dungeon && mc.field_1724 != null && !Dungeon.isInBoss()) {
+         class_746 player = mc.field_1724;
          if (this.serverTotalTickTimer > 2) {
             switch (this.state) {
                case -1:
@@ -173,36 +172,34 @@ public class BloodBlink extends Module {
                      break;
                   }
 
-                  KeyBinding.unpressAll();
+                  class_304.method_1437();
                   this.state = 0;
-                  // Intentionally fall through to run the initial setup immediately.
                case 0:
                   if (this.targetRoom == null && Dungeon.isStarted()) {
                      RSA.chat("Cannot blood blink while run has started and blood has not been loaded!");
                      this.state = 31;
-                  } else if (mc.world != null) {
+                  } else if (mc.field_1687 != null) {
                      this.forceNextSneak = true;
-                     if (!(Boolean)this.waitForGround.getValue() || player.isOnGround()) {
+                     if (!(Boolean)this.waitForGround.getValue() || player.method_24828()) {
                         this.tryRegisterStartRoomSlabUse(player, 2);
                      }
                   }
-               default:
                   break;
                case 4:
-                  this.pearl(player.getYaw(), -90.0F, () -> this.state = 5);
+                  this.pearl(player.method_36454(), -90.0F, () -> this.state = 5);
                   break;
                case 6:
                   if (this.targetRoom != null) {
                      this.state = 17;
                   } else if (this.serverTickTimer % 40 < ((BigDecimal)this.exploreExit.getValue()).intValue()) {
                      PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> {
-                        if (SwapManager.swapItem(Items.DIAMOND_SHOVEL)) {
-                           float playerYaw = player.getYaw();
-                           float[] angles = EtherUtils.getYawAndPitch(MIDDLE_MAP_COORDS.add(0.0, player.getY(), 0.0), false, player, false);
-                           float deltaX = (float)(player.getX() - MIDDLE_MAP_COORDS.x);
-                           float deltaZ = (float)(player.getZ() - MIDDLE_MAP_COORDS.z);
+                        if (SwapManager.swapItem(class_1802.field_8250)) {
+                           float playerYaw = player.method_36454();
+                           float[] angles = EtherUtils.getYawAndPitch(MIDDLE_MAP_COORDS.method_1031(0.0, player.method_23318(), 0.0), false, player, false);
+                           float deltaX = (float)(player.method_23317() - MIDDLE_MAP_COORDS.field_1352);
+                           float deltaZ = (float)(player.method_23321() - MIDDLE_MAP_COORDS.field_1350);
                            this.aotv0(8, playerYaw, -90.0F);
-                           this.aotv0(Math.round(MathHelper.sqrt(deltaX * deltaX + deltaZ * deltaZ) / 12.0F), angles[0], 0.0F);
+                           this.aotv0(Math.round(class_3532.method_15355(deltaX * deltaX + deltaZ * deltaZ) / 12.0F), angles[0], 0.0F);
                            this.explored = true;
                            this.state = 10;
                         }
@@ -210,112 +207,103 @@ public class BloodBlink extends Module {
                   }
                   break;
                case 11:
-                  if (mc.world != null) {
+                  if (mc.field_1687 != null) {
                      this.forceNextSneak = true;
-                     if (!(Boolean)this.waitForGround.getValue() || player.isOnGround()) {
-                        if (this.ensureValidStartRoom(player)) {
-                           if (this.explored) {
-                              if (this.targetRoom == null) {
-                                 this.findTargetRoom();
-                              }
-
-                              if (this.targetRoom == null) {
-                                 RSA.chat("Could not find target room!");
-                                 this.state = 31;
-                                 return;
-                              }
+                     if ((!(Boolean)this.waitForGround.getValue() || player.method_24828()) && this.ensureValidStartRoom(player)) {
+                        if (this.explored) {
+                           if (this.targetRoom == null) {
+                              this.findTargetRoom();
                            }
 
-                           this.tryRegisterStartRoomSlabUse(player, 13);
+                           if (this.targetRoom == null) {
+                              RSA.chat("Could not find target room!");
+                              this.state = 31;
+                              return;
+                           }
                         }
+
+                        this.tryRegisterStartRoomSlabUse(player, 13);
                      }
                   }
                   break;
                case 15:
-                  this.pearl(player.getYaw(), -90.0F, () -> this.state = 16);
+                  this.pearl(player.method_36454(), -90.0F, () -> this.state = 16);
                   break;
                case 17:
-                  SwapManager.swapItem(Items.DIAMOND_SHOVEL);
+                  SwapManager.swapItem(class_1802.field_8250);
                   if (((Boolean)this.africanSlavePingMode.getValue() && this.ticksTilStart != -67 && this.ticksTilStart <= 0 || Dungeon.isStarted())
                      && this.serverTickTimer % 40 < 40 - ((BigDecimal)this.bloodLoadTickTime.getValue()).intValue()) {
                      this.ticksTilStart = -67;
-                     PacketOrderManager.register(
-                        PacketOrderManager.STATE.ITEM_USE,
-                        () -> {
-                           if (SwapManager.swapItem(Items.DIAMOND_SHOVEL)) {
-                              float playerYaw = player.getYaw();
-                              Direction dir = this.getVoidRotation();
-                              this.aotv0(4, dir.getPositiveHorizontalDegrees(), 0.0F);
-                              this.aotv0(10, playerYaw, 90.0F);
-                              Vec3d playerPos = player.getEntityPos().add(fastRotateVec(dir, 0.0, 0.0, -48.0));
-                              float deltaX = (float)(this.targetRoom.getX() + 0.5 - playerPos.getX());
-                              float deltaZ = (float)(this.targetRoom.getZ() + 0.5 - playerPos.getZ());
-                              float[] angles = EtherUtils.getYawAndPitch(deltaX, 0.0, deltaZ);
-                              this.aotv0(Math.round(MathHelper.sqrt(deltaX * deltaX + deltaZ * deltaZ) / 12.0F), angles[0], 3.0F);
-                              this.aotv0(5, playerYaw, -90.0F);
-                              this.state = 29;
-                              if (SwapManager.swapItem((Predicate<ItemStack>)(this::isValidEnderPearlStack))) {
-                                 if (!SwapManager.sendAirC08(player.getYaw(), -90.0F, true, true)) {
-                                    RSA.chat("Pearl failed!");
-                                 } else {
-                                    this.state = 30;
-                                 }
+                     PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> {
+                        if (SwapManager.swapItem(class_1802.field_8250)) {
+                           float playerYaw = player.method_36454();
+                           class_2350 dir = this.getVoidRotation();
+                           this.aotv0(4, dir.method_10144(), 0.0F);
+                           this.aotv0(10, playerYaw, 90.0F);
+                           class_243 playerPos = player.method_73189().method_1019(fastRotateVec(dir, 0.0, 0.0, -48.0));
+                           float deltaX = (float)(this.targetRoom.getX() + 0.5 - playerPos.method_10216());
+                           float deltaZ = (float)(this.targetRoom.getZ() + 0.5 - playerPos.method_10215());
+                           float[] angles = EtherUtils.getYawAndPitch(deltaX, 0.0, deltaZ);
+                           this.aotv0(Math.round(class_3532.method_15355(deltaX * deltaX + deltaZ * deltaZ) / 12.0F), angles[0], 3.0F);
+                           this.aotv0(5, playerYaw, -90.0F);
+                           this.state = 29;
+                           if (SwapManager.swapItem(this::isValidEnderPearlStack)) {
+                              if (!SwapManager.sendAirC08(player.method_36454(), -90.0F, true, true)) {
+                                 RSA.chat("Pearl failed!");
+                              } else {
+                                 this.state = 30;
                               }
                            }
                         }
-                     );
+                     });
                   }
                   break;
                case 29:
-                  this.pearl(player.getYaw(), -90.0F, () -> this.state = 30);
+                  this.pearl(player.method_36454(), -90.0F, () -> this.state = 30);
             }
          }
       }
    }
 
-   private boolean ensureValidStartRoom(ClientPlayerEntity player) {
+   private boolean ensureValidStartRoom(class_746 player) {
       if (this.startRoom == null) {
-         this.startRoom = ScanUtils.getRoomFromPos(player.getBlockX(), player.getBlockZ());
+         this.startRoom = ScanUtils.getRoomFromPos(player.method_31477(), player.method_31479());
       }
 
-      return this.startRoom != null
-         && this.startRoom.getUniqueRoom() != null
-         && this.startRoom.getUniqueRoom().getRotation() != RoomRotation.UNKNOWN;
+      return this.startRoom != null && this.startRoom.getUniqueRoom() != null && this.startRoom.getUniqueRoom().getRotation() != RoomRotation.UNKNOWN;
    }
 
-   private void tryRegisterStartRoomSlabUse(ClientPlayerEntity player, int nextState) {
-      if (!this.ensureValidStartRoom(player) || mc.world == null) {
-         return;
-      }
+   private void tryRegisterStartRoomSlabUse(class_746 player, int nextState) {
+      if (this.ensureValidStartRoom(player) && mc.field_1687 != null) {
+         PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> {
+            if (SwapManager.swapItem(class_1802.field_8250) && player.method_71091().comp_3164() && this.startRoom != null) {
+               Pos slab = RoomUtils.getRealPosition(this.getSlabBlockOffset(), this.startRoom);
+               class_2248 block = mc.field_1687.method_8320(slab.asBlockPos()).method_26204();
+               if (block == class_2246.field_10124) {
+                  this.isLower = true;
+                  slab.selfAdd(0.0, -1.0, 0.0);
+               }
 
-      PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> {
-         if (SwapManager.swapItem(Items.DIAMOND_SHOVEL) && player.getLastPlayerInput().sneak() && this.startRoom != null) {
-            Pos slab = RoomUtils.getRealPosition(this.getSlabBlockOffset(), this.startRoom);
-            Block block = mc.world.getBlockState(slab.asBlockPos()).getBlock();
-            if (block == Blocks.AIR) {
-               this.isLower = true;
-               slab.selfAdd(0.0, -1.0, 0.0);
+               float[] angles = EtherUtils.getYawAndPitch(slab.asVec3(), true, player, true);
+               SwapManager.sendAirC08(angles[0], angles[1], true, false);
+               this.state = nextState;
             }
-
-            float[] angles = EtherUtils.getYawAndPitch(slab.asVec3(), true, player, true);
-            SwapManager.sendAirC08(angles[0], angles[1], true, false);
-            this.state = nextState;
-         }
-      });
+         });
+      }
    }
 
-   private Direction getVoidRotation() {
+   private class_2350 getVoidRotation() {
       int xIndex = (this.startRoom.getX() + 185) / 32;
       int zIndex = (this.startRoom.getZ() + 185) / 32;
-      Direction rotation;
+      class_2350 rotation;
       if (xIndex == 0) {
-         rotation = Direction.WEST;
+         rotation = class_2350.field_11039;
       } else if (zIndex == 0) {
-         rotation = Direction.NORTH;
+         rotation = class_2350.field_11043;
       } else if (xIndex > zIndex) {
-         rotation = Direction.EAST;
+         rotation = class_2350.field_11034;
       } else {
-         rotation = Direction.SOUTH;
+         rotation = class_2350.field_11035;
       }
 
       return rotation;
@@ -325,17 +313,17 @@ public class BloodBlink extends Module {
       return s.equals("ENDER_PEARL");
    }
 
-   private boolean isValidEnderPearlStack(ItemStack stack) {
-      return stack.getItem() == Items.ENDER_PEARL && this.isNormalEnderpearlID(ItemUtils.getID(stack));
+   private boolean isValidEnderPearlStack(class_1799 stack) {
+      return stack.method_7909() == class_1802.field_8634 && this.isNormalEnderpearlID(ItemUtils.getID(stack));
    }
 
-   private static Vec3d fastRotateVec(Direction direction, double x, double y, double z) {
+   private static class_243 fastRotateVec(class_2350 direction, double x, double y, double z) {
       return switch (direction) {
-         case NORTH -> new Vec3d(x, y, z);
-         case EAST -> new Vec3d(-z, y, x);
-         case SOUTH -> new Vec3d(-x, y, -z);
-         case WEST -> new Vec3d(z, y, -x);
-         default -> Vec3d.ZERO;
+         case field_11043 -> new class_243(x, y, z);
+         case field_11034 -> new class_243(-z, y, x);
+         case field_11035 -> new class_243(-x, y, -z);
+         case field_11039 -> new class_243(z, y, -x);
+         default -> class_243.field_1353;
       };
    }
 
@@ -352,17 +340,17 @@ public class BloodBlink extends Module {
    public void doBlink() {
       this.resetState();
       this.state = 0;
-      KeyBinding.unpressAll();
+      class_304.method_1437();
    }
 
    @SubscribeEvent
    public void onPollInputs(InputPollEvent event) {
       if (this.isEnabled() && this.isBlinking() && !Dungeon.isInBoss()) {
-         PlayerInput input = event.getClientInput();
-         if (input.forward() && input.backward() && input.left() && input.right()) {
+         class_10185 input = event.getClientInput();
+         if (input.comp_3159() && input.comp_3160() && input.comp_3161() && input.comp_3162()) {
             this.cancel();
          } else {
-            PlayerInput newInputs = new PlayerInput(false, false, false, false, false, this.forceNextSneak, false);
+            class_10185 newInputs = new class_10185(false, false, false, false, false, this.forceNextSneak, false);
             this.forceNextSneak = false;
             event.getInput().apply(newInputs);
          }
@@ -377,12 +365,8 @@ public class BloodBlink extends Module {
 
    private void pearl(float yaw, float pitch, Runnable succeed) {
       PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, () -> {
-         if (SwapManager.swapItem((Predicate<ItemStack>)(this::isValidEnderPearlStack))) {
-            if (SwapManager.sendAirC08(yaw, pitch, true, false)) {
-               if (succeed != null) {
-                  succeed.run();
-               }
-            }
+         if (SwapManager.swapItem(this::isValidEnderPearlStack) && SwapManager.sendAirC08(yaw, pitch, true, false) && succeed != null) {
+            succeed.run();
          }
       });
    }
@@ -397,24 +381,22 @@ public class BloodBlink extends Module {
 
    @SubscribeEvent
    public void onChat(Chat event) {
-      if (Location.getArea() == Island.Dungeon && MinecraftClient.getInstance().player != null) {
-         if (event.getMessage().getString().equals("Starting in 1 second.")) {
-            this.ticksTilStart = Math.max(20 - ((BigDecimal)this.earlyExit.getValue()).intValue(), 0);
-            AutoGfs.tryGetItem(16, "ENDER_PEARL", true);
-         }
+      if (Location.getArea() == Island.Dungeon && class_310.method_1551().field_1724 != null && event.getMessage().getString().equals("Starting in 1 second.")) {
+         this.ticksTilStart = Math.max(20 - ((BigDecimal)this.earlyExit.getValue()).intValue(), 0);
+         AutoGfs.tryGetItem(16, "ENDER_PEARL", true);
       }
    }
 
    @SubscribeEvent
    public void onReceivePacket(Receive event) {
       if (this.isBlinking() && !Dungeon.isInBoss()) {
-         Packet<?> packet = event.getPacket();
-         if (packet instanceof WorldTimeUpdateS2CPacket timePacket) {
-            long time = timePacket.time();
+         class_2596<?> packet = event.getPacket();
+         if (packet instanceof class_2761 timePacket) {
+            long time = timePacket.comp_3219();
             this.serverTickTimer = (int)(time + ((BigDecimal)this.deathTickOffset.getValue()).intValue()) % 40;
          }
 
-         if (packet instanceof PlayerPositionLookS2CPacket positionLookPacket) {
+         if (packet instanceof class_2708 positionLookPacket) {
             boolean isProxyPearlActive = (Boolean)this.proxyPearl.getValue() && Util.isZero();
             switch (this.state) {
                case 2:
@@ -426,7 +408,7 @@ public class BloodBlink extends Module {
                   }
                   break;
                case 5:
-                  if (positionLookPacket.change().position().y <= (this.isLower ? 97.0 : 98.0)) {
+                  if (positionLookPacket.comp_3228().comp_3148().field_1351 <= (this.isLower ? 97.0 : 98.0)) {
                      if (isProxyPearlActive) {
                         return;
                      }
@@ -437,7 +419,7 @@ public class BloodBlink extends Module {
                   }
                   break;
                case 10:
-                  double y = positionLookPacket.change().position().y;
+                  double y = positionLookPacket.comp_3228().comp_3148().field_1351;
                   if (y == 76.5 || y == 75.5) {
                      this.state = 11;
                   }
@@ -451,7 +433,7 @@ public class BloodBlink extends Module {
                   }
                   break;
                case 16:
-                  if (positionLookPacket.change().position().y <= (this.isLower ? 97.0 : 98.0)) {
+                  if (positionLookPacket.comp_3228().comp_3148().field_1351 <= (this.isLower ? 97.0 : 98.0)) {
                      if (isProxyPearlActive) {
                         return;
                      }
@@ -462,10 +444,11 @@ public class BloodBlink extends Module {
                   }
                   break;
                case 30:
-                  Vec3d pos = positionLookPacket.change().position();
-                  boolean isWithinRoomYRange = pos.y >= this.targetRoom.getBottom() - 1 && pos.y <= this.targetRoom.getBottom() + 7;
-                  if (this.isInRoom(MathHelper.floor(pos.getX()), MathHelper.floor(pos.getZ()), this.targetRoom) && isWithinRoomYRange) {
-                     if (pos.y <= this.targetRoom.getBottom() + 1) {
+                  class_243 pos = positionLookPacket.comp_3228().comp_3148();
+                  boolean isWithinRoomYRange = pos.field_1351 >= this.targetRoom.getBottom() - 1 && pos.field_1351 <= this.targetRoom.getBottom() + 7;
+                  if (this.isInRoom(class_3532.method_15357(pos.method_10216()), class_3532.method_15357(pos.method_10215()), this.targetRoom)
+                     && isWithinRoomYRange) {
+                     if (pos.field_1351 <= this.targetRoom.getBottom() + 1) {
                         this.state = 29;
                      } else {
                         this.state = 31;
@@ -486,7 +469,7 @@ public class BloodBlink extends Module {
    }
 
    private boolean isInRoom(int posX, int posZ, Room room) {
-      return MathHelper.abs(room.getX() - posX) < 16 && MathHelper.abs(room.getZ() - posZ) < 16;
+      return class_3532.method_15382(room.getX() - posX) < 16 && class_3532.method_15382(room.getZ() - posZ) < 16;
    }
 
    private void findTargetRoom() {
@@ -528,10 +511,8 @@ public class BloodBlink extends Module {
    }
 
    private void sendStartPearling(int roof) {
-      if (mc.getNetworkHandler() != null) {
-         if (SwapManager.swapItem("ENDER_PEARL")) {
-            TaskComponent.onTick(0L, () -> mc.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(new BloodClipHelperStartPacket(roof))));
-         }
+      if (mc.method_1562() != null && SwapManager.swapItem("ENDER_PEARL")) {
+         TaskComponent.onTick(0L, () -> mc.method_1562().method_52787(new class_2817(new BloodClipHelperStartPacket(roof))));
       }
    }
 

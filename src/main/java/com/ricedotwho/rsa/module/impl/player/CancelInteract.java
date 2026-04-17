@@ -9,43 +9,43 @@ import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.BooleanSetting;
 import com.ricedotwho.rsm.utils.ItemUtils;
 import java.util.List;
-import net.minecraft.item.ItemStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.AbstractCauldronBlock;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.CraftingTableBlock;
-import net.minecraft.block.HopperBlock;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.block.SkullBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_1799;
+import net.minecraft.class_2248;
+import net.minecraft.class_2275;
+import net.minecraft.class_2281;
+import net.minecraft.class_2304;
+import net.minecraft.class_2377;
+import net.minecraft.class_2401;
+import net.minecraft.class_2484;
+import net.minecraft.class_2680;
+import net.minecraft.class_3481;
+import net.minecraft.class_3965;
+import net.minecraft.class_6862;
+import net.minecraft.class_746;
 
 @ModuleInfo(aliases = "Cancel Interact", id = "CancelInteract", category = Category.PLAYER)
 public class CancelInteract extends Module {
    private final BooleanSetting abilityOnly = new BooleanSetting("Ability Only", false);
-   private static final List<Class<?>> WHITELIST = List.of(LeverBlock.class, SkullBlock.class, AbstractCauldronBlock.class, ChestBlock.class);
-   private static final List<TagKey<Block>> WHITELIST_TAGS = List.of(BlockTags.BUTTONS, BlockTags.COPPER_CHESTS);
-   private static final List<Class<?>> BLACKLIST = List.of(HopperBlock.class, CraftingTableBlock.class);
-   private static final List<TagKey<Block>> BLACKLIST_TAGS = List.of(BlockTags.WALLS, BlockTags.FENCES, BlockTags.DIRT);
+   private static final List<Class<?>> WHITELIST = List.of(class_2401.class, class_2484.class, class_2275.class, class_2281.class);
+   private static final List<class_6862<class_2248>> WHITELIST_TAGS = List.of(class_3481.field_15493, class_3481.field_61206);
+   private static final List<Class<?>> BLACKLIST = List.of(class_2377.class, class_2304.class);
+   private static final List<class_6862<class_2248>> BLACKLIST_TAGS = List.of(class_3481.field_15504, class_3481.field_16584, class_3481.field_29822);
 
    public CancelInteract() {
       this.registerProperty(new Setting[]{this.abilityOnly});
    }
 
-   public static boolean shouldCancelInteract(BlockHitResult hit, ClientPlayerEntity player, ItemStack item) {
+   public static boolean shouldCancelInteract(class_3965 hit, class_746 player, class_1799 item) {
       CancelInteract module = (CancelInteract)RSM.getModule(CancelInteract.class);
       if (module.isEnabled() && Location.isInSkyblock()) {
-         BlockState state = player.getEntityWorld().getBlockState(hit.getBlockPos());
-         if (WHITELIST.stream().anyMatch(c -> c.isInstance(state.getBlock())) || WHITELIST_TAGS.stream().anyMatch(state::isIn)) {
-            return false;
-         } else {
+         class_2680 state = player.method_73183().method_8320(hit.method_17777());
+         if (!WHITELIST.stream().anyMatch(c -> c.isInstance(state.method_26204())) && !WHITELIST_TAGS.stream().anyMatch(state::method_26164)) {
             return "ENDER_PEARL".equals(ItemUtils.getID(item))
                ? true
-               : (!(Boolean)module.getAbilityOnly().getValue() || ItemUtils.isAbilityItem(mc.player.getInventory().getSelectedStack()))
-                  && (BLACKLIST_TAGS.stream().anyMatch(state::isIn) || BLACKLIST.stream().anyMatch(c -> c.isInstance(state.getBlock())));
+               : (!(Boolean)module.getAbilityOnly().getValue() || ItemUtils.isAbilityItem(mc.field_1724.method_31548().method_7391()))
+                  && (BLACKLIST_TAGS.stream().anyMatch(state::method_26164) || BLACKLIST.stream().anyMatch(c -> c.isInstance(state.method_26204())));
+         } else {
+            return false;
          }
       } else {
          return false;

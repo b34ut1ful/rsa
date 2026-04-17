@@ -1,25 +1,25 @@
 package com.ricedotwho.rsa.component.impl.pathfinding;
 
 import com.ricedotwho.rsm.utils.EtherUtils;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.class_2338;
 
 public class GoalXYZ implements Goal {
-   private final BlockPos endPos;
+   private final class_2338 endPos;
 
-   public GoalXYZ(BlockPos endPos) {
+   public GoalXYZ(class_2338 endPos) {
       this.endPos = endPos;
    }
 
    @Override
    public boolean test(int x, int y, int z) {
-      return x == this.endPos.getX() && y == this.endPos.getY() && z == this.endPos.getZ();
+      return x == this.endPos.method_10263() && y == this.endPos.method_10264() && z == this.endPos.method_10260();
    }
 
    @Override
    public double heuristic(int x, int y, int z) {
-      int xDif = x - this.endPos.getX();
-      int yDif = y - this.endPos.getY();
-      int zDif = z - this.endPos.getZ();
+      int xDif = x - this.endPos.method_10263();
+      int yDif = y - this.endPos.method_10264();
+      int zDif = z - this.endPos.method_10260();
       return xDif * xDif + yDif * yDif + zDif * zDif;
    }
 

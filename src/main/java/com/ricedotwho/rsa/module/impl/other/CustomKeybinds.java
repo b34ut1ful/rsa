@@ -79,8 +79,8 @@ public class CustomKeybinds extends Module {
    }
 
    private void sendCmd(String cmd) {
-      if (mc.player != null && mc.getNetworkHandler() != null) {
-         mc.getNetworkHandler().sendChatCommand(cmd);
+      if (mc.field_1724 != null && mc.method_1562() != null) {
+         mc.method_1562().method_45730(cmd);
       }
    }
 

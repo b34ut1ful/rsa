@@ -29,20 +29,20 @@ import com.ricedotwho.rsm.utils.render.render3d.type.FilledOutlineBox;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_2246;
+import net.minecraft.class_2338;
+import net.minecraft.class_2350;
+import net.minecraft.class_243;
+import net.minecraft.class_265;
+import net.minecraft.class_2680;
+import net.minecraft.class_310;
+import net.minecraft.class_638;
+import net.minecraft.class_746;
 
 @ModuleInfo(aliases = "AutoSS", id = "AutoSS", category = Category.DUNGEONS)
 public class AutoSS extends Module {
-   private static final Vec3d START_BUTTON = new Vec3d(110.875, 121.5, 91.5);
-   private static final BlockPos DETECT = new BlockPos(110, 123, 92);
+   private static final class_243 START_BUTTON = new class_243(110.875, 121.5, 91.5);
+   private static final class_2338 DETECT = new class_2338(110, 123, 92);
    KeybindSetting resetKey = new KeybindSetting("Reset SS Key", new Keybind(-1, false, null), this::SSR);
    BooleanSetting sendChat = new BooleanSetting("Send SSR Chat Message", true);
    BooleanSetting autoStart = new BooleanSetting("Autostart", true);
@@ -56,62 +56,59 @@ public class AutoSS extends Module {
    private int state = 0;
    private boolean doneFirst = false;
    private boolean doingSS = false;
-   private final List<BlockPos> clicks = new ArrayList<>();
-   private final List<Vec3d> allButtons = new ArrayList<>();
-   private Vec3d clickedButton;
+   private final List<class_2338> clicks = new ArrayList<>();
+   private final List<class_243> allButtons = new ArrayList<>();
+   private class_243 clickedButton;
 
    public AutoSS() {
       this.registerProperty(new Setting[]{this.resetKey, this.sendChat, this.autoStart, this.forceSkyblock, this.clickDelay, this.autoStartDelay});
    }
 
    private void start() {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
-      if (player != null) {
-         if (!(player.squaredDistanceTo(START_BUTTON) > 25.0)) {
-            this.allButtons.clear();
-            RSA.chat("Starting SS!");
-            this.resetState();
-            this.doingSS = true;
-            new Thread(() -> {
-               try {
-                  for (int i = 0; i < 2; i++) {
-                     this.reset();
-                     this.clickButton(START_BUTTON);
-                     Thread.sleep(((BigDecimal)this.autoStartDelay.getValue()).longValue());
-                  }
-
-                  this.doingSS = true;
+      class_746 player = class_310.method_1551().field_1724;
+      if (player != null && !(player.method_5707(START_BUTTON) > 25.0)) {
+         this.allButtons.clear();
+         RSA.chat("Starting SS!");
+         this.resetState();
+         this.doingSS = true;
+         new Thread(() -> {
+            try {
+               for (int i = 0; i < 2; i++) {
+                  this.reset();
                   this.clickButton(START_BUTTON);
-               } catch (Exception var2) {
-                  RSA.chat("Error Occurred");
+                  Thread.sleep(((BigDecimal)this.autoStartDelay.getValue()).longValue());
                }
-            }).start();
-         }
+
+               this.doingSS = true;
+               this.clickButton(START_BUTTON);
+            } catch (Exception var21) {
+               RSA.chat("Error Occurred");
+            }
+         }).start();
       }
    }
 
    @SubscribeEvent
    public void onRender(Last event) {
-      if (this.areaCheck()) {
-         if (System.currentTimeMillis() - this.lastClickTime + 1L >= ((BigDecimal)this.clickDelay.getValue()).longValue()) {
-            if (MinecraftClient.getInstance().world != null && MinecraftClient.getInstance().player != null) {
-               ClientPlayerEntity player = MinecraftClient.getInstance().player;
-               if (!(player.squaredDistanceTo(START_BUTTON) > 25.0)) {
-                  if (MinecraftClient.getInstance().world.getBlockState(DETECT).getBlock() == Blocks.STONE_BUTTON && this.doingSS) {
-                     if (!this.doneFirst && this.clicks.size() == 3) {
-                        this.clicks.removeFirst();
-                        this.allButtons.removeFirst();
-                     }
+      if (this.areaCheck()
+         && System.currentTimeMillis() - this.lastClickTime + 1L >= ((BigDecimal)this.clickDelay.getValue()).longValue()
+         && class_310.method_1551().field_1687 != null
+         && class_310.method_1551().field_1724 != null) {
+         class_746 player = class_310.method_1551().field_1724;
+         if (!(player.method_5707(START_BUTTON) > 25.0)
+            && class_310.method_1551().field_1687.method_8320(DETECT).method_26204() == class_2246.field_10494
+            && this.doingSS) {
+            if (!this.doneFirst && this.clicks.size() == 3) {
+               this.clicks.removeFirst();
+               this.allButtons.removeFirst();
+            }
 
-                     this.doneFirst = true;
-                     if (this.state < this.clicks.size()) {
-                        BlockPos next = this.clicks.get(this.state);
-                        if (MinecraftClient.getInstance().world.getBlockState(next).getBlock() == Blocks.STONE_BUTTON) {
-                           this.clickButton(Vec3d.of(next));
-                           this.state++;
-                        }
-                     }
-                  }
+            this.doneFirst = true;
+            if (this.state < this.clicks.size()) {
+               class_2338 next = this.clicks.get(this.state);
+               if (class_310.method_1551().field_1687.method_8320(next).method_26204() == class_2246.field_10494) {
+                  this.clickButton(class_243.method_24954(next));
+                  this.state++;
                }
             }
          }
@@ -126,34 +123,30 @@ public class AutoSS extends Module {
 
    @SubscribeEvent
    public void onRenderButtons(Extract event) {
-      if (this.areaCheck()) {
-         if (MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().world != null) {
-            ClientWorld level = MinecraftClient.getInstance().world;
-            if (System.currentTimeMillis() - this.lastClickTime > ((BigDecimal)this.clickDelay.getValue()).longValue()) {
-               this.clickedButton = null;
-            }
+      if (this.areaCheck() && class_310.method_1551().field_1724 != null && class_310.method_1551().field_1687 != null) {
+         class_638 level = class_310.method_1551().field_1687;
+         if (System.currentTimeMillis() - this.lastClickTime > ((BigDecimal)this.clickDelay.getValue()).longValue()) {
+            this.clickedButton = null;
+         }
 
-            if (!(MinecraftClient.getInstance().player.squaredDistanceTo(START_BUTTON) >= 1600.0)) {
-               if (this.clickedButton != null) {
-                  this.renderButton(level, BlockPos.ofFloored(this.clickedButton), this.fillColor.getValue(), this.outlineColor.getValue());
-               }
-            }
+         if (!(class_310.method_1551().field_1724.method_5707(START_BUTTON) >= 1600.0) && this.clickedButton != null) {
+            this.renderButton(level, class_2338.method_49638(this.clickedButton), this.fillColor.getValue(), this.outlineColor.getValue());
          }
       }
    }
 
-   private void renderButton(ClientWorld level, BlockPos pos, Colour colorFill, Colour colorOutline) {
-      BlockState state = level.getBlockState(pos);
-      VoxelShape shape = state.getOutlineShape(level, pos);
-      if (!shape.isEmpty()) {
-         Renderer3D.addTask(new FilledOutlineBox(shape.getBoundingBox().offset(pos), colorFill, colorOutline, false));
+   private void renderButton(class_638 level, class_2338 pos, Colour colorFill, Colour colorOutline) {
+      class_2680 state = level.method_8320(pos);
+      class_265 shape = state.method_26218(level, pos);
+      if (!shape.method_1110()) {
+         Renderer3D.addTask(new FilledOutlineBox(shape.method_1107().method_996(pos), colorFill, colorOutline, false));
       }
    }
 
-   private void clickButton(Vec3d vec3) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   private void clickButton(class_243 vec3) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null) {
-         if (player.squaredDistanceTo(vec3) > 36.0) {
+         if (player.method_5707(vec3) > 36.0) {
             RSA.chat("Button too far!");
          } else {
             this.lastClickTime = System.currentTimeMillis();
@@ -162,14 +155,14 @@ public class AutoSS extends Module {
       }
    }
 
-   private void clickButton0(Vec3d vec3) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+   private void clickButton0(class_243 vec3) {
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null) {
-         if (player.squaredDistanceTo(vec3) > 36.0) {
+         if (player.method_5707(vec3) > 36.0) {
             RSA.chat("Button too far!");
          } else {
             this.clickedButton = vec3;
-            SwapManager.sendBlockC08(vec3, Direction.WEST, true, false);
+            SwapManager.sendBlockC08(vec3, class_2350.field_11039, true, false);
          }
       }
    }
@@ -181,43 +174,43 @@ public class AutoSS extends Module {
 
    @SubscribeEvent
    public void onChatMessage(Chat event) {
-      if (this.areaCheck() && (Boolean)this.autoStart.getValue()) {
-         if (MinecraftClient.getInstance().player != null) {
-            String msg = event.getMessage().getString();
-            if (msg.equals("[BOSS] Goldor: Who dares trespass into my domain?")) {
-               this.start();
-            }
+      if (this.areaCheck() && (Boolean)this.autoStart.getValue() && class_310.method_1551().field_1724 != null) {
+         String msg = event.getMessage().getString();
+         if (msg.equals("[BOSS] Goldor: Who dares trespass into my domain?")) {
+            this.start();
          }
       }
    }
 
    @SubscribeEvent
    public void onBlockChange(BlockChangeEvent event) {
-      BlockPos pos = event.getBlockPos();
-      if (event.getNewState().getBlock() == Blocks.SEA_LANTERN) {
-         if (this.areaCheck()) {
-            if (pos.getX() == 111 && pos.getY() >= 120 && pos.getY() <= 123 && pos.getZ() >= 92 && pos.getZ() <= 95) {
-               BlockPos button = new BlockPos(110, event.getBlockPos().getY(), event.getBlockPos().getZ());
-               if (this.clicks.size() == 2 && this.clicks.getFirst().equals(button) && !this.doneFirst) {
-                  this.doneFirst = true;
-                  this.clicks.removeFirst();
-                  this.allButtons.removeFirst();
-               }
+      class_2338 pos = event.getBlockPos();
+      if (event.getNewState().method_26204() == class_2246.field_10174
+         && this.areaCheck()
+         && pos.method_10263() == 111
+         && pos.method_10264() >= 120
+         && pos.method_10264() <= 123
+         && pos.method_10260() >= 92
+         && pos.method_10260() <= 95) {
+         class_2338 button = new class_2338(110, event.getBlockPos().method_10264(), event.getBlockPos().method_10260());
+         if (this.clicks.size() == 2 && this.clicks.getFirst().equals(button) && !this.doneFirst) {
+            this.doneFirst = true;
+            this.clicks.removeFirst();
+            this.allButtons.removeFirst();
+         }
 
-               if (!this.clicks.contains(button)) {
-                  this.state = 0;
-                  this.clicks.add(button);
-                  this.allButtons.add(Vec3d.of(button));
-               }
-            }
+         if (!this.clicks.contains(button)) {
+            this.state = 0;
+            this.clicks.add(button);
+            this.allButtons.add(class_243.method_24954(button));
          }
       }
    }
 
    public void SSR() {
       if (this.areaCheck()) {
-         if ((Boolean)this.sendChat.getValue() && MinecraftClient.getInstance().getNetworkHandler() != null) {
-            MinecraftClient.getInstance().getNetworkHandler().sendChatCommand("pc SSRS! blame tps");
+         if ((Boolean)this.sendChat.getValue() && class_310.method_1551().method_1562() != null) {
+            class_310.method_1551().method_1562().method_45730("pc SSRS! blame tps");
          }
 
          this.start();
@@ -289,15 +282,15 @@ public class AutoSS extends Module {
       return this.doingSS;
    }
 
-   public List<BlockPos> getClicks() {
+   public List<class_2338> getClicks() {
       return this.clicks;
    }
 
-   public List<Vec3d> getAllButtons() {
+   public List<class_243> getAllButtons() {
       return this.allButtons;
    }
 
-   public Vec3d getClickedButton() {
+   public class_243 getClickedButton() {
       return this.clickedButton;
    }
 }

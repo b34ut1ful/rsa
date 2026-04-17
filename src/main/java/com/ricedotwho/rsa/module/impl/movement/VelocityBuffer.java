@@ -13,16 +13,16 @@ import com.ricedotwho.rsm.ui.clickgui.settings.impl.DragSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.KeybindSetting;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.class_1109;
+import net.minecraft.class_2596;
+import net.minecraft.class_2708;
+import net.minecraft.class_2743;
+import net.minecraft.class_310;
+import net.minecraft.class_3414;
+import net.minecraft.class_3417;
+import net.minecraft.class_6373;
+import net.minecraft.class_746;
+import net.minecraft.class_8042;
 import org.joml.Vector2d;
 
 @ModuleInfo(aliases = "VelocityBuffer", id = "VelocityBuffer", category = Category.MOVEMENT, hasKeybind = true)
@@ -31,8 +31,8 @@ public class VelocityBuffer extends Module {
    private final KeybindSetting popKey = new KeybindSetting("Queue Pop Key", new Keybind(-1, false, this::popQueue));
    private final DragSetting gui = new DragSetting("Velocity Buffer Hud", new Vector2d(100.0, 100.0), new Vector2d(144.0, 80.0));
    private int bufferedCount = 0;
-   private static final Set<Class<? extends Packet<?>>> PACKET_SET = Set.of(CommonPingS2CPacket.class, BundleS2CPacket.class);
-   private final ConcurrentLinkedQueue<Packet<?>> queue = new ConcurrentLinkedQueue<>();
+   private static final Set<Class<? extends class_2596<?>>> PACKET_SET = Set.of(class_6373.class, class_8042.class);
+   private final ConcurrentLinkedQueue<class_2596<?>> queue = new ConcurrentLinkedQueue<>();
 
    public VelocityBuffer() {
       this.registerProperty(new Setting[]{this.popKey, this.gui});
@@ -44,7 +44,7 @@ public class VelocityBuffer extends Module {
          this.gui
             .renderScaled(
                event.getGfx(),
-               () -> event.getGfx().drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, "Buffered Packets : " + this.bufferedCount, 0, 0, -1),
+               () -> event.getGfx().method_25300(class_310.method_1551().field_1772, "Buffered Packets : " + this.bufferedCount, 0, 0, -1),
                10.0F,
                10.0F
             );
@@ -62,7 +62,7 @@ public class VelocityBuffer extends Module {
       }
    }
 
-   public static boolean onReceivePacketPre(Packet<?> packet) {
+   public static boolean onReceivePacketPre(class_2596<?> packet) {
       if (INSTANCE == null) {
          INSTANCE = (VelocityBuffer)RSM.getModule(VelocityBuffer.class);
       }
@@ -70,21 +70,21 @@ public class VelocityBuffer extends Module {
       return INSTANCE.onReceivePacket(packet);
    }
 
-   private boolean onReceivePacket(Packet<?> packet) {
+   private boolean onReceivePacket(class_2596<?> packet) {
       synchronized (this.queue) {
-         if (MinecraftClient.getInstance().player == null || !this.isEnabled()) {
+         if (class_310.method_1551().field_1724 == null || !this.isEnabled()) {
             return false;
-         } else if (packet instanceof PlayerPositionLookS2CPacket) {
+         } else if (packet instanceof class_2708) {
             this.onKeyToggle();
             return false;
-         } else if (this.isMotionPacket(packet, MinecraftClient.getInstance().player)) {
+         } else if (this.isMotionPacket(packet, class_310.method_1551().field_1724)) {
             this.queue.add(packet);
             this.bufferedCount++;
-            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master((SoundEvent)SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), 0.5F, 0.5F));
+            class_310.method_1551().method_1483().method_4873(class_1109.method_4757((class_3414)class_3417.field_14622.comp_349(), 0.5F, 0.5F));
             return true;
          } else {
-            if (packet instanceof BundleS2CPacket bundlePacket) {
-               bundlePacket.getPackets().forEach(p -> System.out.println(p.getClass()));
+            if (packet instanceof class_8042 bundlePacket) {
+               bundlePacket.method_48324().forEach(p -> System.out.println(p.getClass()));
             }
 
             if (!PACKET_SET.contains(packet.getClass())) {
@@ -115,18 +115,18 @@ public class VelocityBuffer extends Module {
    }
 
    public void popQueue() {
-      if (MinecraftClient.getInstance().player != null) {
+      if (class_310.method_1551().field_1724 != null) {
          synchronized (this.queue) {
             if (this.queue.isEmpty()) {
                return;
             }
 
             while (!this.queue.isEmpty()) {
-               Packet<?> packet = this.queue.poll();
+               class_2596<?> packet = this.queue.poll();
                this.receivePacket(packet);
-               if (this.isMotionPacket(packet, MinecraftClient.getInstance().player)) {
+               if (this.isMotionPacket(packet, class_310.method_1551().field_1724)) {
                   this.bufferedCount--;
-                  if (!this.queue.stream().anyMatch(p -> this.isMotionPacket((Packet<?>)p, MinecraftClient.getInstance().player))) {
+                  if (!this.queue.stream().anyMatch(p -> this.isMotionPacket((class_2596<?>)p, class_310.method_1551().field_1724))) {
                      this.flush();
                      if (this.isEnabled()) {
                         this.onKeyToggle();
@@ -137,18 +137,18 @@ public class VelocityBuffer extends Module {
             }
          }
 
-         MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master((SoundEvent)SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), 2.0F, 2.0F));
+         class_310.method_1551().method_1483().method_4873(class_1109.method_4757((class_3414)class_3417.field_14622.comp_349(), 2.0F, 2.0F));
       }
    }
 
-   private void receivePacket(Packet<?> packet) {
-      if (MinecraftClient.getInstance().getNetworkHandler() != null) {
-         ((Packet)packet).apply(MinecraftClient.getInstance().getNetworkHandler());
+   private void receivePacket(class_2596<?> packet) {
+      if (class_310.method_1551().method_1562() != null) {
+         packet.method_65081(class_310.method_1551().method_1562());
       }
    }
 
-   private boolean isMotionPacket(Packet<?> packet, ClientPlayerEntity player) {
-      return packet instanceof EntityVelocityUpdateS2CPacket motionPacket && motionPacket.getEntityId() == player.getId();
+   private boolean isMotionPacket(class_2596<?> packet, class_746 player) {
+      return packet instanceof class_2743 motionPacket && motionPacket.method_11818() == player.method_5628();
    }
 
    private void flush() {

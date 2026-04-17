@@ -17,7 +17,7 @@ public class Jump extends ModComponent {
 
    @SubscribeEvent
    public void onInput(InputPollEvent event) {
-      if (jump && mc.player != null && mc.player.isOnGround() && !mc.options.jumpKey.isPressed()) {
+      if (jump && mc.field_1724 != null && mc.field_1724.method_24828() && !mc.field_1690.field_1903.method_1434()) {
          jump = false;
          event.getInput().jump(true);
       }

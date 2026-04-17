@@ -9,11 +9,11 @@ import com.ricedotwho.rsm.data.Colour;
 import com.ricedotwho.rsm.data.MutableInput;
 import com.ricedotwho.rsm.data.Pos;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.class_10185;
+import net.minecraft.class_243;
+import net.minecraft.class_304;
+import net.minecraft.class_310;
+import net.minecraft.class_3532;
 
 public class StopRing extends Ring {
    public StopRing(Pos min, Pos max, ArgumentManager manage, SubActionManager actions) {
@@ -31,7 +31,7 @@ public class StopRing extends Ring {
 
    @Override
    public boolean run() {
-      KeyBinding.unpressAll();
+      class_304.method_1437();
       return false;
    }
 
@@ -51,23 +51,23 @@ public class StopRing extends Ring {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
-      if (MinecraftClient.getInstance().player == null) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
+      if (class_310.method_1551().field_1724 == null) {
          return true;
       } else {
-         Vec3d velocity = MinecraftClient.getInstance().player.getVelocity();
-         double speedSq = velocity.horizontalLengthSquared();
+         class_243 velocity = class_310.method_1551().field_1724.method_18798();
+         double speedSq = velocity.method_37268();
          if (speedSq < 1.0E-4) {
             return true;
          } else {
-            float yaw = (float)Math.toRadians(MinecraftClient.getInstance().player.getYaw());
-            float fwdX = -MathHelper.sin(yaw);
-            float fwdZ = MathHelper.cos(yaw);
-            float rightX = MathHelper.cos(yaw);
-            float rightZ = MathHelper.sin(yaw);
-            double fwdDot = velocity.x * fwdX + velocity.z * fwdZ;
-            double rightDot = velocity.x * rightX + velocity.z * rightZ;
-            double accel = MinecraftClient.getInstance().player.getMovementSpeed() * 0.98;
+            float yaw = (float)Math.toRadians(class_310.method_1551().field_1724.method_36454());
+            float fwdX = -class_3532.method_15374(yaw);
+            float fwdZ = class_3532.method_15362(yaw);
+            float rightX = class_3532.method_15362(yaw);
+            float rightZ = class_3532.method_15374(yaw);
+            double fwdDot = velocity.field_1352 * fwdX + velocity.field_1350 * fwdZ;
+            double rightDot = velocity.field_1352 * rightX + velocity.field_1350 * rightZ;
+            double accel = class_310.method_1551().field_1724.method_6029() * 0.98;
             double baseNextSq = MovementPredictor.squaredAfterTick(fwdDot, rightDot, 0.0, 0.0);
             boolean pressFwd = fwdDot < -0.01 && MovementPredictor.squaredAfterTick(fwdDot, rightDot, accel, 0.0) < baseNextSq;
             boolean pressBack = fwdDot > 0.01 && MovementPredictor.squaredAfterTick(fwdDot, rightDot, -accel, 0.0) < baseNextSq;

@@ -19,10 +19,10 @@ import com.ricedotwho.rsm.utils.DungeonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.item.ArrowItem;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.class_1533;
+import net.minecraft.class_1744;
+import net.minecraft.class_238;
+import net.minecraft.class_243;
 import org.jetbrains.annotations.NotNull;
 
 @ModuleInfo(aliases = "Align Aura", id = "AlignAura", category = Category.DUNGEONS)
@@ -40,7 +40,7 @@ public class AlignAura extends Module {
    };
    private static final Pos DEVICE_MIDDLE = new Pos(-3.0, 120.0, 77.0);
    private static final Pos DEVICE_CORNER = new Pos(-2.0, 120.0, 75.0);
-   private static final Box DEVICE_BOX = new Box(-1.0, 119.0, 74.0, -4.0, 125.0, 80.0);
+   private static final class_238 DEVICE_BOX = new class_238(-1.0, 119.0, 74.0, -4.0, 125.0, 80.0);
    private final long[] recentClicks = new long[25];
    private AlignAura.FrameData[] currentFrames = null;
 
@@ -51,9 +51,9 @@ public class AlignAura extends Module {
                || (Boolean)((ClickGUI)Objects.requireNonNull((ClickGUI)RSM.getModule(ClickGUI.class))).getForceSkyBlock().getValue()
          )
          && DungeonUtils.isPhase(Phase7.P3)) {
-         assert mc.player != null;
+         assert mc.field_1724 != null;
 
-         if (mc.player.squaredDistanceTo(DEVICE_MIDDLE.x(), DEVICE_MIDDLE.y(), DEVICE_MIDDLE.z()) > 100.0) {
+         if (mc.field_1724.method_5649(DEVICE_MIDDLE.x(), DEVICE_MIDDLE.y(), DEVICE_MIDDLE.z()) > 100.0) {
             this.currentFrames = null;
          } else {
             PacketOrderManager.register(PacketOrderManager.STATE.ITEM_USE, this::aura);
@@ -63,7 +63,7 @@ public class AlignAura extends Module {
 
    private void aura() {
       this.currentFrames = this.getCurrentFrames();
-      if (this.currentFrames.length != 0 && mc.getNetworkHandler() != null && mc.player != null && mc.interactionManager != null && mc.world != null) {
+      if (this.currentFrames.length != 0 && mc.method_1562() != null && mc.field_1724 != null && mc.field_1761 != null && mc.field_1687 != null) {
          int[] rotations = new int[25];
 
          for (int i = 0; i < 25; i++) {
@@ -92,10 +92,10 @@ public class AlignAura extends Module {
 
                            for (int i = 0; i < clicksNeeded; i++) {
                               frame.rotation = (frame.rotation + 1) % 8;
-                              Vec3d vec3 = this.clamp(
-                                    frame.entity.getBoundingBox(), mc.player.getEntityPos().add(0.0, mc.player.getStandingEyeHeight(), 0.0)
+                              class_243 vec3 = this.clamp(
+                                    frame.entity.method_5829(), mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_5751(), 0.0)
                                  )
-                                 .subtract(frame.entity.getX(), frame.entity.getY(), frame.entity.getZ());
+                                 .method_1023(frame.entity.method_23317(), frame.entity.method_23318(), frame.entity.method_23321());
                               InteractUtils.interactOnEntity(frame.entity, vec3);
                            }
                            break;
@@ -108,11 +108,11 @@ public class AlignAura extends Module {
       }
    }
 
-   private Vec3d clamp(Box aabb, Vec3d vec3) {
-      return new Vec3d(
-         this.clamp(vec3.x, aabb.minX, aabb.maxX),
-         this.clamp(vec3.y, aabb.minY, aabb.maxY),
-         this.clamp(vec3.z, aabb.minZ, aabb.maxZ)
+   private class_243 clamp(class_238 aabb, class_243 vec3) {
+      return new class_243(
+         this.clamp(vec3.field_1352, aabb.field_1323, aabb.field_1320),
+         this.clamp(vec3.field_1351, aabb.field_1322, aabb.field_1325),
+         this.clamp(vec3.field_1350, aabb.field_1321, aabb.field_1324)
       );
    }
 
@@ -143,16 +143,16 @@ public class AlignAura extends Module {
    private AlignAura.FrameData[] getCurrentFrames() {
       AlignAura.FrameData[] array = new AlignAura.FrameData[25];
 
-      assert mc.world != null;
+      assert mc.field_1687 != null;
 
-      for (ItemFrameEntity itemFrame : mc.world.getEntitiesByClass(ItemFrameEntity.class, DEVICE_BOX, e -> e.getHeldItemStack().getItem() instanceof ArrowItem)) {
-         int dy = (int)(itemFrame.getBlockY() - DEVICE_CORNER.y());
-         int dz = (int)(itemFrame.getBlockZ() - DEVICE_CORNER.z());
+      for (class_1533 itemFrame : mc.field_1687.method_8390(class_1533.class, DEVICE_BOX, e -> e.method_6940().method_7909() instanceof class_1744)) {
+         int dy = (int)(itemFrame.method_31478() - DEVICE_CORNER.y());
+         int dz = (int)(itemFrame.method_31479() - DEVICE_CORNER.z());
          int index = dy + dz * 5;
          if (this.currentFrames != null && System.currentTimeMillis() - this.recentClicks[index] < 1000L) {
             array[index] = this.currentFrames[index];
          } else {
-            int rotation = itemFrame.getRotation();
+            int rotation = itemFrame.method_6934();
             array[index] = new AlignAura.FrameData(itemFrame, rotation);
          }
       }
@@ -181,8 +181,8 @@ public class AlignAura extends Module {
       return null;
    }
 
-   private double getDistanceToFrame(ItemFrameEntity frame) {
-      return mc.player.getEyePos().squaredDistanceTo(frame.getEntityPos());
+   private double getDistanceToFrame(class_1533 frame) {
+      return mc.field_1724.method_33571().method_1025(frame.method_73189());
    }
 
    private int countFramesToSolve(int[] solution) {
@@ -214,10 +214,10 @@ public class AlignAura extends Module {
    }
 
    private static class FrameData {
-      public ItemFrameEntity entity;
+      public class_1533 entity;
       public int rotation;
 
-      FrameData(ItemFrameEntity entity, int rotation) {
+      FrameData(class_1533 entity, int rotation) {
          this.entity = entity;
          this.rotation = rotation;
       }

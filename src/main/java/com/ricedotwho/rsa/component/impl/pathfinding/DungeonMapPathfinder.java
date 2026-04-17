@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.class_3532;
 
 public class DungeonMapPathfinder {
    private DungeonMapPathfinder() {
@@ -104,7 +104,7 @@ public class DungeonMapPathfinder {
       }
 
       public int heuristic() {
-         return MathHelper.abs(this.x - this.endX) + MathHelper.abs(this.z - this.endZ);
+         return class_3532.method_15382(this.x - this.endX) + class_3532.method_15382(this.z - this.endZ);
       }
 
       public List<DungeonMapPathfinder.RoomNode> getNeighbors() {
@@ -125,8 +125,7 @@ public class DungeonMapPathfinder {
                && doorX < 11
                && doorZ < 11
                && DungeonInfo.getDungeonList()[newX * 2 + newZ * 22] instanceof Room newRoom
-               && (newRoom.getUniqueRoom() == this.room.getUniqueRoom()
-                  || DungeonInfo.getDungeonList()[doorX + doorZ * 11] instanceof Door)) {
+               && (newRoom.getUniqueRoom() == this.room.getUniqueRoom() || DungeonInfo.getDungeonList()[doorX + doorZ * 11] instanceof Door)) {
                neighbors.add(new DungeonMapPathfinder.RoomNode(newRoom, this, this.endX, this.endZ));
             }
          }

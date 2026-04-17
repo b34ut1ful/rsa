@@ -2,10 +2,10 @@ package com.ricedotwho.rsa.component.impl.pathfinding;
 
 import java.util.List;
 import java.util.function.Predicate;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.class_2338;
 
 public class PathNode {
-   private final BlockPos pos;
+   private final class_2338 pos;
    private final double heuristicCost;
    public int heapPosition;
    private PathNode parent;
@@ -13,7 +13,7 @@ public class PathNode {
    private float pitch = Float.MIN_VALUE;
    private int index;
 
-   public PathNode(BlockPos pos, PathNode parent, Goal goal) {
+   public PathNode(class_2338 pos, PathNode parent, Goal goal) {
       this.pos = pos;
       this.parent = parent;
       this.index = parent == null ? 0 : parent.index + 1;
@@ -32,17 +32,17 @@ public class PathNode {
    @Override
    public int hashCode() {
       long hash = 3241L;
-      hash = 3457689L * hash + this.pos.getX();
-      hash = 8734625L * hash + this.pos.getY();
-      hash = 2873465L * hash + this.pos.getZ();
+      hash = 3457689L * hash + this.pos.method_10263();
+      hash = 8734625L * hash + this.pos.method_10264();
+      hash = 2873465L * hash + this.pos.method_10260();
       return (int)hash;
    }
 
-   public static int hashCode(BlockPos pos) {
+   public static int hashCode(class_2338 pos) {
       long hash = 3241L;
-      hash = 3457689L * hash + pos.getX();
-      hash = 8734625L * hash + pos.getY();
-      hash = 2873465L * hash + pos.getZ();
+      hash = 3457689L * hash + pos.method_10263();
+      hash = 8734625L * hash + pos.method_10264();
+      hash = 2873465L * hash + pos.method_10260();
       return (int)hash;
    }
 
@@ -50,7 +50,7 @@ public class PathNode {
       return this.parent;
    }
 
-   private void testOffset(Predicate<BlockPos> predicate, List<BlockPos> blocks, BlockPos pos) {
+   private void testOffset(Predicate<class_2338> predicate, List<class_2338> blocks, class_2338 pos) {
       if (predicate.test(pos)) {
          blocks.add(pos);
       }
@@ -72,12 +72,12 @@ public class PathNode {
    @Override
    public synchronized boolean equals(Object obj) {
       PathNode other = (PathNode)obj;
-      return this.pos.getX() == other.pos.getX()
-         && this.pos.getY() == other.pos.getY()
-         && this.pos.getZ() == other.pos.getZ();
+      return this.pos.method_10263() == other.pos.method_10263()
+         && this.pos.method_10264() == other.pos.method_10264()
+         && this.pos.method_10260() == other.pos.method_10260();
    }
 
-   public BlockPos getPos() {
+   public class_2338 getPos() {
       return this.pos;
    }
 

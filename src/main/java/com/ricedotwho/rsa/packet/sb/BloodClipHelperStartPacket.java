@@ -1,28 +1,28 @@
 package com.ricedotwho.rsa.packet.sb;
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload.Id;
+import net.minecraft.class_2540;
+import net.minecraft.class_2960;
+import net.minecraft.class_8710;
+import net.minecraft.class_9139;
+import net.minecraft.class_8710.class_9154;
 import org.jetbrains.annotations.NotNull;
 
-public record BloodClipHelperStartPacket(int roofHeight) implements CustomPayload {
-   public static final PacketCodec<PacketByteBuf, BloodClipHelperStartPacket> CODEC = CustomPayload.codecOf(
+public record BloodClipHelperStartPacket(int roofHeight) implements class_8710 {
+   public static final class_9139<class_2540, BloodClipHelperStartPacket> CODEC = class_8710.method_56484(
       BloodClipHelperStartPacket::write, BloodClipHelperStartPacket::new
    );
-   public static final Id<BloodClipHelperStartPacket> TYPE = new Id(Identifier.of("zero", "bloodcliphelper/start"));
+   public static final class_9154<BloodClipHelperStartPacket> TYPE = new class_9154(class_2960.method_60655("zero", "bloodcliphelper/start"));
 
-   public BloodClipHelperStartPacket(PacketByteBuf buf) {
-      this(buf.readVarInt());
+   public BloodClipHelperStartPacket(class_2540 buf) {
+      this(buf.method_10816());
    }
 
-   public void write(PacketByteBuf buf) {
-      buf.writeVarInt(this.roofHeight);
+   public void write(class_2540 buf) {
+      buf.method_10804(this.roofHeight);
    }
 
    @NotNull
-   public Id<BloodClipHelperStartPacket> getId() {
+   public class_9154<BloodClipHelperStartPacket> method_56479() {
       return TYPE;
    }
 }

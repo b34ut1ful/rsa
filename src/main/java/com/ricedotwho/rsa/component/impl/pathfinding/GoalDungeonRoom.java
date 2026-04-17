@@ -6,9 +6,9 @@ import com.ricedotwho.rsm.component.impl.map.map.UniqueRoom;
 import com.ricedotwho.rsm.component.impl.map.utils.ScanUtils;
 import java.util.HashMap;
 import java.util.List;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_310;
+import net.minecraft.class_3532;
+import net.minecraft.class_746;
 
 public class GoalDungeonRoom implements Goal {
    private static final float MAX = 1.0E8F;
@@ -26,11 +26,11 @@ public class GoalDungeonRoom implements Goal {
    }
 
    public static GoalDungeonRoom create(UniqueRoom endRoom) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player == null) {
          return null;
       } else {
-         Room startRoom = ScanUtils.getRoomFromPos(player.getBlockX(), player.getBlockZ());
+         Room startRoom = ScanUtils.getRoomFromPos(player.method_31477(), player.method_31479());
          if (startRoom != null && endRoom != null) {
             List<RoomCandidate> candidates = DungeonMapPathfinder.solve(startRoom, (Room)endRoom.getTiles().getFirst());
             if (candidates.isEmpty()) {
@@ -52,7 +52,7 @@ public class GoalDungeonRoom implements Goal {
       if (current != null && current.getUniqueRoom() != null) {
          return current.getUniqueRoom() != this.endRoom
             ? false
-            : current.getRoofHeight() > y && MathHelper.abs(current.getX() - x) <= 14.0F && MathHelper.abs(current.getZ() - z) <= 14.0F;
+            : current.getRoofHeight() > y && class_3532.method_15382(current.getX() - x) <= 14.0F && class_3532.method_15382(current.getZ() - z) <= 14.0F;
       } else {
          return false;
       }

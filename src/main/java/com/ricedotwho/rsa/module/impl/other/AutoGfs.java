@@ -14,9 +14,9 @@ import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.BooleanSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import java.math.BigDecimal;
-import net.minecraft.item.ItemStack;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_1799;
+import net.minecraft.class_310;
+import net.minecraft.class_746;
 
 @ModuleInfo(aliases = "Auto Gfs", id = "AutoGfs", category = Category.OTHER)
 public class AutoGfs extends Module {
@@ -36,27 +36,25 @@ public class AutoGfs extends Module {
 
    @SubscribeEvent
    public void onTick(Start event) {
-      if (Location.getArea() != Island.Unknown) {
-         if (this.worldLoaded) {
-            ClientPlayerEntity player = MinecraftClient.getInstance().player;
-            if (player != null) {
-               if (this.globalDelay > 0) {
-                  this.globalDelay--;
-               } else {
-                  boolean sentCommand = false;
-                  if ((Boolean)this.enderPearl.getValue() && tryGetItem(16, "ENDER_PEARL")) {
-                     this.globalDelay = 20;
-                     sentCommand = true;
-                  }
+      if (Location.getArea() != Island.Unknown && this.worldLoaded) {
+         class_746 player = class_310.method_1551().field_1724;
+         if (player != null) {
+            if (this.globalDelay > 0) {
+               this.globalDelay--;
+            } else {
+               boolean sentCommand = false;
+               if ((Boolean)this.enderPearl.getValue() && tryGetItem(16, "ENDER_PEARL")) {
+                  this.globalDelay = 20;
+                  sentCommand = true;
+               }
 
-                  if (!sentCommand && (Boolean)this.spiritLeap.getValue() && tryGetItem(16, "ENDER_PEARL")) {
-                     this.globalDelay = 20;
-                     sentCommand = true;
-                  }
+               if (!sentCommand && (Boolean)this.spiritLeap.getValue() && tryGetItem(16, "ENDER_PEARL")) {
+                  this.globalDelay = 20;
+                  sentCommand = true;
+               }
 
-                  if (!sentCommand && (Boolean)this.superBoom.getValue() && tryGetItem(64, "SUPERBOOM_TNT")) {
-                     this.globalDelay = 20;
-                  }
+               if (!sentCommand && (Boolean)this.superBoom.getValue() && tryGetItem(64, "SUPERBOOM_TNT")) {
+                  this.globalDelay = 20;
                }
             }
          }
@@ -71,17 +69,17 @@ public class AutoGfs extends Module {
       int slot = SwapManager.getItemSlot(sbId);
       if (slot == -1) {
          if (notExisting) {
-            mc.player.networkHandler.sendChatCommand("gfs " + sbId + " " + maxStack);
+            mc.field_1724.field_3944.method_45730("gfs " + sbId + " " + maxStack);
             return true;
          } else {
             return false;
          }
       } else {
-         ItemStack stack = mc.player.getInventory().getStack(slot);
-         int count = stack.getCount();
+         class_1799 stack = mc.field_1724.method_31548().method_5438(slot);
+         int count = stack.method_7947();
          if (count > 0 && count < maxStack) {
             int missing = maxStack - count;
-            mc.player.networkHandler.sendChatCommand("gfs " + sbId + " " + missing);
+            mc.field_1724.field_3944.method_45730("gfs " + sbId + " " + missing);
             return true;
          } else {
             return false;
@@ -97,17 +95,15 @@ public class AutoGfs extends Module {
 
    @SubscribeEvent
    public void countDown(ServerTickEvent event) {
-      if (Location.getArea() != Island.Unknown) {
-         if (this.countdownStarted) {
-            this.worldLoaded = false;
-            if (this.loadDelay > 0) {
-               this.loadDelay--;
-               return;
-            }
-
-            this.countdownStarted = false;
-            this.worldLoaded = true;
+      if (Location.getArea() != Island.Unknown && this.countdownStarted) {
+         this.worldLoaded = false;
+         if (this.loadDelay > 0) {
+            this.loadDelay--;
+            return;
          }
+
+         this.countdownStarted = false;
+         this.worldLoaded = true;
       }
    }
 

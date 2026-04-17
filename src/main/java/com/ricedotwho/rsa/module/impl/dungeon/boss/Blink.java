@@ -16,23 +16,23 @@ import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import com.ricedotwho.rsm.utils.ChatUtils;
 import java.math.BigDecimal;
 import java.util.LinkedList;
-import net.minecraft.util.PlayerInput;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.network.packet.c2s.play.ClientTickEndC2SPacket;
+import net.minecraft.class_10185;
+import net.minecraft.class_2596;
+import net.minecraft.class_2793;
+import net.minecraft.class_2828;
+import net.minecraft.class_2851;
+import net.minecraft.class_310;
+import net.minecraft.class_9836;
 import org.joml.Vector2d;
 
 @ModuleInfo(aliases = "Blink", id = "Blink", category = Category.MOVEMENT, hasKeybind = true)
 public class Blink extends Module {
    private static Blink INSTANCE;
-   private PlayerInput lastInput;
+   private class_10185 lastInput;
    private final DragSetting gui = new DragSetting("Blink Hud", new Vector2d(100.0, 100.0), new Vector2d(144.0, 80.0));
    private final NumberSetting maxBlinkPacket = new NumberSetting("Max Blink Ticks", 1.0, 30.0, 17.0, 1.0);
    private BlinkRing currentRing;
-   private final LinkedList<Packet<?>> queue = new LinkedList<>();
+   private final LinkedList<class_2596<?>> queue = new LinkedList<>();
    private boolean flushing = false;
    private int packetCount = 0;
 
@@ -47,7 +47,7 @@ public class Blink extends Module {
             .renderScaled(
                event.getGfx(),
                () -> event.getGfx()
-                  .drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, "Blinking", (int)this.gui.getPosition().x, (int)this.gui.getPosition().y, -1),
+                  .method_25300(class_310.method_1551().field_1772, "Blinking", (int)this.gui.getPosition().x, (int)this.gui.getPosition().y, -1),
                10.0F,
                10.0F
             );
@@ -56,23 +56,23 @@ public class Blink extends Module {
 
    @SubscribeEvent
    public void onSendPacket(Send event) {
-      if (event.getPacket() instanceof PlayerInputC2SPacket inputPacket) {
-         if (this.lastInput != null && this.inputEquals(inputPacket.input(), this.lastInput)) {
+      if (event.getPacket() instanceof class_2851 inputPacket) {
+         if (this.lastInput != null && this.inputEquals(inputPacket.comp_3139(), this.lastInput)) {
             event.setCancelled(true);
          }
 
-         this.lastInput = inputPacket.input();
+         this.lastInput = inputPacket.comp_3139();
       }
    }
 
-   private boolean inputEquals(PlayerInput input1, PlayerInput input2) {
-      return input1.sneak() == input2.sneak()
-         && input1.forward() == input2.forward()
-         && input1.backward() == input2.backward()
-         && input1.left() == input2.left()
-         && input1.right() == input2.right()
-         && input1.jump() == input2.jump()
-         && input1.sprint() == input2.sprint();
+   private boolean inputEquals(class_10185 input1, class_10185 input2) {
+      return input1.comp_3164() == input2.comp_3164()
+         && input1.comp_3159() == input2.comp_3159()
+         && input1.comp_3160() == input2.comp_3160()
+         && input1.comp_3161() == input2.comp_3161()
+         && input1.comp_3162() == input2.comp_3162()
+         && input1.comp_3163() == input2.comp_3163()
+         && input1.comp_3165() == input2.comp_3165();
    }
 
    @SubscribeEvent
@@ -85,7 +85,7 @@ public class Blink extends Module {
       }
    }
 
-   public static boolean onSendPacket(Packet<?> packet) {
+   public static boolean onSendPacket(class_2596<?> packet) {
       if (INSTANCE == null) {
          INSTANCE = (Blink)RSM.getModule(Blink.class);
       }
@@ -93,8 +93,8 @@ public class Blink extends Module {
       return INSTANCE.onPreSendPacket(packet);
    }
 
-   private boolean onPreSendPacket(Packet<?> packet) {
-      if (MinecraftClient.getInstance().player != null && this.isEnabled()) {
+   private boolean onPreSendPacket(class_2596<?> packet) {
+      if (class_310.method_1551().field_1724 != null && this.isEnabled()) {
          synchronized (this.queue) {
             if (this.flushing) {
                return false;
@@ -102,11 +102,11 @@ public class Blink extends Module {
                boolean bl = true;
                if (this.currentRing != null
                   && (this.packetCount >= ((BigDecimal)this.maxBlinkPacket.getValue()).intValue() || this.currentRing.isDonePlaying())) {
-                  if (packet instanceof PlayerMoveC2SPacket || packet instanceof PlayerInputC2SPacket) {
+                  if (packet instanceof class_2828 || packet instanceof class_2851) {
                      return true;
                   }
 
-                  if (packet instanceof TeleportConfirmC2SPacket) {
+                  if (packet instanceof class_2793) {
                      if (this.isEnabled()) {
                         this.onKeyToggle();
                      }
@@ -115,7 +115,7 @@ public class Blink extends Module {
                   }
                }
 
-               if (packet instanceof ClientTickEndC2SPacket) {
+               if (packet instanceof class_9836) {
                   this.packetCount++;
                   if (this.currentRing != null) {
                      if (this.packetCount >= ((BigDecimal)this.maxBlinkPacket.getValue()).intValue()) {
@@ -146,24 +146,24 @@ public class Blink extends Module {
    }
 
    public void clearMovements() {
-      this.queue.removeIf(p -> p instanceof PlayerInputC2SPacket || p instanceof PlayerMoveC2SPacket);
+      this.queue.removeIf(p -> p instanceof class_2851 || p instanceof class_2828);
    }
 
-   public void actuallySendImmediately(Packet<?> packet) {
-      if (MinecraftClient.getInstance().getNetworkHandler() != null) {
+   public void actuallySendImmediately(class_2596<?> packet) {
+      if (class_310.method_1551().method_1562() != null) {
          synchronized (this.queue) {
             this.flushing = true;
-            ((IConnection)MinecraftClient.getInstance().getNetworkHandler().getConnection()).sendPacketImmediately(packet);
+            ((IConnection)class_310.method_1551().method_1562().method_48296()).sendPacketImmediately(packet);
             this.flushing = true;
          }
       }
    }
 
-   public void actuallySend(Packet<?> packet) {
-      if (MinecraftClient.getInstance().getNetworkHandler() != null) {
+   public void actuallySend(class_2596<?> packet) {
+      if (class_310.method_1551().method_1562() != null) {
          synchronized (this.queue) {
             this.flushing = true;
-            MinecraftClient.getInstance().getNetworkHandler().sendPacket(packet);
+            class_310.method_1551().method_1562().method_52787(packet);
             this.flushing = true;
          }
       }
@@ -179,7 +179,7 @@ public class Blink extends Module {
 
    public void onDisable() {
       super.onDisable();
-      ChatUtils.chat("Packets : " + this.queue.stream().filter(p -> p instanceof PlayerMoveC2SPacket).count(), new Object[0]);
+      ChatUtils.chat("Packets : " + this.queue.stream().filter(p -> p instanceof class_2828).count(), new Object[0]);
       this.flush();
       this.currentRing = null;
       this.lastInput = null;
@@ -187,7 +187,7 @@ public class Blink extends Module {
    }
 
    private void flushTick() {
-      if (MinecraftClient.getInstance().getNetworkHandler() != null) {
+      if (class_310.method_1551().method_1562() != null) {
          synchronized (this.queue) {
             this.flushing = true;
             if (this.queue.isEmpty()) {
@@ -195,9 +195,9 @@ public class Blink extends Module {
                this.setEnabled(false);
             } else {
                while (!this.queue.isEmpty()) {
-                  Packet<?> packet = this.queue.poll();
-                  ((IConnection)MinecraftClient.getInstance().getNetworkHandler().getConnection()).sendPacketImmediately(packet);
-                  if (packet instanceof ClientTickEndC2SPacket) {
+                  class_2596<?> packet = this.queue.poll();
+                  ((IConnection)class_310.method_1551().method_1562().method_48296()).sendPacketImmediately(packet);
+                  if (packet instanceof class_9836) {
                      this.flushing = false;
                      return;
                   }
@@ -210,13 +210,13 @@ public class Blink extends Module {
    }
 
    private void flush() {
-      if (MinecraftClient.getInstance().getNetworkHandler() != null) {
+      if (class_310.method_1551().method_1562() != null) {
          synchronized (this.queue) {
             this.flushing = true;
             if (this.queue.isEmpty()) {
                this.flushing = false;
             } else {
-               this.queue.forEach(packet -> ((IConnection)MinecraftClient.getInstance().getNetworkHandler().getConnection()).sendPacketImmediately((Packet<?>)packet));
+               this.queue.forEach(packet -> ((IConnection)class_310.method_1551().method_1562().method_48296()).sendPacketImmediately((class_2596<?>)packet));
                this.queue.clear();
                this.flushing = false;
             }

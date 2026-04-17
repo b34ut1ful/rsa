@@ -16,9 +16,9 @@ import com.ricedotwho.rsm.ui.clickgui.settings.Setting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.BooleanSetting;
 import com.ricedotwho.rsm.utils.render.render3d.type.Beacon;
 import com.ricedotwho.rsm.utils.render.render3d.type.Circle;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.StringHelper;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_310;
+import net.minecraft.class_3544;
+import net.minecraft.class_746;
 
 @ModuleInfo(aliases = "PWaypoints", id = "PresetWaypoints", category = Category.RENDER)
 public class PresetWaypoints extends Module {
@@ -87,9 +87,9 @@ public class PresetWaypoints extends Module {
 
    @SubscribeEvent
    public void onChat(Chat event) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null) {
-         String unformatted = StringHelper.stripTextFormat(event.getMessage().getString());
+         String unformatted = class_3544.method_15440(event.getMessage().getString());
          if ((Boolean)this.BaarBerserkers.getValue()) {
             if (unformatted.contains("Hello there, adventurer!")) {
                RSA.chat("Hello BAAR!!");
@@ -142,7 +142,7 @@ public class PresetWaypoints extends Module {
 
    @SubscribeEvent
    public void onRender3D(Extract event) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null) {
          if ((Boolean)this.AbiPhones.getValue()) {
             if (Location.getArea() == Island.CrimsonIsle) {

@@ -10,7 +10,7 @@ import com.ricedotwho.rsm.data.MutableInput;
 import com.ricedotwho.rsm.data.Pos;
 import com.ricedotwho.rsm.utils.Accessor;
 import java.util.Map;
-import net.minecraft.util.PlayerInput;
+import net.minecraft.class_10185;
 
 public class LookRing extends Ring implements Accessor {
    private final float yaw;
@@ -25,8 +25,8 @@ public class LookRing extends Ring implements Accessor {
       this(
          min,
          max,
-         (Float)extra.getOrDefault("yaw", mc.gameRenderer.getCamera().getCameraYaw()),
-         (Float)extra.getOrDefault("yaw", mc.gameRenderer.getCamera().getPitch()),
+         (Float)extra.getOrDefault("yaw", mc.field_1773.method_19418().method_71155()),
+         (Float)extra.getOrDefault("yaw", mc.field_1773.method_19418().method_19329()),
          manage,
          actions
       );
@@ -40,8 +40,8 @@ public class LookRing extends Ring implements Accessor {
 
    @Override
    public boolean run() {
-      mc.player.setYaw(this.yaw);
-      mc.player.setPitch(this.pitch);
+      mc.field_1724.method_36456(this.yaw);
+      mc.field_1724.method_36457(this.pitch);
       return true;
    }
 
@@ -56,7 +56,7 @@ public class LookRing extends Ring implements Accessor {
    }
 
    @Override
-   public boolean tick(MutableInput mutableInput, PlayerInput input, AutoP3 autoP3) {
+   public boolean tick(MutableInput mutableInput, class_10185 input, AutoP3 autoP3) {
       return true;
    }
 

@@ -19,9 +19,9 @@ import com.ricedotwho.rsm.ui.clickgui.settings.impl.ButtonSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.DragSetting;
 import com.ricedotwho.rsm.utils.DungeonUtils;
 import com.ricedotwho.rsm.utils.render.render2d.NVGUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.StringHelper;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.class_310;
+import net.minecraft.class_3544;
+import net.minecraft.class_746;
 import org.joml.Vector2d;
 
 @ModuleInfo(aliases = "Pad Timer", id = "PadTimer", category = Category.DUNGEONS)
@@ -75,9 +75,9 @@ public class PadTimer extends Module {
 
    @SubscribeEvent
    public void onChat(Chat event) {
-      ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      class_746 player = class_310.method_1551().field_1724;
       if (player != null) {
-         String unformatted = StringHelper.stripTextFormat(event.getMessage().getString());
+         String unformatted = class_3544.method_15440(event.getMessage().getString());
          if (unformatted.contains("I'd be happy to show you what that's like!") && Location.getArea() == Island.Dungeon && DungeonUtils.isPhase(Phase7.P2)
             || (Boolean)this.debug.getValue()) {
             this.pPadcountdown = true;

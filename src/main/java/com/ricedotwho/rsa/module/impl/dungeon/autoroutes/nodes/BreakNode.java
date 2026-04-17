@@ -23,15 +23,15 @@ import com.ricedotwho.rsm.utils.FileUtils;
 import com.ricedotwho.rsm.utils.render.render3d.type.FilledBox;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.class_124;
+import net.minecraft.class_2338;
+import net.minecraft.class_238;
+import net.minecraft.class_265;
+import net.minecraft.class_2680;
+import net.minecraft.class_310;
+import net.minecraft.class_3965;
+import net.minecraft.class_746;
+import net.minecraft.class_239.class_240;
 
 public class BreakNode extends Node implements Accessor {
    private final List<Pos> blocks;
@@ -66,13 +66,13 @@ public class BreakNode extends Node implements Accessor {
             .stream()
             .filter(
                p -> {
-                  BlockPos bp = p.asBlockPos();
-                  BlockState state = mc.world.getBlockState(bp);
-                  VoxelShape shape = state.getOutlineShape(mc.world, bp);
-                  return !shape.isEmpty()
+                  class_2338 bp = p.asBlockPos();
+                  class_2680 state = mc.field_1687.method_8320(bp);
+                  class_265 shape = state.method_26218(mc.field_1687, bp);
+                  return !shape.method_1110()
                      && DungeonBreaker.canInstantMine(state)
                      && InteractUtils.faceDistance(
-                           p.asVec3(), mc.player.getEntityPos().add(0.0, mc.player.getEyeHeight(mc.player.getPose()), 0.0)
+                           p.asVec3(), mc.field_1724.method_73189().method_1031(0.0, mc.field_1724.method_18381(mc.field_1724.method_18376()), 0.0)
                         )
                         <= 25.0;
                }
@@ -115,11 +115,11 @@ public class BreakNode extends Node implements Accessor {
          Colour colour = AutoRoutes.getBreakColour().getValue().alpha(90.0F);
 
          for (Pos pos : this.rotated) {
-            BlockPos bp = pos.asBlockPos();
-            BlockState state = mc.world.getBlockState(bp);
-            VoxelShape shape = state.getOutlineShape(mc.world, bp);
-            if (!shape.isEmpty()) {
-               Box aabb = shape.getBoundingBox().offset(bp);
+            class_2338 bp = pos.asBlockPos();
+            class_2680 state = mc.field_1687.method_8320(bp);
+            class_265 shape = state.method_26218(mc.field_1687, bp);
+            if (!shape.method_1110()) {
+               class_238 aabb = shape.method_1107().method_996(bp);
                Renderer3D.addTask(new FilledBox(aabb, colour, true));
             }
          }
@@ -148,32 +148,32 @@ public class BreakNode extends Node implements Accessor {
       return json;
    }
 
-   public static BreakNode supply(UniqueRoom fullRoom, ClientPlayerEntity player, AwaitManager awaits, boolean start) {
+   public static BreakNode supply(UniqueRoom fullRoom, class_746 player, AwaitManager awaits, boolean start) {
       Room mainRoom = fullRoom.getMainRoom();
-      Pos playerRelative = RoomUtils.getRelativePosition(new Pos(player.getEntityPos()), mainRoom);
+      Pos playerRelative = RoomUtils.getRelativePosition(new Pos(player.method_73189()), mainRoom);
       return new BreakNode(playerRelative, awaits, start);
    }
 
    public void addOrRemoveBlock() {
       if (Map.getCurrentRoom() == null) {
-         RSA.chat(Formatting.RED + "Room is null!");
+         RSA.chat(class_124.field_1061 + "Room is null!");
       }
 
-      if (MinecraftClient.getInstance().crosshairTarget instanceof BlockHitResult blockHitResult && blockHitResult.getType() != Type.MISS) {
-         Pos pos = new Pos(blockHitResult.getBlockPos());
+      if (class_310.method_1551().field_1765 instanceof class_3965 blockHitResult && blockHitResult.method_17783() != class_240.field_1333) {
+         Pos pos = new Pos(blockHitResult.method_17777());
          Pos relPos = RoomUtils.getRelativePositionFixed(pos, Map.getCurrentRoom().getUniqueRoom().getMainRoom());
          if (this.blocks.contains(relPos)) {
             this.blocks.remove(relPos);
-            RSA.chat(Formatting.RED + "Removed " + relPos.toChatString() + " from break node");
+            RSA.chat(class_124.field_1061 + "Removed " + relPos.toChatString() + " from break node");
          } else {
             this.blocks.add(relPos);
-            RSA.chat(Formatting.GREEN + "Added " + relPos.toChatString() + " to break node!");
+            RSA.chat(class_124.field_1060 + "Added " + relPos.toChatString() + " to break node!");
          }
 
          this.calculate(Map.getCurrentRoom().getUniqueRoom());
          ((AutoRoutes)RSM.getModule(AutoRoutes.class)).save();
       } else {
-         RSA.chat(Formatting.RED + "Not looking at a block");
+         RSA.chat(class_124.field_1061 + "Not looking at a block");
       }
    }
 
