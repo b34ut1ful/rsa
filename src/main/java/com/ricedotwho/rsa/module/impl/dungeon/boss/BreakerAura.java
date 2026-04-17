@@ -79,14 +79,14 @@ public class BreakerAura extends Module {
       if (Location.getArea().is(Island.Dungeon)
          && Dungeon.isInBoss()
          && Utils.equalsOneOf(Location.getFloor(), new Object[]{Floor.M7, Floor.F7})
-         && !((Set)this.data.getValue()).isEmpty()
+         && !((Set<Pos>)this.data.getValue()).isEmpty()
          && !(Boolean)this.edit.getValue()
          && mc.field_1687 != null
          && mc.field_1724 != null
          && this.charges > 0) {
          long now = System.currentTimeMillis();
          if ((Boolean)this.zeroTick.getValue()) {
-            List<Pos> f = ((Set)this.data.getValue())
+            List<Pos> f = ((Set<Pos>)this.data.getValue())
                .stream()
                .filter(
                   p -> {
@@ -138,7 +138,7 @@ public class BreakerAura extends Module {
          && (Boolean)this.renderBlocks.getValue()
          && Dungeon.isInBoss()
          && Utils.equalsOneOf(Location.getFloor(), new Object[]{Floor.M7, Floor.F7})
-         && !((Set)this.data.getValue()).isEmpty()
+         && !((Set<Pos>)this.data.getValue()).isEmpty()
          && mc.field_1687 != null
          && mc.field_1724 != null) {
          for (Pos pos : (Set)this.data.getValue()) {
@@ -212,12 +212,12 @@ public class BreakerAura extends Module {
       if (Location.getArea().is(Island.Dungeon) && Dungeon.isInBoss() && mc.field_1724 != null) {
          if (class_310.method_1551().field_1765 instanceof class_3965 blockHitResult && blockHitResult.method_17783() != class_240.field_1333) {
             Pos pos = new Pos(blockHitResult.method_17777());
-            if (((Set)this.data.getValue()).contains(pos)) {
-               ((Set)this.data.getValue()).remove(pos);
+            if (((Set<Pos>)this.data.getValue()).contains(pos)) {
+               ((Set<Pos>)this.data.getValue()).remove(pos);
                this.nextMineAttempt.remove(pos);
                RSA.chat(class_124.field_1061 + "Removed " + pos.toChatString());
             } else {
-               ((Set)this.data.getValue()).add(pos);
+               ((Set<Pos>)this.data.getValue()).add(pos);
                RSA.chat(class_124.field_1060 + "Added " + pos.toChatString());
             }
 

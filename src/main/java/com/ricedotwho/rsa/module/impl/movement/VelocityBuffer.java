@@ -143,7 +143,7 @@ public class VelocityBuffer extends Module {
 
    private void receivePacket(class_2596<?> packet) {
       if (class_310.method_1551().method_1562() != null) {
-         packet.method_65081(class_310.method_1551().method_1562());
+         ((class_2596) packet).method_65081(class_310.method_1551().method_1562());
       }
    }
 
