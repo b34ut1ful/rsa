@@ -141,7 +141,7 @@ public class BreakerAura extends Module {
          && !((Set<Pos>)this.data.getValue()).isEmpty()
          && mc.field_1687 != null
          && mc.field_1724 != null) {
-         for (Pos pos : (Set)this.data.getValue()) {
+         for (Pos pos : (Set<Pos>)this.data.getValue()) {
             class_2338 bp = pos.asBlockPos();
             class_2680 state = mc.field_1687.method_8320(bp);
             class_265 shape = state.method_26218(mc.field_1687, bp);
