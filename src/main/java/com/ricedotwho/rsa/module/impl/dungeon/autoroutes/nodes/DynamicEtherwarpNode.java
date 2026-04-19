@@ -28,6 +28,7 @@ public class DynamicEtherwarpNode extends Node {
    private final boolean await;
    private final int priority;
    private class_243 target;
+   private transient int armedTick = -1;
 
    public DynamicEtherwarpNode(Pos localPos, float yaw, float pitch, boolean await, int priority, AwaitManager awaits, boolean start) {
       super(localPos, null, false);
@@ -44,6 +45,30 @@ public class DynamicEtherwarpNode extends Node {
    @Override
    public boolean shouldAwait() {
       return this.await;
+   }
+
+   @Override
+   protected boolean shouldUseCenterOnly() {
+      return DynamicRoutes.shouldCenterOnly();
+   }
+
+   @Override
+   public boolean updateNodeState(Pos playerPos, int tickTime) {
+      if (tickTime <= this.getLastTickTime()) {
+         return false;
+      } else {
+         if (this.isInNode(playerPos) && this.armedTick < 0) {
+            this.armedTick = tickTime;
+         }
+
+         return super.updateNodeState(playerPos, tickTime);
+      }
+   }
+
+   @Override
+   public boolean isReadyToRun(int tickTime) {
+      int delay = DynamicRoutes.getEtherwarpTickDelay();
+      return delay <= 0 || this.armedTick >= 0 && tickTime - this.armedTick >= delay;
    }
 
    @Override
@@ -93,6 +118,7 @@ public class DynamicEtherwarpNode extends Node {
    @Override
    public void calculate(UniqueRoom room) {
       this.realPos = this.localPos;
+      this.armedTick = -1;
       class_243 origin = this.localPos.add(0.0, 1.5899999618530274, 0.0).asVec3();
       this.target = EtherUtils.rayTraceBlock(61, this.yaw, this.pitch, origin);
       if (this.target == null) {
@@ -129,6 +155,17 @@ public class DynamicEtherwarpNode extends Node {
       return DynamicRoutes.getNodeColor().getValue();
    }
 
+   @Override
+   protected void onNodeInactive() {
+      this.armedTick = -1;
+   }
+
+   @Override
+   public void reset() {
+      super.reset();
+      this.armedTick = -1;
+   }
+
    public static DynamicEtherwarpNode fromBlockPos(class_2338 pos, float yaw, float pitch, boolean await, int priority) {
       Pos nodePos = new Pos(pos.method_61082()).selfAdd(0.0, 1.0, 0.0);
       return new DynamicEtherwarpNode(nodePos, yaw, pitch, await, Integer.MAX_VALUE - priority);
@@ -136,7 +173,7 @@ public class DynamicEtherwarpNode extends Node {
 
    public static DynamicEtherwarpNode supply(UniqueRoom fullRoom, class_746 player) {
       Room mainRoom = fullRoom.getMainRoom();
-      Pos playerRelative = RoomUtils.getRelativePosition(new Pos(player.method_73189()), mainRoom);
+      Pos playerRelative = RoomUtils.getRelativePosition(new Pos(player.method_23317(), player.method_23318(), player.method_23321()), mainRoom);
       return new DynamicEtherwarpNode(playerRelative, player.method_36454(), player.method_36455(), false, 0);
    }
 }

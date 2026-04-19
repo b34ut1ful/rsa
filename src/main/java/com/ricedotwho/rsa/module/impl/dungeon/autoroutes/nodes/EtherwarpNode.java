@@ -26,7 +26,6 @@ import net.minecraft.class_4050;
 import net.minecraft.class_746;
 
 public class EtherwarpNode extends Node {
-   private static final int READY_DELAY_TICKS = 2;
    protected final Pos localTarget;
    protected Pos realTargetPos;
    private transient int armedTick;
@@ -46,13 +45,22 @@ public class EtherwarpNode extends Node {
    }
 
    @Override
-   public boolean isReadyToRun(int tickTime) {
-      if (this.armedTick < 0) {
-         this.armedTick = tickTime;
+   public boolean updateNodeState(Pos playerPos, int tickTime) {
+      if (tickTime <= this.getLastTickTime()) {
          return false;
       } else {
-         return tickTime - this.armedTick >= 2;
+         if (this.isInNode(playerPos) && this.armedTick < 0) {
+            this.armedTick = tickTime;
+         }
+
+         return super.updateNodeState(playerPos, tickTime);
       }
+   }
+
+   @Override
+   public boolean isReadyToRun(int tickTime) {
+      int delay = AutoRoutes.getActionNodeTickDelay();
+      return delay <= 0 || this.armedTick >= 0 && tickTime - this.armedTick >= delay;
    }
 
    @Override

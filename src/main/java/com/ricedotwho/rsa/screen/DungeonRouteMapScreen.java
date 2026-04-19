@@ -25,9 +25,7 @@ import net.minecraft.class_332;
 import net.minecraft.class_437;
 
 public class DungeonRouteMapScreen extends class_437 implements Accessor {
-   private static final int BACKGROUND = -804384488;
-   private static final int PANEL_BACKGROUND = -300606942;
-   private static final int PANEL_BORDER = -13024942;
+   private static final int PANEL_BACKGROUND = 0x66FFFFFF;
    private static final int ROUTEABLE_BORDER = -11937851;
    private static final int CURRENT_ROOM_BORDER = -657414;
    private static final int HOVER_BORDER = -11930;
@@ -44,7 +42,6 @@ public class DungeonRouteMapScreen extends class_437 implements Accessor {
    }
 
    public void method_25394(class_332 context, int mouseX, int mouseY, float delta) {
-      context.method_25294(0, 0, this.field_22789, this.field_22790, -804384488);
       DungeonRouteMapScreen.MapLayout layout = this.createLayout();
       this.hitboxes.clear();
       this.drawPanel(context, layout);
@@ -67,15 +64,14 @@ public class DungeonRouteMapScreen extends class_437 implements Accessor {
    }
 
    private void drawPanel(class_332 context, DungeonRouteMapScreen.MapLayout layout) {
-      int panelLeft = layout.mapX() - 24;
-      int panelTop = layout.mapY() - 56;
-      int panelRight = layout.mapX() + layout.mapWidth() + 24;
-      int panelBottom = layout.mapY() + layout.mapHeight() + 56;
-      context.method_25294(panelLeft, panelTop, panelRight, panelBottom, -300606942);
-      this.drawBorder(context, panelLeft, panelTop, panelRight, panelBottom, -13024942);
-      context.method_27534(this.field_22793, class_2561.method_43470("Dungeon Route Map"), this.field_22789 / 2, panelTop + 14, -1446155);
+      int panelLeft = layout.mapX() - 20;
+      int panelTop = layout.mapY() - 20;
+      int panelRight = layout.mapX() + layout.mapWidth() + 20;
+      int panelBottom = layout.mapY() + layout.mapHeight() + 20;
+      context.method_25294(panelLeft, panelTop, panelRight, panelBottom, PANEL_BACKGROUND);
+      context.method_27534(this.field_22793, class_2561.method_43470("Dungeon Route Map"), this.field_22789 / 2, panelTop + 6, -1446155);
       context.method_27534(
-         this.field_22793, class_2561.method_43470("Left click a room to path to its route start."), this.field_22789 / 2, panelTop + 30, -6839372
+         this.field_22793, class_2561.method_43470("Left click a room to path to its route start."), this.field_22789 / 2, panelTop + 18, -6839372
       );
    }
 

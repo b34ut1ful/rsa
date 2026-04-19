@@ -38,11 +38,13 @@ import com.ricedotwho.rsm.ui.clickgui.settings.group.DefaultGroupSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.BooleanSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.ColourSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.KeybindSetting;
+import com.ricedotwho.rsm.ui.clickgui.settings.impl.NumberSetting;
 import com.ricedotwho.rsm.ui.clickgui.settings.impl.SaveSetting;
 import com.ricedotwho.rsm.utils.Accessor;
 import com.ricedotwho.rsm.utils.FileUtils;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -74,6 +76,7 @@ public class AutoRoutes extends Module implements Accessor {
    private final HashMap<String, List<Node>> redoMap = new HashMap<>();
    private static final BooleanSetting centerOnly = new BooleanSetting("Center Only", false);
    private static final BooleanSetting centerOnlyOnNonStartNodes = new BooleanSetting("Center Only on Non Start Nodes", false);
+   private static final NumberSetting actionNodeTickDelay = new NumberSetting("AOTV/Etherwarp Tick Delay", 0.0, 10.0, 0.0, 1.0);
    private static final BooleanSetting zeroTickBreak = new BooleanSetting("0t Break", false);
    private static final BooleanSetting use1_8Height = new BooleanSetting("Use 1.8 height for placing node", false);
    private final BooleanSetting editMode = new BooleanSetting("Edit Mode", false);
@@ -135,6 +138,7 @@ public class AutoRoutes extends Module implements Accessor {
             this.editMode,
             centerOnly,
             centerOnlyOnNonStartNodes,
+            actionNodeTickDelay,
             zeroTickBreak,
             use1_8Height,
             this.triggerBind,
@@ -186,7 +190,7 @@ public class AutoRoutes extends Module implements Accessor {
       this.isRouting = false;
       if (Location.getArea().is(Island.Dungeon)) {
          this.tickTime++;
-         if (!this.hasGuiOpen() && !(Boolean)this.editMode.getValue() && Map.getCurrentRoom() != null && class_310.method_1551().field_1724 != null) {
+         if (!this.shouldPauseRouteAutomationForGui() && !(Boolean)this.editMode.getValue() && Map.getCurrentRoom() != null && class_310.method_1551().field_1724 != null) {
             Room currentRoom = Map.getCurrentRoom();
             List<Node> nodes = this.activeNodes.get(currentRoom.getData());
             if (nodes != null && !nodes.isEmpty()) {
@@ -209,16 +213,17 @@ public class AutoRoutes extends Module implements Accessor {
 
    @SubscribeEvent
    public void onPollInputs(InputPollEvent event) {
-      if (this.isRouting() && Location.getArea().is(Island.Dungeon) && !this.hasGuiOpen()) {
+      if (this.isRouting() && Location.getArea().is(Island.Dungeon) && !this.shouldPauseRouteAutomationForGui()) {
          class_10185 oldInputs = event.getClientInput();
+         boolean routeMapOpen = this.isRouteMapOpen();
          class_10185 newInputs = new class_10185(
-            oldInputs.comp_3159(),
-            oldInputs.comp_3160(),
-            oldInputs.comp_3161(),
-            oldInputs.comp_3162(),
-            oldInputs.comp_3163(),
+            routeMapOpen ? false : oldInputs.comp_3159(),
+            routeMapOpen ? false : oldInputs.comp_3160(),
+            routeMapOpen ? false : oldInputs.comp_3161(),
+            routeMapOpen ? false : oldInputs.comp_3162(),
+            routeMapOpen ? false : oldInputs.comp_3163(),
             !this.forceNextNotSneak,
-            oldInputs.comp_3165()
+            routeMapOpen ? false : oldInputs.comp_3165()
          );
          this.forceNextNotSneak = false;
          event.getInput().apply(newInputs);
@@ -251,6 +256,14 @@ public class AutoRoutes extends Module implements Accessor {
 
    private boolean hasGuiOpen() {
       return class_310.method_1551().field_1724 != null && class_310.method_1551().field_1755 instanceof class_465;
+   }
+
+   private boolean isRouteMapOpen() {
+      return class_310.method_1551().field_1755 instanceof DungeonRouteMapScreen;
+   }
+
+   private boolean shouldPauseRouteAutomationForGui() {
+      return this.hasGuiOpen() && !this.isRouteMapOpen();
    }
 
    private HashMap<String, List<Node>> getSavedNodes() {
@@ -720,6 +733,10 @@ public class AutoRoutes extends Module implements Accessor {
 
    public static BooleanSetting getCenterOnlyOnNonStartNodes() {
       return centerOnlyOnNonStartNodes;
+   }
+
+   public static int getActionNodeTickDelay() {
+      return ((BigDecimal)actionNodeTickDelay.getValue()).intValue();
    }
 
    public static BooleanSetting getZeroTickBreak() {

@@ -26,7 +26,6 @@ import net.minecraft.class_310;
 import net.minecraft.class_746;
 
 public class AotvNode extends Node implements Accessor {
-   private static final int READY_DELAY_TICKS = 2;
    private final Pos rotationVec;
    private Pos realRotationVector;
    private transient int armedTick;
@@ -46,13 +45,22 @@ public class AotvNode extends Node implements Accessor {
    }
 
    @Override
-   public boolean isReadyToRun(int tickTime) {
-      if (this.armedTick < 0) {
-         this.armedTick = tickTime;
+   public boolean updateNodeState(Pos playerPos, int tickTime) {
+      if (tickTime <= this.getLastTickTime()) {
          return false;
       } else {
-         return tickTime - this.armedTick >= 2;
+         if (this.isInNode(playerPos) && this.armedTick < 0) {
+            this.armedTick = tickTime;
+         }
+
+         return super.updateNodeState(playerPos, tickTime);
       }
+   }
+
+   @Override
+   public boolean isReadyToRun(int tickTime) {
+      int delay = AutoRoutes.getActionNodeTickDelay();
+      return delay <= 0 || this.armedTick >= 0 && tickTime - this.armedTick >= delay;
    }
 
    @Override

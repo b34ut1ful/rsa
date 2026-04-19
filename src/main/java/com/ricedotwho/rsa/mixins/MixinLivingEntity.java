@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinLivingEntity {
    @Inject(method = "method_5863()Z", at = @At("HEAD"), cancellable = true)
    public void isPickable(CallbackInfoReturnable<Boolean> cir) {
-      if (HidePlayers.shouldHitThrough((class_1297)this)) {
+      if (HidePlayers.shouldHitThrough((class_1297)(Object)this)) {
          cir.setReturnValue(false);
       }
    }

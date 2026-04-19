@@ -79,14 +79,14 @@ public class BreakerAura extends Module {
       if (Location.getArea().is(Island.Dungeon)
          && Dungeon.isInBoss()
          && Utils.equalsOneOf(Location.getFloor(), new Object[]{Floor.M7, Floor.F7})
-         && !((Set)this.data.getValue()).isEmpty()
+         && !this.data.getValue().isEmpty()
          && !(Boolean)this.edit.getValue()
          && mc.field_1687 != null
          && mc.field_1724 != null
          && this.charges > 0) {
          long now = System.currentTimeMillis();
          if ((Boolean)this.zeroTick.getValue()) {
-            List<Pos> f = ((Set)this.data.getValue())
+            List<Pos> f = this.data.getValue()
                .stream()
                .filter(
                   p -> {
@@ -117,7 +117,7 @@ public class BreakerAura extends Module {
                }
             }
          } else {
-            Optional<Pos> closest = this.getClosest((Set<Pos>)this.data.getValue());
+            Optional<Pos> closest = this.getClosest(this.data.getValue());
             closest.ifPresent(
                posx -> {
                   if ((Boolean)this.swap.getValue() && SwapManager.reserveSwap("DUNGEONBREAKER")
@@ -138,10 +138,10 @@ public class BreakerAura extends Module {
          && (Boolean)this.renderBlocks.getValue()
          && Dungeon.isInBoss()
          && Utils.equalsOneOf(Location.getFloor(), new Object[]{Floor.M7, Floor.F7})
-         && !((Set)this.data.getValue()).isEmpty()
+         && !this.data.getValue().isEmpty()
          && mc.field_1687 != null
          && mc.field_1724 != null) {
-         for (Pos pos : (Set)this.data.getValue()) {
+         for (Pos pos : this.data.getValue()) {
             class_2338 bp = pos.asBlockPos();
             class_2680 state = mc.field_1687.method_8320(bp);
             class_265 shape = state.method_26218(mc.field_1687, bp);
@@ -212,12 +212,12 @@ public class BreakerAura extends Module {
       if (Location.getArea().is(Island.Dungeon) && Dungeon.isInBoss() && mc.field_1724 != null) {
          if (class_310.method_1551().field_1765 instanceof class_3965 blockHitResult && blockHitResult.method_17783() != class_240.field_1333) {
             Pos pos = new Pos(blockHitResult.method_17777());
-            if (((Set)this.data.getValue()).contains(pos)) {
-               ((Set)this.data.getValue()).remove(pos);
+            if (this.data.getValue().contains(pos)) {
+               this.data.getValue().remove(pos);
                this.nextMineAttempt.remove(pos);
                RSA.chat(class_124.field_1061 + "Removed " + pos.toChatString());
             } else {
-               ((Set)this.data.getValue()).add(pos);
+               this.data.getValue().add(pos);
                RSA.chat(class_124.field_1060 + "Added " + pos.toChatString());
             }
 

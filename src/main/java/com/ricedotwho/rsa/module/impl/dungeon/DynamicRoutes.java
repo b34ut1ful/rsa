@@ -41,6 +41,7 @@ public class DynamicRoutes extends Module {
    private final UniqueRoom EMPTY_UNIQUE;
    private final List<Node> nodes = new ArrayList<>();
    private static final BooleanSetting centerOnly = new BooleanSetting("Center Only", false);
+   private static final NumberSetting etherwarpTickDelay = new NumberSetting("Etherwarp Tick Delay", 0.0, 10.0, 0.0, 1.0);
    private final BooleanSetting oneUse = new BooleanSetting("Delete After Use", true);
    private final BooleanSetting editMode = new BooleanSetting("Edit Mode", false);
    private final DefaultGroupSetting render = new DefaultGroupSetting("Render", this);
@@ -63,7 +64,7 @@ public class DynamicRoutes extends Module {
    private byte awaitState = 0;
 
    public DynamicRoutes() {
-      this.registerProperty(new Setting[]{this.editMode, centerOnly, this.oneUse, this.render, this.pathfinder, this.instaclear});
+      this.registerProperty(new Setting[]{this.editMode, centerOnly, etherwarpTickDelay, this.oneUse, this.render, this.pathfinder, this.instaclear});
       this.pathQueue = new ArrayList<>();
       this.render.add(new Setting[]{nodeDepth, nodeColor});
       this.pathfinder.add(new Setting[]{this.threadCount, this.heuristicThreshold, this.nodeCost, this.yawStep, this.pitchStep});
@@ -107,7 +108,7 @@ public class DynamicRoutes extends Module {
       if (this.awaitState == 0) {
          this.isRouting = false;
          if (!(Boolean)this.editMode.getValue() && class_310.method_1551().field_1724 != null && !this.nodes.isEmpty()) {
-            Pos playerPos = new Pos(class_310.method_1551().field_1724.method_73189());
+            Pos playerPos = this.getPlayerPos(class_310.method_1551().field_1724);
             this.nodes.forEach(n -> n.updateNodeState(playerPos, this.tickTime));
 
             while (this.handleQueue(playerPos, this.nodes)) {
@@ -120,8 +121,15 @@ public class DynamicRoutes extends Module {
    public void onPollInputs(InputPollEvent event) {
       if (this.isRouting()) {
          class_10185 oldInputs = event.getClientInput();
+         boolean routeMapOpen = class_310.method_1551().field_1755 instanceof com.ricedotwho.rsa.screen.DungeonRouteMapScreen;
          class_10185 newInputs = new class_10185(
-            oldInputs.comp_3159(), oldInputs.comp_3160(), oldInputs.comp_3161(), oldInputs.comp_3162(), oldInputs.comp_3163(), true, oldInputs.comp_3165()
+            routeMapOpen ? false : oldInputs.comp_3159(),
+            routeMapOpen ? false : oldInputs.comp_3160(),
+            routeMapOpen ? false : oldInputs.comp_3161(),
+            routeMapOpen ? false : oldInputs.comp_3162(),
+            routeMapOpen ? false : oldInputs.comp_3163(),
+            true,
+            routeMapOpen ? false : oldInputs.comp_3165()
          );
          event.getInput().apply(newInputs);
       }
@@ -260,6 +268,10 @@ public class DynamicRoutes extends Module {
          return false;
       } else {
          Node node = nodes.get(bestIndex);
+         if (!node.isReadyToRun(this.tickTime)) {
+            return false;
+         }
+
          node.preTrigger(this.tickTime);
          boolean bl = node.run(playerPos);
          if (bl) {
@@ -281,8 +293,20 @@ public class DynamicRoutes extends Module {
       return this.nodes;
    }
 
+   private Pos getPlayerPos(class_746 player) {
+      return new Pos(player.method_23317(), player.method_23318(), player.method_23321());
+   }
+
    public static ColourSetting getNodeColor() {
       return nodeColor;
+   }
+
+   public static boolean shouldCenterOnly() {
+      return (Boolean)centerOnly.getValue();
+   }
+
+   public static int getEtherwarpTickDelay() {
+      return ((BigDecimal)etherwarpTickDelay.getValue()).intValue();
    }
 
    public boolean isRouting() {
