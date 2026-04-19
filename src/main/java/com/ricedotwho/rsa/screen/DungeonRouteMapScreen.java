@@ -366,12 +366,7 @@ public class DungeonRouteMapScreen extends class_437 implements Accessor {
       if (click.method_74245() == 0) {
          Room hoveredRoom = this.findHoveredRoom(click.comp_4798(), click.comp_4799());
          if (hoveredRoom != null && hoveredRoom.getUniqueRoom() != null) {
-            boolean routed = this.autoRoutes.routeToRoomStart(hoveredRoom.getUniqueRoom());
-            if (routed) {
-               this.method_25419();
-            }
-
-            return routed;
+            return this.autoRoutes.routeToRoomStart(hoveredRoom.getUniqueRoom());
          }
       }
 

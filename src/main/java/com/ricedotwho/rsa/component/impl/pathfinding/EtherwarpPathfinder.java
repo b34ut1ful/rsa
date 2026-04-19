@@ -14,7 +14,9 @@ public class EtherwarpPathfinder {
    public static final double MIN_IMPROVEMENT = 1.0;
    private final Goal goal;
    private final PathfindingCalculationContext context;
-   private boolean solved = false;
+   private boolean finished = false;
+   private boolean foundPath = false;
+   private boolean cancelled = false;
    private Path path;
    private PathNode bestNode;
    private CachedPath bestCachedPath;
@@ -31,7 +33,7 @@ public class EtherwarpPathfinder {
    }
 
    public Path calculate() {
-      if (this.solved) {
+      if (this.finished) {
          return this.path;
       } else if (!this.goal.isPossible()) {
          RSA.chat("Goal is impossible!");
@@ -50,32 +52,49 @@ public class EtherwarpPathfinder {
          }
 
          this.run();
+         if (this.cancelled || !this.foundPath) {
+            return null;
+         }
+
          RSA.chat("Found path! Took " + (System.currentTimeMillis() - time) + "ms!");
          this.path = new Path(this.context.startBlock(), startNode, this.bestNode, this.goal);
-         this.solved = true;
+         this.finished = true;
          return this.path;
       }
    }
 
    private void run() {
-      while (!this.isComplete()) {
-         this.checkNode(this.getLowest());
+      while (!this.isFinished()) {
+         PathNode lowest = this.getLowest();
+         if (lowest == null) {
+            if (this.finishIfExhausted()) {
+               return;
+            }
+         } else {
+            this.checkNode(lowest);
+         }
       }
    }
 
    private void checkNode(PathNode checkNode) {
       if (checkNode != null) {
+         if (this.isFinished() && !this.hasSolvedPath()) {
+            this.finishNode(checkNode);
+            return;
+         }
+
          double moveCost = checkNode.getMoveCost(this.context.newNodeCost());
          if (this.goal.test(checkNode.getPos())) {
             RSA.chat("Found valid route length " + checkNode.getIndex());
-            if (!this.isComplete() || moveCost < this.getBestNodeMoveCost()) {
+            if (!this.hasSolvedPath() || moveCost < this.getBestNodeMoveCost()) {
                this.setBestNode(checkNode);
             }
          }
 
-         if (this.isComplete() && moveCost >= this.getBestNodeMoveCost()) {
+         if (this.hasSolvedPath() && moveCost >= this.getBestNodeMoveCost()) {
             this.finishNode(checkNode);
-         } else if (this.isComplete() && checkNode.getHeuristicCost() >= this.getBestHeuristicByIndex(checkNode.getIndex()) * this.context.heuristicThreshold()
+         } else if (this.hasSolvedPath()
+            && checkNode.getHeuristicCost() >= this.getBestHeuristicByIndex(checkNode.getIndex()) * this.context.heuristicThreshold()
             )
           {
             this.finishNode(checkNode);
@@ -84,17 +103,17 @@ public class EtherwarpPathfinder {
             this.consumeRaycastBlocks(
                checkNode,
                (neighborNode, yaw, pitch) -> {
-                  if (!neighborNode.hasBeenScanned() || neighborNode.getMoveCost(this.context.newNodeCost()) - newCost > 1.0) {
-                     neighborNode.updateParent(checkNode);
-                     neighborNode.setYaw(yaw);
-                     neighborNode.setPitch(pitch);
-                     if (neighborNode.isOpen()) {
+                     if (!neighborNode.hasBeenScanned() || neighborNode.getMoveCost(this.context.newNodeCost()) - newCost > 1.0) {
+                        neighborNode.updateParent(checkNode);
+                        neighborNode.setYaw(yaw);
+                        neighborNode.setPitch(pitch);
+                        if (neighborNode.isOpen()) {
                         this.updateNodes(neighborNode);
                      } else {
-                        this.insertNodes(neighborNode);
-                     }
+                           this.insertNodes(neighborNode);
+                        }
 
-                     if (!this.isComplete()
+                     if (!this.hasSolvedPath()
                         && this.getBestNodeHeuristic() - neighborNode.getHeuristicCost() > 1.0
                         && neighborNode.getMoveCost(this.context.newNodeCost()) < this.getBestNodeMoveCost()) {
                         this.setBestNode(neighborNode);
@@ -108,7 +127,8 @@ public class EtherwarpPathfinder {
    }
 
    public void cancel() {
-      this.solved = true;
+      this.cancelled = true;
+      this.finished = true;
    }
 
    private synchronized void updateNodes(PathNode node) {
@@ -144,8 +164,12 @@ public class EtherwarpPathfinder {
       }
    }
 
-   private synchronized boolean isComplete() {
-      return this.solved;
+   private synchronized boolean isFinished() {
+      return this.finished;
+   }
+
+   private synchronized boolean hasSolvedPath() {
+      return this.foundPath;
    }
 
    private synchronized double getBestNodeMoveCost() {
@@ -157,7 +181,7 @@ public class EtherwarpPathfinder {
    }
 
    private synchronized void setBestNode(PathNode node) {
-      if (this.solved) {
+      if (this.foundPath) {
          if (node.getMoveCost(this.context.newNodeCost()) < this.bestNode.getMoveCost(this.context.newNodeCost())) {
             this.bestNode = node;
             this.bestCachedPath = new CachedPath(node);
@@ -165,10 +189,22 @@ public class EtherwarpPathfinder {
       } else if (this.goal.test(node.getPos())) {
          this.bestNode = node;
          this.bestCachedPath = new CachedPath(node);
-         this.solved = true;
+         this.foundPath = true;
+         this.finished = true;
       } else if (this.bestNode.getHeuristicCost() - node.getHeuristicCost() > 1.0
          && this.bestNode.getMoveCost(this.context.newNodeCost()) < this.getBestNodeMoveCost()) {
          this.bestNode = node;
+      }
+   }
+
+   private synchronized boolean finishIfExhausted() {
+      if (this.finished) {
+         return true;
+      } else if (this.nodes.isEmpty() && this.processing.isEmpty()) {
+         this.finished = true;
+         return true;
+      } else {
+         return false;
       }
    }
 

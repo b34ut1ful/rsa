@@ -48,6 +48,7 @@ public class DynamicRoutes extends Module {
    private static final BooleanSetting nodeDepth = new BooleanSetting("Node Depth", true);
    private static final ColourSetting nodeColor = new ColourSetting("Color", Colour.ORANGE);
    private final DefaultGroupSetting pathfinder = new DefaultGroupSetting("Pathfinding", this);
+   private final NumberSetting generationTimeoutMs = new NumberSetting("Generation Timeout", 500.0, 7000.0, 3000.0, 100.0, "ms");
    private final NumberSetting heuristicThreshold = new NumberSetting("Heuristic Threshold", 0.1, 5.0, 0.5, 0.1);
    private final NumberSetting threadCount = new NumberSetting("Thead Count", 1.0, 64.0, 8.0, 1.0);
    private final NumberSetting nodeCost = new NumberSetting("Node Cost", 1.0, 10000.0, 500.0, 1.0);
@@ -62,12 +63,14 @@ public class DynamicRoutes extends Module {
    private int tickTime = 0;
    private boolean isRouting = false;
    private byte awaitState = 0;
+   private int activePathfinderGeneration = 0;
+   private long pathfinderStartTimeMs = 0L;
 
    public DynamicRoutes() {
       this.registerProperty(new Setting[]{this.editMode, centerOnly, etherwarpTickDelay, this.oneUse, this.render, this.pathfinder, this.instaclear});
       this.pathQueue = new ArrayList<>();
       this.render.add(new Setting[]{nodeDepth, nodeColor});
-      this.pathfinder.add(new Setting[]{this.threadCount, this.heuristicThreshold, this.nodeCost, this.yawStep, this.pitchStep});
+      this.pathfinder.add(new Setting[]{this.generationTimeoutMs, this.threadCount, this.heuristicThreshold, this.nodeCost, this.yawStep, this.pitchStep});
       this.instaclear.add(new Setting[]{this.tickOffset});
       this.EMPTY_UNIQUE = UniqueRoom.emptyUnique();
    }
@@ -105,6 +108,7 @@ public class DynamicRoutes extends Module {
    @SubscribeEvent
    public void onClientTickStart(Start event) {
       this.tickTime++;
+      this.failTimedOutGeneration();
       if (this.awaitState == 0) {
          this.isRouting = false;
          if (!(Boolean)this.editMode.getValue() && class_310.method_1551().field_1724 != null && !this.nodes.isEmpty()) {
@@ -174,14 +178,21 @@ public class DynamicRoutes extends Module {
          RSA.chat("Pathfinder already active!");
       } else {
          this.queueSequence = 0;
+         int generation = ++this.activePathfinderGeneration;
          this.currentPathfinder = pathfinder;
+         this.pathfinderStartTimeMs = System.currentTimeMillis();
          this.pathfinderThread = new Thread(() -> {
             Path path = pathfinder.calculate();
+            if (generation != this.activePathfinderGeneration) {
+               return;
+            }
+
+            this.clearPathfinderState();
             if (path == null) {
-               this.cancelPathing();
+               this.pathQueue.clear();
+               RSA.chat("Uh.. whoops... [Route Generation Failed]");
             } else {
                this.queueSequence = path.consumeNodes(this::addNode, DynamicEtherwarpNode::fromBlockPos, this.queueSequence);
-               this.currentPathfinder = null;
                if (callback != null) {
                   callback.accept(path);
                }
@@ -196,14 +207,7 @@ public class DynamicRoutes extends Module {
    }
 
    public boolean cancelPathing() {
-      this.pathQueue.clear();
-      if (this.currentPathfinder == null) {
-         return false;
-      } else {
-         this.currentPathfinder.cancel();
-         this.currentPathfinder = null;
-         return true;
-      }
+      return this.stopActivePathfinder(false);
    }
 
    public boolean clearNodes() {
@@ -297,6 +301,34 @@ public class DynamicRoutes extends Module {
       return new Pos(player.method_23317(), player.method_23318(), player.method_23321());
    }
 
+   private void failTimedOutGeneration() {
+      if (this.currentPathfinder != null && System.currentTimeMillis() - this.pathfinderStartTimeMs >= this.getGenerationTimeoutMs()) {
+         this.stopActivePathfinder(true);
+      }
+   }
+
+   private boolean stopActivePathfinder(boolean failed) {
+      this.pathQueue.clear();
+      if (this.currentPathfinder == null) {
+         return false;
+      } else {
+         this.activePathfinderGeneration++;
+         this.currentPathfinder.cancel();
+         this.clearPathfinderState();
+         if (failed) {
+            RSA.chat("Uh.. whoops... [Route Generation Failed]");
+         }
+
+         return true;
+      }
+   }
+
+   private void clearPathfinderState() {
+      this.currentPathfinder = null;
+      this.pathfinderThread = null;
+      this.pathfinderStartTimeMs = 0L;
+   }
+
    public static ColourSetting getNodeColor() {
       return nodeColor;
    }
@@ -307,6 +339,10 @@ public class DynamicRoutes extends Module {
 
    public static int getEtherwarpTickDelay() {
       return ((BigDecimal)etherwarpTickDelay.getValue()).intValue();
+   }
+
+   public long getGenerationTimeoutMs() {
+      return ((BigDecimal)this.generationTimeoutMs.getValue()).longValue();
    }
 
    public boolean isRouting() {
